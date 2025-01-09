@@ -88,7 +88,7 @@ if (!(Test-Path $sourceDir)) {
 }
 Copy-Item -Path "$sourceDir\*" -Destination $appDir -Recurse -Force
 
-# Step 7: Navigate to Application Directory and Start Docker Compose
+# Navigate to Application Directory and Start Docker Compose
 Set-Location -Path $appDir
 Write-Host "Starting application with Docker Compose..."
 try {
@@ -100,7 +100,7 @@ try {
     exit
 }
 
-# Step 8: Verify Services
+# Verify Services
 Write-Host "Verifying running containers..."
 docker ps
 
