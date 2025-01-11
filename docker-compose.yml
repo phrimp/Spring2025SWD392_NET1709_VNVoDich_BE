@@ -42,6 +42,21 @@ services:
       - app-network
     restart: unless-stopped
 
+  payment-service:
+    build:
+      context: ./paymentservice
+      dockerfile: Dockerfile
+    ports:
+      - "${PAYMENT_SERVICE_PORT}:${PAYMENT_SERVICE_PORT}"
+    depends_on:
+      mysql: 
+        condition: service_healthy
+    networks:
+        - app-network
+    volumes:
+      - ./paymentservice/src/main/resources/application.properties:/app/application.properties  # Mounts properties file.
+    restart: unless-stopped
+
   mysql:
     image: mysql:8.0
     ports:
