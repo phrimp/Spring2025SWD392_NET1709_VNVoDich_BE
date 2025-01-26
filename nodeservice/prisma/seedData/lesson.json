@@ -1,0 +1,402 @@
+[
+  {
+    "id": 1,
+    "title": "Addition and Subtraction",
+    "description": "Learn basic addition and subtraction techniques.",
+    "learning_objectives": "Master basic arithmetic operations.",
+    "materials_needed": "Notebook, pencil, and calculator.",
+    "course_id": 1
+  },
+  {
+    "id": 2,
+    "title": "Multiplication and Division",
+    "description": "Understand multiplication and division fundamentals.",
+    "learning_objectives": "Develop skills to solve multiplication and division problems.",
+    "materials_needed": "Notebook and times table chart.",
+    "course_id": 1
+  },
+  {
+    "id": 3,
+    "title": "Understanding Nouns",
+    "description": "Learn about nouns and their types.",
+    "learning_objectives": "Identify and use nouns correctly in sentences.",
+    "materials_needed": "Grammar workbook.",
+    "course_id": 2
+  },
+  {
+    "id": 4,
+    "title": "Advanced Sentence Structures",
+    "description": "Explore complex sentence structures.",
+    "learning_objectives": "Construct and analyze complex sentences.",
+    "materials_needed": "English textbook and examples.",
+    "course_id": 2
+  },
+  {
+    "id": 5,
+    "title": "What is Science?",
+    "description": "Introduction to the scientific method and basic concepts.",
+    "learning_objectives": "Understand what science is and its applications.",
+    "materials_needed": "Notebook and examples of experiments.",
+    "course_id": 3
+  },
+  {
+    "id": 6,
+    "title": "The Solar System",
+    "description": "Explore planets and celestial bodies.",
+    "learning_objectives": "Learn about planets, stars, and other celestial objects.",
+    "materials_needed": "Model of the solar system and pictures.",
+    "course_id": 3
+  },
+  {
+    "id": 7,
+    "title": "Ancient Civilizations",
+    "description": "Study the history of early human societies.",
+    "learning_objectives": "Understand the contributions of ancient civilizations.",
+    "materials_needed": "History book and timelines.",
+    "course_id": 4
+  },
+  {
+    "id": 8,
+    "title": "World Wars",
+    "description": "Learn about major world wars and their impact.",
+    "learning_objectives": "Analyze the causes and effects of world wars.",
+    "materials_needed": "Historical documents and videos.",
+    "course_id": 4
+  },
+  {
+    "id": 9,
+    "title": "Creative Writing Techniques",
+    "description": "Learn various creative writing strategies.",
+    "learning_objectives": "Improve storytelling and narrative skills.",
+    "materials_needed": "Writing journal and prompts.",
+    "course_id": 5
+  },
+  {
+    "id": 10,
+    "title": "Editing and Revising",
+    "description": "Master the art of editing and revising writing pieces.",
+    "learning_objectives": "Learn how to polish and refine written content.",
+    "materials_needed": "Drafts and red pens.",
+    "course_id": 5
+  },
+  {
+    "id": 11,
+    "title": "Introduction to Motion",
+    "description": "Understand basic motion concepts in physics.",
+    "learning_objectives": "Learn about speed, velocity, and acceleration.",
+    "materials_needed": "Physics textbook and stopwatch.",
+    "course_id": 6
+  },
+  {
+    "id": 12,
+    "title": "Newton's Laws of Motion",
+    "description": "Explore the three laws of motion.",
+    "learning_objectives": "Understand and apply Newton's laws to real-life scenarios.",
+    "materials_needed": "Examples and experiment kit.",
+    "course_id": 6
+  },
+  {
+    "id": 13,
+    "title": "Introduction to Chemistry",
+    "description": "Learn basic chemistry concepts.",
+    "learning_objectives": "Understand atoms, elements, and compounds.",
+    "materials_needed": "Periodic table and chemistry set.",
+    "course_id": 7
+  },
+  {
+    "id": 14,
+    "title": "Chemical Reactions",
+    "description": "Study the types and effects of chemical reactions.",
+    "learning_objectives": "Identify and balance chemical equations.",
+    "materials_needed": "Examples of chemical reactions and safety gear.",
+    "course_id": 7
+  },
+  {
+    "id": 15,
+    "title": "Introduction to Drawing",
+    "description": "Learn basic drawing techniques.",
+    "learning_objectives": "Develop skills to draw shapes and objects.",
+    "materials_needed": "Sketchbook and pencils.",
+    "course_id": 8
+  },
+  {
+    "id": 16,
+    "title": "Color Theory",
+    "description": "Understand the principles of color theory.",
+    "learning_objectives": "Learn how colors interact and complement each other.",
+    "materials_needed": "Color wheel and paint.",
+    "course_id": 8
+  },
+  {
+    "id": 17,
+    "title": "Introduction to Python",
+    "description": "Learn the basics of Python programming.",
+    "learning_objectives": "Write simple Python programs.",
+    "materials_needed": "Computer and Python IDE.",
+    "course_id": 9
+  },
+  {
+    "id": 18,
+    "title": "Control Structures",
+    "description": "Learn about loops and conditional statements in Python.",
+    "learning_objectives": "Implement control structures in Python programs.",
+    "materials_needed": "Examples and practice problems.",
+    "course_id": 9
+  },
+  {
+    "id": 19,
+    "title": "Basic Music Notes",
+    "description": "Learn about musical notes and their values.",
+    "learning_objectives": "Identify and play basic musical notes.",
+    "materials_needed": "Music sheet and instrument.",
+    "course_id": 10
+  },
+  {
+    "id": 20,
+    "title": "Scales and Chords",
+    "description": "Understand musical scales and chords.",
+    "learning_objectives": "Play scales and simple chords.",
+    "materials_needed": "Keyboard and practice sheet.",
+    "course_id": 10
+  },
+  {
+    "id": 21,
+    "title": "Introduction to Fractions",
+    "description": "Learn the basics of fractions and their uses.",
+    "learning_objectives": "Understand and work with simple fractions.",
+    "materials_needed": "Fraction circles and practice sheet.",
+    "course_id": 1
+  },
+  {
+    "id": 22,
+    "title": "Decimals and Percentages",
+    "description": "Explore the relationship between decimals and percentages.",
+    "learning_objectives": "Convert and compare decimals and percentages.",
+    "materials_needed": "Calculator and examples.",
+    "course_id": 1
+  },
+  {
+    "id": 23,
+    "title": "Adjectives and Adverbs",
+    "description": "Learn about adjectives and adverbs and how to use them.",
+    "learning_objectives": "Enhance sentences using adjectives and adverbs.",
+    "materials_needed": "Grammar workbook.",
+    "course_id": 2
+  },
+  {
+    "id": 24,
+    "title": "Writing Paragraphs",
+    "description": "Master the art of constructing effective paragraphs.",
+    "learning_objectives": "Write coherent and concise paragraphs.",
+    "materials_needed": "Notebook and writing prompts.",
+    "course_id": 2
+  },
+  {
+    "id": 25,
+    "title": "Plant Biology Basics",
+    "description": "Understand the structure and function of plants.",
+    "learning_objectives": "Identify plant parts and their roles.",
+    "materials_needed": "Plant samples and microscope.",
+    "course_id": 3
+  },
+  {
+    "id": 26,
+    "title": "Ecosystems and Food Chains",
+    "description": "Learn about ecosystems and how organisms interact.",
+    "learning_objectives": "Understand the flow of energy in ecosystems.",
+    "materials_needed": "Diagrams and examples.",
+    "course_id": 3
+  },
+  {
+    "id": 27,
+    "title": "Medieval History",
+    "description": "Study key events and figures of the medieval period.",
+    "learning_objectives": "Analyze medieval society and its influence.",
+    "materials_needed": "History book and timelines.",
+    "course_id": 4
+  },
+  {
+    "id": 28,
+    "title": "Modern History Overview",
+    "description": "Understand major developments of modern history.",
+    "learning_objectives": "Analyze the impact of historical events on today’s world.",
+    "materials_needed": "Documentaries and books.",
+    "course_id": 4
+  },
+  {
+    "id": 29,
+    "title": "Poetry Writing",
+    "description": "Explore the art of writing poetry.",
+    "learning_objectives": "Create and analyze poetic works.",
+    "materials_needed": "Notebook and poetry examples.",
+    "course_id": 5
+  },
+  {
+    "id": 30,
+    "title": "Descriptive Writing",
+    "description": "Master techniques for vivid and detailed descriptions.",
+    "learning_objectives": "Improve narrative with sensory details.",
+    "materials_needed": "Writing prompts and examples.",
+    "course_id": 5
+  },
+  {
+    "id": 31,
+    "title": "Forces and Energy",
+    "description": "Explore different types of forces and energy.",
+    "learning_objectives": "Understand how forces and energy interact.",
+    "materials_needed": "Experiment kit and diagrams.",
+    "course_id": 6
+  },
+  {
+    "id": 32,
+    "title": "Electricity Basics",
+    "description": "Learn about circuits and electrical components.",
+    "learning_objectives": "Build simple circuits and understand electricity flow.",
+    "materials_needed": "Battery, wires, and bulbs.",
+    "course_id": 6
+  },
+  {
+    "id": 33,
+    "title": "States of Matter",
+    "description": "Understand solids, liquids, and gases.",
+    "learning_objectives": "Explain the behavior of matter in different states.",
+    "materials_needed": "Examples of matter and experiments.",
+    "course_id": 7
+  },
+  {
+    "id": 34,
+    "title": "Periodic Table Basics",
+    "description": "Learn how to use the periodic table.",
+    "learning_objectives": "Identify elements and their properties.",
+    "materials_needed": "Periodic table and element samples.",
+    "course_id": 7
+  },
+  {
+    "id": 35,
+    "title": "Perspective Drawing",
+    "description": "Understand the basics of perspective in art.",
+    "learning_objectives": "Create drawings with depth and dimension.",
+    "materials_needed": "Paper, pencils, and ruler.",
+    "course_id": 8
+  },
+  {
+    "id": 36,
+    "title": "Digital Art Basics",
+    "description": "Learn how to create digital artworks.",
+    "learning_objectives": "Use digital tools for artistic expression.",
+    "materials_needed": "Tablet and stylus.",
+    "course_id": 8
+  },
+  {
+    "id": 37,
+    "title": "Functions in Python",
+    "description": "Understand and use functions in Python.",
+    "learning_objectives": "Write reusable and efficient code with functions.",
+    "materials_needed": "Python IDE and examples.",
+    "course_id": 9
+  },
+  {
+    "id": 38,
+    "title": "Introduction to Data Structures",
+    "description": "Learn about basic data structures in programming.",
+    "learning_objectives": "Understand lists, dictionaries, and sets.",
+    "materials_needed": "Examples and exercises.",
+    "course_id": 9
+  },
+  {
+    "id": 39,
+    "title": "Rhythm and Tempo",
+    "description": "Explore the concepts of rhythm and tempo in music.",
+    "learning_objectives": "Play rhythms with correct tempo.",
+    "materials_needed": "Metronome and music sheet.",
+    "course_id": 10
+  },
+  {
+    "id": 40,
+    "title": "Music Dynamics",
+    "description": "Learn about dynamics and expressions in music.",
+    "learning_objectives": "Play music with varying dynamics.",
+    "materials_needed": "Instrument and dynamic markers.",
+    "course_id": 10
+  },
+  {
+    "id": 41,
+    "title": "Geometry Basics",
+    "description": "Learn about shapes, angles, and lines.",
+    "learning_objectives": "Identify and measure geometric figures.",
+    "materials_needed": "Protractor and ruler.",
+    "course_id": 1
+  },
+  {
+    "id": 42,
+    "title": "Advanced Algebra",
+    "description": "Solve complex algebraic equations.",
+    "learning_objectives": "Understand and apply algebra in real-world problems.",
+    "materials_needed": "Graphing calculator.",
+    "course_id": 1
+  },
+  {
+    "id": 43,
+    "title": "Speech and Debate",
+    "description": "Develop public speaking and debate skills.",
+    "learning_objectives": "Present arguments clearly and effectively.",
+    "materials_needed": "Speech topics and notecards.",
+    "course_id": 2
+  },
+  {
+    "id": 44,
+    "title": "Creative Essay Writing",
+    "description": "Write engaging and creative essays.",
+    "learning_objectives": "Develop unique ideas and articulate them effectively.",
+    "materials_needed": "Writing prompts.",
+    "course_id": 2
+  },
+  {
+    "id": 45,
+    "title": "Environmental Science",
+    "description": "Learn about the environment and sustainable practices.",
+    "learning_objectives": "Understand ecosystems and human impact.",
+    "materials_needed": "Field guide and examples.",
+    "course_id": 3
+  },
+  {
+    "id": 46,
+    "title": "Space Exploration",
+    "description": "Explore the history and future of space exploration.",
+    "learning_objectives": "Analyze the impact of space research.",
+    "materials_needed": "NASA resources and videos.",
+    "course_id": 3
+  },
+  {
+    "id": 47,
+    "title": "Renaissance Art",
+    "description": "Study key artworks and artists of the Renaissance.",
+    "learning_objectives": "Analyze artistic techniques and their influence.",
+    "materials_needed": "Art books and images.",
+    "course_id": 4
+  },
+  {
+    "id": 48,
+    "title": "Modern Art Movements",
+    "description": "Learn about major modern art movements.",
+    "learning_objectives": "Understand the evolution of modern art.",
+    "materials_needed": "Gallery visits or virtual tours.",
+    "course_id": 4
+  },
+  {
+    "id": 49,
+    "title": "Advanced Coding Challenges",
+    "description": "Solve complex coding problems.",
+    "learning_objectives": "Apply advanced algorithms and data structures.",
+    "materials_needed": "Online coding platforms.",
+    "course_id": 9
+  },
+  {
+    "id": 50,
+    "title": "Improvisation in Music",
+    "description": "Learn how to improvise in music.",
+    "learning_objectives": "Develop creative musical ideas spontaneously.",
+    "materials_needed": "Instrument and practice tracks.",
+    "course_id": 10
+  }
+]

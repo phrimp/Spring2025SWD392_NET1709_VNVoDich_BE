@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "email": "user1@example.com",
+    "password_hash": "hash1",
+    "full_name": "Alice Johnson",
+    "phone": "1234567890",
+    "role": "Tutor",
+    "google_id": "google1",
+    "timezone": "UTC+7",
+    "is_verified": true
+  },
+  {
+    "id": 2,
+    "email": "user2@example.com",
+    "password_hash": "hash2",
+    "full_name": "Bob Smith",
+    "phone": "0987654321",
+    "role": "Parent",
+    "google_id": null,
+    "timezone": "UTC+5",
+    "is_verified": false
+  },
+  {
+    "id": 3,
+    "email": "user3@example.com",
+    "password_hash": "hash3",
+    "full_name": "Charlie Brown",
+    "phone": "1122334455",
+    "role": "Tutor",
+    "google_id": null,
+    "timezone": "UTC+8",
+    "is_verified": true
+  },
+  {
+    "id": 4,
+    "email": "user4@example.com",
+    "password_hash": "hash4",
+    "full_name": "Diana Prince",
+    "phone": null,
+    "role": "Parent",
+    "google_id": "google4",
+    "timezone": "UTC-3",
+    "is_verified": true
+  },
+  {
+    "id": 5,
+    "email": "user5@example.com",
+    "password_hash": "hash5",
+    "full_name": "Edward Green",
+    "phone": "6677889900",
+    "role": "Tutor",
+    "google_id": null,
+    "timezone": "UTC+1",
+    "is_verified": false
+  },
+  {
+    "id": 6,
+    "email": "user6@example.com",
+    "password_hash": "hash6",
+    "full_name": "Fiona Blue",
+    "phone": "5566778899",
+    "role": "Parent",
+    "google_id": "google6",
+    "timezone": "UTC+2",
+    "is_verified": false
+  },
+  {
+    "id": 7,
+    "email": "user7@example.com",
+    "password_hash": "hash7",
+    "full_name": "George King",
+    "phone": "2233445566",
+    "role": "Tutor",
+    "google_id": null,
+    "timezone": "UTC-4",
+    "is_verified": true
+  },
+  {
+    "id": 8,
+    "email": "user8@example.com",
+    "password_hash": "hash8",
+    "full_name": "Hannah White",
+    "phone": null,
+    "role": "Parent",
+    "google_id": "google8",
+    "timezone": "UTC+6",
+    "is_verified": true
+  },
+  {
+    "id": 9,
+    "email": "user9@example.com",
+    "password_hash": "hash9",
+    "full_name": "Ian Black",
+    "phone": "4455667788",
+    "role": "Tutor",
+    "google_id": null,
+    "timezone": "UTC+3",
+    "is_verified": false
+  },
+  {
+    "id": 10,
+    "email": "user10@example.com",
+    "password_hash": "hash10",
+    "full_name": "Jenna Gray",
+    "phone": "9988776655",
+    "role": "Parent",
+    "google_id": null,
+    "timezone": "UTC+4",
+    "is_verified": false
+  }
+]

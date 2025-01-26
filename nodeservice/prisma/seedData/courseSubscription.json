@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "status": "Active",
+    "sessions_remaining": 8,
+    "course_id": 1,
+    "children_id": 1
+  },
+  {
+    "id": 2,
+    "status": "Completed",
+    "sessions_remaining": 0,
+    "course_id": 2,
+    "children_id": 2
+  },
+  {
+    "id": 3,
+    "status": "Active",
+    "sessions_remaining": 6,
+    "course_id": 4,
+    "children_id": 3
+  },
+  {
+    "id": 4,
+    "status": "Inactive",
+    "sessions_remaining": 10,
+    "course_id": 5,
+    "children_id": 4
+  },
+  {
+    "id": 5,
+    "status": "Active",
+    "sessions_remaining": 5,
+    "course_id": 7,
+    "children_id": 5
+  },
+  {
+    "id": 6,
+    "status": "Active",
+    "sessions_remaining": 9,
+    "course_id": 8,
+    "children_id": 6
+  },
+  {
+    "id": 7,
+    "status": "Completed",
+    "sessions_remaining": 0,
+    "course_id": 9,
+    "children_id": 7
+  },
+  {
+    "id": 8,
+    "status": "Active",
+    "sessions_remaining": 4,
+    "course_id": 3,
+    "children_id": 8
+  },
+  {
+    "id": 9,
+    "status": "Inactive",
+    "sessions_remaining": 12,
+    "course_id": 6,
+    "children_id": 9
+  },
+  {
+    "id": 10,
+    "status": "Active",
+    "sessions_remaining": 7,
+    "course_id": 10,
+    "children_id": 10
+  }
+]

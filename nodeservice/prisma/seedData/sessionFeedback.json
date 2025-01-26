@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "rating": 5,
+    "comment": "The student was very attentive and engaged throughout the session.",
+    "teaching_quality": "Excellent",
+    "session_id": 1
+  },
+  {
+    "id": 2,
+    "rating": 4,
+    "comment": "The student grasped the concepts well but could use more practice with problem-solving.",
+    "teaching_quality": "Good",
+    "session_id": 2
+  },
+  {
+    "id": 3,
+    "rating": 3,
+    "comment": "The session was a bit challenging for the student, but we made progress.",
+    "teaching_quality": "Average",
+    "session_id": 3
+  },
+  {
+    "id": 4,
+    "rating": 5,
+    "comment": "The student was very focused, and the session was productive.",
+    "teaching_quality": "Excellent",
+    "session_id": 4
+  },
+  {
+    "id": 5,
+    "rating": 2,
+    "comment": "The student struggled with understanding some of the key concepts.",
+    "teaching_quality": "Below Average",
+    "session_id": 5
+  },
+  {
+    "id": 6,
+    "rating": 4,
+    "comment": "Good session, but the student needs more time to fully grasp the material.",
+    "teaching_quality": "Good",
+    "session_id": 6
+  },
+  {
+    "id": 7,
+    "rating": 5,
+    "comment": "Excellent session! The student made significant improvements.",
+    "teaching_quality": "Excellent",
+    "session_id": 7
+  },
+  {
+    "id": 8,
+    "rating": 3,
+    "comment": "The student seemed distracted at times, but overall, the session went well.",
+    "teaching_quality": "Average",
+    "session_id": 8
+  },
+  {
+    "id": 9,
+    "rating": 4,
+    "comment": "The student had a good understanding of the topic, but more review could help.",
+    "teaching_quality": "Good",
+    "session_id": 9
+  },
+  {
+    "id": 10,
+    "rating": 5,
+    "comment": "Great session! The student showed excellent understanding and was eager to learn.",
+    "teaching_quality": "Excellent",
+    "session_id": 10
+  }
+]
