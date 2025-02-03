@@ -10,6 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var API_KEY string
+
 type User struct {
 	gorm.Model
 	Username string `json:"username"`
@@ -30,6 +32,7 @@ type LoginResponse struct {
 
 func init() {
 	godotenv.Load(".env")
+	API_KEY = os.Getenv("API_KEY")
 }
 
 func main() {
@@ -47,15 +50,16 @@ func main() {
 
 	// Database connection
 	db := initDB()
+	auth := app.Group("", Middleware(API_KEY))
 
 	// Health check for docker compose
-	app.Get("/health", func(c *fiber.Ctx) error {
+	auth.Get("/health", func(c *fiber.Ctx) error {
 		return c.SendString("OK")
 	})
 
 	// Routes
-	app.Post("/login", handleLogin(db))
-	app.Post("/register", handleRegister(db))
+	auth.Post("/login", handleLogin(db))
+	auth.Post("/register", handleRegister(db))
 
 	port := os.Getenv("AUTH_SERVICE_PORT")
 	if port == "" {

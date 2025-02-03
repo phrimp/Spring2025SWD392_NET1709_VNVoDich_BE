@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gateway/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
@@ -17,9 +18,7 @@ func (g *Gateway) handleLogin() fiber.Handler {
 		defer fasthttp.ReleaseResponse(resp)
 
 		// Copy request body
-		req.SetBody(c.Body())
-		req.Header.SetMethod("POST")
-		req.SetRequestURI(g.config.AuthServiceURL + "/login")
+		utils.BuildRequest(req, "POST", c.Body(), API_KEY, g.config.AuthServiceURL+"/login")
 
 		// Forward request
 		if err := fasthttp.Do(req, resp); err != nil {
@@ -43,10 +42,7 @@ func (g *Gateway) handleRegister() fiber.Handler {
 		defer fasthttp.ReleaseResponse(resp)
 
 		// Copy request body
-		req.SetBody(c.Body())
-		req.Header.SetMethod("POST")
-		req.SetRequestURI(g.config.AuthServiceURL + "/register")
-		fmt.Println(req)
+		utils.BuildRequest(req, "POST", c.Body(), API_KEY, g.config.AuthServiceURL+"/register")
 
 		// Forward request
 		if err := fasthttp.Do(req, resp); err != nil {
@@ -98,7 +94,7 @@ func (g *Gateway) handleGetUsers() fiber.Handler {
 
 		req.Header.SetMethod("GET")
 		req.SetRequestURI(g.config.NodeServiceURL + "/user" + string(c.Request().URI().QueryString()))
-		req.Header.Set("Authorization", c.Get("Authorization"))
+		req.Header.Set("API_KEY", API_KEY)
 
 		if err := fasthttp.Do(req, resp); err != nil {
 			fmt.Printf("Error forwarding request: %v\n", err)

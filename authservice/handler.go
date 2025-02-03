@@ -13,7 +13,6 @@ import (
 
 func handleLogin(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		fmt.Println("DADWAFAWFWAFAWFAWFWA")
 		var req LoginRequest
 		if err := c.BodyParser(&req); err != nil {
 			fmt.Println("Invalid request:", err)
