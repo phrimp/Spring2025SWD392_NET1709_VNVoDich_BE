@@ -7,10 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/joho/godotenv"
 )
-
-var API_KEY string
 
 type Config struct {
 	AuthServiceURL string
@@ -21,13 +18,6 @@ type Config struct {
 type Gateway struct {
 	config Config
 	app    *fiber.App
-}
-
-func init() {
-	if err := godotenv.Load(".env"); err != nil {
-		fmt.Println("Warning: .env file not found, using environment variables")
-	}
-	API_KEY = os.Getenv("API_KEY")
 }
 
 func NewGateway(config Config) *Gateway {
@@ -66,7 +56,6 @@ func main() {
 	api.Use(gateway.jwtMiddleware())
 
 	// Protected routes
-	api.Get("/users", gateway.handleGetUsers())
 
 	port := os.Getenv("GATEWAY_PORT")
 	if port == "" {

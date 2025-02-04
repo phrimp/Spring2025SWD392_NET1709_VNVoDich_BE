@@ -1,6 +1,7 @@
-package main
+package handlers
 
 import (
+	"authservice/internal/repository"
 	"fmt"
 	"os"
 	"time"
@@ -11,9 +12,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func handleLogin(db *gorm.DB) fiber.Handler {
+func HandleLogin(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var req LoginRequest
+		var req repository.LoginRequest
 		if err := c.BodyParser(&req); err != nil {
 			fmt.Println("Invalid request:", err)
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -22,7 +23,7 @@ func handleLogin(db *gorm.DB) fiber.Handler {
 		}
 
 		// Find user
-		var user User
+		var user repository.User
 		if err := db.Where("username = ?", req.Username).First(&user).Error; err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Invalid credentials",
@@ -55,16 +56,16 @@ func handleLogin(db *gorm.DB) fiber.Handler {
 		// Clear password before sending
 		user.Password = ""
 
-		return c.JSON(LoginResponse{
+		return c.JSON(repository.LoginResponse{
 			Token: tokenString,
 			User:  user,
 		})
 	}
 }
 
-func handleRegister(db *gorm.DB) fiber.Handler {
+func HandleRegister(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var user User
+		var user repository.User
 		if err := c.BodyParser(&user); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid request body",
@@ -72,7 +73,7 @@ func handleRegister(db *gorm.DB) fiber.Handler {
 		}
 
 		// Check if username already exists
-		var existingUser User
+		var existingUser repository.User
 		if err := db.Where("username = ?", user.Username).First(&existingUser).Error; err == nil {
 			return c.Status(fiber.StatusConflict).JSON(fiber.Map{
 				"error": "Username already exists",
