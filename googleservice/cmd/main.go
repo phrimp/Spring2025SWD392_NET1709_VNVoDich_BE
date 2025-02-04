@@ -13,18 +13,20 @@ import (
 
 func main() {
 	// Initialize configs
-	// cfg := config.New()
-	googleCfg := config.NewGoogleOAuthConfig()
+	cfg := config.GetConfig()
 
 	// Initialize app
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		ReadTimeout:  cfg.Server.ReadTimeout,
+		WriteTimeout: cfg.Server.WriteTimeout,
+	})
 
 	// Middleware
 	app.Use(cors.New())
 	app.Use(logger.New())
 
 	// Initialize handlers
-	googleHandler := handlers.NewGoogleHandler(googleCfg)
+	googleHandler := handlers.NewGoogleHandler(cfg.GoogleAuth)
 
 	// Routes
 	api := app.Group("/api")
@@ -32,6 +34,7 @@ func main() {
 	// Google OAuth routes
 	auth := api.Group("/auth")
 	auth.Get("/google/login", googleHandler.HandleGoogleLogin)
+	auth.Get("/google/callback", googleHandler.HandleGoogleCallback)
 
 	// Email routes
 	// email := api.Group("/email")

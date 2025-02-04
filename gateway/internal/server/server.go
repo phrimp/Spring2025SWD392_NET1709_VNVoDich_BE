@@ -14,6 +14,7 @@ type Gateway struct {
 	config *config.Config
 	app    *fiber.App
 	auth   *handlers.AuthHandler
+	google *handlers.GoogleHandler
 }
 
 func NewGateway(config *config.Config) *Gateway {
@@ -34,6 +35,7 @@ func NewGateway(config *config.Config) *Gateway {
 		config: config,
 		app:    app,
 		auth:   handlers.NewAuthHandler(config.AuthServiceURL),
+		google: handlers.NewGoogleHandler(config.GoogleServiceURL),
 	}
 
 	gateway.setupRoutes()
@@ -44,6 +46,7 @@ func (g *Gateway) setupRoutes() {
 	// Public routes
 	g.app.Post("/auth/login", g.auth.HandleLogin())
 	g.app.Post("/auth/register", g.auth.HandleRegister())
+	g.app.Post("/google/auth/login", g.google.HandleLogin())
 
 	// Protected routes
 	api := g.app.Group("/api")
