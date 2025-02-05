@@ -64,11 +64,6 @@ func (g *Gateway) setupRoutes() {
 	//admin.Get("/users", g.auth.HandleListUsers())
 	//admin.Delete("/users/:id", g.auth.HandleDeleteUser())
 
-	//// Manager routes
-	//manager := api.Group("/manager")
-	//manager.Use(middleware.RequireRole("admin", "manager"))
-	//manager.Get("/reports", g.auth.HandleReports())
-
 	//// Specific role-based routes
 	//api.Get("/sensitive-data", middleware.RequireRole("admin", "data_analyst"), g.auth.HandleSensitiveData())
 }
