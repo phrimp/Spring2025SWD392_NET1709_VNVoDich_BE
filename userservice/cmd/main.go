@@ -39,6 +39,7 @@ func main() {
 
 	// Routes
 	user.Post("/get", handlers.GetUserWithUsernamePasswordHandler(repository.DB))
+	user.Post("/add", handlers.AddUser(repository.DB))
 
 	port := os.Getenv("PORT")
 	if port == "" {
