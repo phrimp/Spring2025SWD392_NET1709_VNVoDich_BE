@@ -4,6 +4,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -31,6 +33,10 @@ type JWTConfig struct {
 	Secret        string
 	ExpiresIn     time.Duration
 	RefreshSecret string
+}
+
+func init() {
+	godotenv.Load(".env")
 }
 
 // New creates a new Config instance with values from environment variables

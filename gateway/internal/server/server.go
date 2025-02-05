@@ -18,7 +18,10 @@ type Gateway struct {
 }
 
 func NewGateway(config *config.Config) *Gateway {
-	app := fiber.New(fiber.Config{})
+	app := fiber.New(fiber.Config{
+		ReadTimeout:  config.ServerCfg.ReadTimeout,
+		WriteTimeout: config.ServerCfg.WriteTimeout,
+	})
 
 	// Middleware
 	app.Use(cors.New(cors.Config{
