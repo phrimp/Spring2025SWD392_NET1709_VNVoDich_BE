@@ -23,3 +23,11 @@ func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*mode
 	}
 	return &user, nil
 }
+
+func AddUser(username, password, email, role string, db *gorm.DB) error {
+	user := models.User{Username: username, Password: password, Email: email, Role: role}
+	if err := db.Save(user).Error; err != nil {
+		return fmt.Errorf("add user error: %v", err)
+	}
+	return nil
+}
