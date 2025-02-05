@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"gateway/internal/config"
 	"gateway/internal/server"
-	"os"
 )
 
 func main() {
 	cfg := config.New()
 	gateway := server.NewGateway(cfg)
 
-	port := os.Getenv("GATEWAY_PORT")
+	port := cfg.ServerCfg.Port
 	if port == "" {
 		port = "8080"
 	}
