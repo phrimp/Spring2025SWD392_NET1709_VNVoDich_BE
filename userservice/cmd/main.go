@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"user-service/internal/handlers"
+	"user-service/internal/repository"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
@@ -28,16 +30,17 @@ func main() {
 		},
 	})
 
-	auth := app.Group("", Middleware(API_KEY))
-
 	// Health check for docker compose
-	auth.Get("/health", func(c *fiber.Ctx) error {
+	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.SendString("OK")
 	})
 
-	// Routes
+	user := app.Group("/user", Middleware(API_KEY))
 
-	port := os.Getenv("USER_SERVICE_PORT")
+	// Routes
+	user.Post("/get", handlers.GetUserWithUsernamePasswordHandler(repository.DB))
+
+	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8085" // default port
 	}
