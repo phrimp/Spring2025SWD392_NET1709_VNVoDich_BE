@@ -23,6 +23,6 @@ func (h *GoogleHandler) HandleLogin() fiber.Handler {
 		resp := fasthttp.AcquireResponse()
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
-		return routes.GoogleLoginRoute(req, resp, c, h.googleServiceURL+"auth/google/login")
+		return routes.GoogleLoginRoute(req, resp, c, h.googleServiceURL+"/api/auth/google/login")
 	}
 }

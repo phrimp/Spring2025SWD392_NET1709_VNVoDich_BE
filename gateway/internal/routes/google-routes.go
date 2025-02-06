@@ -10,7 +10,7 @@ import (
 
 func GoogleLoginRoute(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
 	// Copy request body
-	utils.BuildRequest(req, "POST", c.Body(), utils.API_KEY, url)
+	utils.BuildRequest(req, "GET", c.Body(), utils.API_KEY, url)
 
 	// Forward request
 	if err := fasthttp.Do(req, resp); err != nil {

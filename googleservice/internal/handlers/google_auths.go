@@ -3,6 +3,7 @@ package handlers
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"google-service/internal/config"
 	"google-service/internal/services"
 	"time"
@@ -56,6 +57,7 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 			"error": "Failed to get user info",
 		})
 	}
+	fmt.Println(userInfo)
 
 	//// Initialize email service with the token
 	//emailService, err := services.NewEmailService(c.Context(), token, h.config)
