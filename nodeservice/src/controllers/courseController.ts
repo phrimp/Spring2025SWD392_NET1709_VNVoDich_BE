@@ -17,8 +17,7 @@ export const getCourses = async (
 
     // Tạo bộ lọc dựa trên query parameters
     const filters: any = {};
-    if (subject)
-      filters.subject = { contains: subject as string, mode: "insensitive" };
+    if (subject) filters.subject = { contains: subject as string };
     if (grade) filters.grade = parseInt(grade as string, 10);
     if (status) filters.status = status as string;
 
@@ -40,6 +39,7 @@ export const getCourses = async (
             },
           },
         },
+        lessons: true,
       },
     });
 
@@ -61,3 +61,96 @@ export const getCourses = async (
     res.status(500).json({ message: "Error retrieving courses", error });
   }
 };
+
+export const getCourse = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+
+  try {
+    const course = await prisma.course.findUnique({
+      where: {
+        id: Number(id),
+      },
+      include: {
+        tutor: {
+          include: {
+            profile: {
+              select: {
+                email: true,
+                full_name: true,
+                phone: true,
+              },
+            },
+          },
+        },
+        lessons: true,
+      },
+    });
+    if (!course) {
+      res.status(404).json({
+        message: "Course not found",
+      });
+      return;
+    }
+    res.json({ message: "Courses retrieved successfully", data: course });
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving courses", error });
+  }
+};
+
+export const createCourse = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { tutor_id } = req.body;
+
+    if (!tutor_id) {
+      res.status(404).json({ message: "Tutor Id is required" });
+      return;
+    }
+
+    const newCourse = await prisma.course.create({
+      data: {
+        tutor_id: Number(tutor_id),
+        title: "Untitled Course",
+        description: "",
+        subject: "Uncategorized",
+        grade: 0,
+        total_lessons: 0,
+        image: "",
+        price: 0,
+        status: "Draft",
+      },
+    });
+
+    res.json({ message: "Course created successfully", data: newCourse });
+  } catch (error) {
+    res.status(500).json({ message: "Error creating course", error });
+  }
+};
+
+// export const deleteCourse = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   const { courseId } = req.params;
+//   const { userId } = getAuth(req);
+
+//   try {
+//     const course = await Course.get(courseId);
+//     if (!course) {
+//       res.status(404).json({ message: "Course not found" });
+//       return;
+//     }
+
+//     if (course.teacherId !== userId) {
+//       res.status(403).json({ message: "Not authorized to delete this course" });
+//     }
+
+//     await Course.delete(courseId);
+
+//     res.json({ message: "Course deleted successfully" });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error deleting course", error });
+//   }
+// };
