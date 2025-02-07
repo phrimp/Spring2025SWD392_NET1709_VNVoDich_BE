@@ -1,6 +1,8 @@
-package main
+package handlers
 
 import (
+	"authservice/internal/repository"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -11,10 +13,16 @@ import (
 	"gorm.io/gorm"
 )
 
-func handleLogin(db *gorm.DB) fiber.Handler {
+type Claims struct {
+	jwt.RegisteredClaims
+	UserID   uint   `json:"userId"`
+	Username string `json:"username"`
+	Role     string `json:"role"`
+}
+
+func HandleLogin(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		fmt.Println("DADWAFAWFWAFAWFAWFWA")
-		var req LoginRequest
+		var req repository.LoginRequest
 		if err := c.BodyParser(&req); err != nil {
 			fmt.Println("Invalid request:", err)
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -23,10 +31,15 @@ func handleLogin(db *gorm.DB) fiber.Handler {
 		}
 
 		// Find user
-		var user User
+		var user repository.User
 		if err := db.Where("username = ?", req.Username).First(&user).Error; err != nil {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Invalid credentials",
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+					"error": "Invalid credentials",
+				})
+			}
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Database error",
 			})
 		}
 
@@ -38,12 +51,19 @@ func handleLogin(db *gorm.DB) fiber.Handler {
 		}
 
 		// Generate JWT
-		token := jwt.New(jwt.SigningMethodHS256)
-		claims := token.Claims.(jwt.MapClaims)
-		claims["userId"] = user.ID
-		claims["username"] = user.Username
-		claims["role"] = user.Role
-		claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+		claims := Claims{
+			RegisteredClaims: jwt.RegisteredClaims{
+				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+				IssuedAt:  jwt.NewNumericDate(time.Now()),
+				Issuer:    "auth-service",
+			},
+			UserID:   user.ID,
+			Username: user.Username,
+			Role:     user.Role,
+		}
+
+		// Create token with claims
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 		// Sign token
 		tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
@@ -56,16 +76,16 @@ func handleLogin(db *gorm.DB) fiber.Handler {
 		// Clear password before sending
 		user.Password = ""
 
-		return c.JSON(LoginResponse{
+		return c.JSON(repository.LoginResponse{
 			Token: tokenString,
 			User:  user,
 		})
 	}
 }
 
-func handleRegister(db *gorm.DB) fiber.Handler {
+func HandleRegister(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var user User
+		var user repository.User
 		if err := c.BodyParser(&user); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid request body",
@@ -73,7 +93,7 @@ func handleRegister(db *gorm.DB) fiber.Handler {
 		}
 
 		// Check if username already exists
-		var existingUser User
+		var existingUser repository.User
 		if err := db.Where("username = ?", user.Username).First(&existingUser).Error; err == nil {
 			return c.Status(fiber.StatusConflict).JSON(fiber.Map{
 				"error": "Username already exists",
