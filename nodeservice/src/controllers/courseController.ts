@@ -27,7 +27,7 @@ export const getCourses = async (
     if (subject && subject !== "all")
       filters.subject = { contains: subject as string };
     if (title) filters.title = { contains: title as string };
-    if (grade) filters.grade = parseInt(grade as string, 10);
+    if (grade && grade !== "all") filters.grade = parseInt(grade as string, 10);
     if (status) filters.status = status as string;
 
     // Tính toán skip và lấy dữ liệu
@@ -169,5 +169,59 @@ export const deleteCourse = async (
     res.json({ message: "Course deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting course", error });
+  }
+};
+
+export const updateCourse = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+  const updateData = { ...req.body };
+  // const { userId } = getAuth(req);
+
+  try {
+    if (updateData.price) {
+      const price = parseInt(updateData.price);
+      if (isNaN(price)) {
+        res.status(400).json({
+          message: "Invaid price format",
+          error: "Price must be a valid number",
+        });
+      }
+      updateData.price = price;
+    }
+
+    if (updateData.grade) {
+      const grade = parseInt(updateData.grade);
+      if (isNaN(grade)) {
+        res.status(400).json({
+          message: "Invaid price format",
+          error: "Grade must be a valid number",
+        });
+      }
+      updateData.grade = grade;
+    }
+
+    const course = await prisma.course.update({
+      where: {
+        id: Number(id),
+        // AND: {
+        //   tutor_id: {
+        //     equals: tutorId
+        //   }
+        // }
+      },
+      data: updateData,
+    });
+
+    if (!course) {
+      res.status(404).json({ message: "Course not found" });
+      return;
+    }
+
+    res.json({ message: "Course updated successfully", data: course });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating course", error });
   }
 };
