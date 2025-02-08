@@ -6,4 +6,5 @@ const router = (0, express_1.Router)();
 router.get("/", courseController_1.getCourses);
 router.get("/:id", courseController_1.getCourse);
 router.post("/", courseController_1.createCourse);
+router.delete("/:id", courseController_1.deleteCourse);
 exports.default = router;

@@ -9,7 +9,14 @@ export const getCourses = async (
 ): Promise<void> => {
   try {
     // Lấy query từ request
-    const { page = 1, pageSize = 10, subject, grade, status } = req.query;
+    const {
+      page = 1,
+      pageSize = 10,
+      subject,
+      grade,
+      title,
+      status,
+    } = req.query;
 
     // Chuyển đổi page và pageSize sang số nguyên
     const pageNum = parseInt(page as string, 10);
@@ -17,7 +24,9 @@ export const getCourses = async (
 
     // Tạo bộ lọc dựa trên query parameters
     const filters: any = {};
-    if (subject) filters.subject = { contains: subject as string };
+    if (subject && subject !== "all")
+      filters.subject = { contains: subject as string };
+    if (title) filters.title = { contains: title as string };
     if (grade) filters.grade = parseInt(grade as string, 10);
     if (status) filters.status = status as string;
 
@@ -129,28 +138,36 @@ export const createCourse = async (
   }
 };
 
-// export const deleteCourse = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   const { courseId } = req.params;
-//   const { userId } = getAuth(req);
+export const deleteCourse = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+  // const { userId } = getAuth(req);
 
-//   try {
-//     const course = await Course.get(courseId);
-//     if (!course) {
-//       res.status(404).json({ message: "Course not found" });
-//       return;
-//     }
+  try {
+    const course = await prisma.course.delete({
+      where: {
+        id: Number(id),
+        // AND: {
+        //   tutor_id: {
+        //     equals: tutorId
+        //   }
+        // }
+      },
+    });
 
-//     if (course.teacherId !== userId) {
-//       res.status(403).json({ message: "Not authorized to delete this course" });
-//     }
+    if (!course) {
+      res.status(404).json({ message: "Course not found" });
+      return;
+    }
 
-//     await Course.delete(courseId);
+    // if (course.teacherId !== userId) {
+    //   res.status(403).json({ message: "Not authorized to delete this course" });
+    // }
 
-//     res.json({ message: "Course deleted successfully" });
-//   } catch (error) {
-//     res.status(500).json({ message: "Error deleting course", error });
-//   }
-// };
+    res.json({ message: "Course deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting course", error });
+  }
+};

@@ -9,20 +9,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createCourse = exports.getCourse = exports.getCourses = void 0;
+exports.deleteCourse = exports.createCourse = exports.getCourse = exports.getCourses = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Lấy query từ request
-        const { page = 1, pageSize = 10, subject, grade, status } = req.query;
+        const { page = 1, pageSize = 10, subject, grade, title, status, } = req.query;
         // Chuyển đổi page và pageSize sang số nguyên
         const pageNum = parseInt(page, 10);
         const pageSizeNum = parseInt(pageSize, 10);
         // Tạo bộ lọc dựa trên query parameters
         const filters = {};
-        if (subject)
+        if (subject && subject !== "all")
             filters.subject = { contains: subject };
+        if (title)
+            filters.title = { contains: title };
         if (grade)
             filters.grade = parseInt(grade, 10);
         if (status)
@@ -129,24 +131,31 @@ const createCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.createCourse = createCourse;
-// export const deleteCourse = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   const { courseId } = req.params;
-//   const { userId } = getAuth(req);
-//   try {
-//     const course = await Course.get(courseId);
-//     if (!course) {
-//       res.status(404).json({ message: "Course not found" });
-//       return;
-//     }
-//     if (course.teacherId !== userId) {
-//       res.status(403).json({ message: "Not authorized to delete this course" });
-//     }
-//     await Course.delete(courseId);
-//     res.json({ message: "Course deleted successfully" });
-//   } catch (error) {
-//     res.status(500).json({ message: "Error deleting course", error });
-//   }
-// };
+const deleteCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    // const { userId } = getAuth(req);
+    try {
+        const course = yield prisma.course.delete({
+            where: {
+                id: Number(id),
+                // AND: {
+                //   tutor_id: {
+                //     equals: tutorId
+                //   }
+                // }
+            },
+        });
+        if (!course) {
+            res.status(404).json({ message: "Course not found" });
+            return;
+        }
+        // if (course.teacherId !== userId) {
+        //   res.status(403).json({ message: "Not authorized to delete this course" });
+        // }
+        res.json({ message: "Course deleted successfully" });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error deleting course", error });
+    }
+});
+exports.deleteCourse = deleteCourse;
