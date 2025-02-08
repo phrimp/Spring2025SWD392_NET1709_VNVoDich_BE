@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTutor = exports.createTutor = exports.getTutor = exports.getTutors = void 0;
+exports.getTutor = exports.getTutors = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 //  Lấy danh sách tất cả tutors với phân trang và bộ lọc
@@ -75,42 +75,52 @@ const getTutor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getTutor = getTutor;
 //  Tạo một tutor mới
-const createTutor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        let { id, bio, qualifications, teaching_style, is_available, demo_video_url, image, } = req.body;
-        if (!id) {
-            id = Math.floor(1 + Math.random() * 9);
-        }
-        const newTutor = yield prisma.tutor.create({
-            data: {
-                id: Number(id), // ✅ ID là số
-                bio,
-                qualifications,
-                teaching_style,
-                is_available: Boolean(is_available),
-                demo_video_url: demo_video_url || null,
-                image: image || null,
-            },
-        });
-        res.json({ message: "Tutor created successfully", data: newTutor });
-    }
-    catch (error) {
-        console.error("Error creating tutor:", error);
-        res.status(500).json({ message: "Error creating tutor", error });
-    }
-});
-exports.createTutor = createTutor;
-//  Xóa một tutor theo ID
-const deleteTutor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    try {
-        const tutor = yield prisma.tutor.delete({
-            where: { id: Number(id) },
-        });
-        res.json({ message: "Tutor deleted successfully", data: tutor });
-    }
-    catch (error) {
-        res.status(500).json({ message: "Error deleting tutor", error });
-    }
-});
-exports.deleteTutor = deleteTutor;
+// export const createTutor = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     let {
+//       id,
+//       bio,
+//       qualifications,
+//       teaching_style,
+//       is_available,
+//       demo_video_url,
+//       image,
+//     } = req.body;
+//     if (!id) {
+//       id = Math.floor(1 + Math.random() * 9);
+//     }
+//     const newTutor = await prisma.tutor.create({
+//       data: {
+//         id: Number(id), // ✅ ID là số
+//         bio,
+//         qualifications,
+//         teaching_style,
+//         is_available: Boolean(is_available),
+//         demo_video_url: demo_video_url || null,
+//         image: image || null,
+//       },
+//     });
+//     res.json({ message: "Tutor created successfully", data: newTutor });
+//   } catch (error: any) {
+//     console.error("Error creating tutor:", error);
+//     res.status(500).json({ message: "Error creating tutor", error });
+//   }
+// };
+// //  Xóa một tutor theo ID
+// export const deleteTutor = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   const { id } = req.params;
+//   try {
+//     const tutor = await prisma.tutor.delete({
+//       where: { id: Number(id) },
+//     });
+//     res.json({ message: "Tutor deleted successfully", data: tutor });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error deleting tutor", error });
+//   }
+// };
