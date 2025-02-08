@@ -15,32 +15,50 @@ const prisma = new client_1.PrismaClient();
 //  Lấy danh sách tất cả tutors với phân trang và bộ lọc
 const getTutors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Lấy query từ request
-        const { page = 1, pageSize = 10, isAvailable, qualifications, teachingStyle, } = req.query;
-        // Chuyển đổi page và pageSize sang số nguyên
+        const { page = 1, pageSize = 10, qualifications, teachingStyle, isAvailable, } = req.query;
         const pageNum = parseInt(page, 10);
         const pageSizeNum = parseInt(pageSize, 10);
-        // Tạo bộ lọc dựa trên query parameters
         const filters = {};
-        if (isAvailable !== undefined)
-            filters.is_available = isAvailable === "true";
         if (qualifications)
             filters.qualifications = { contains: qualifications };
         if (teachingStyle)
             filters.teaching_style = { contains: teachingStyle };
-        // Tính toán skip và lấy dữ liệu
+        if (isAvailable !== undefined)
+            filters.is_available = isAvailable === "true";
         const skip = (pageNum - 1) * pageSizeNum;
         const tutors = yield prisma.tutor.findMany({
             where: filters,
             skip,
             take: pageSizeNum,
         });
-        // Đếm tổng số bản ghi
         const totalTutors = yield prisma.tutor.count({ where: filters });
-        // Trả về dữ liệu với phân trang và filter
+        // Tìm thông tin user tương ứng cho mỗi tutor
+        const formattedTutors = yield Promise.all(tutors.map((tutor) => __awaiter(void 0, void 0, void 0, function* () {
+            const user = yield prisma.user.findUnique({
+                where: { id: tutor.id },
+            });
+            return {
+                id: tutor.id,
+                bio: tutor.bio,
+                qualifications: tutor.qualifications,
+                teaching_style: tutor.teaching_style,
+                is_available: tutor.is_available,
+                demo_video_url: tutor.demo_video_url || null,
+                image: tutor.image || null,
+                user: user
+                    ? {
+                        email: user.email,
+                        full_name: user.full_name,
+                        phone: user.phone || null,
+                        google_id: user.google_id || null,
+                        timezone: user.timezone,
+                    }
+                    : null,
+            };
+        })));
         res.json({
             message: "Tutors retrieved successfully",
-            data: tutors,
+            data: formattedTutors,
             pagination: {
                 total: totalTutors,
                 page: pageNum,
@@ -50,26 +68,48 @@ const getTutors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
+        console.error("Error retrieving tutors:", error);
         res.status(500).json({ message: "Error retrieving tutors", error });
     }
 });
 exports.getTutors = getTutors;
 //  Lấy thông tin một tutor theo ID
 const getTutor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
+    const { id } = req.params; // ID của tutor (chính là user ID)
     try {
         const tutor = yield prisma.tutor.findUnique({
             where: { id: Number(id) },
         });
         if (!tutor) {
-            res.status(404).json({
-                message: "Tutor not found",
-            });
+            res.status(404).json({ message: "Tutor not found" });
             return;
         }
-        res.json({ message: "Tutor retrieved successfully", data: tutor });
+        // Tìm thông tin user tương ứng
+        const user = yield prisma.user.findUnique({
+            where: { id: tutor.id },
+        });
+        const formattedTutor = {
+            id: tutor.id,
+            bio: tutor.bio,
+            qualifications: tutor.qualifications,
+            teaching_style: tutor.teaching_style,
+            is_available: tutor.is_available,
+            demo_video_url: tutor.demo_video_url || null,
+            image: tutor.image || null,
+            user: user
+                ? {
+                    email: user.email,
+                    full_name: user.full_name,
+                    phone: user.phone || null,
+                    google_id: user.google_id || null,
+                    timezone: user.timezone,
+                }
+                : null,
+        };
+        res.json({ message: "Tutor retrieved successfully", data: formattedTutor });
     }
     catch (error) {
+        console.error("Error retrieving tutor:", error);
         res.status(500).json({ message: "Error retrieving tutor", error });
     }
 });
