@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "subscription_id": 1,
+    "availability_id": 1
+  },
+  {
+    "id": 2,
+    "subscription_id": 2,
+    "availability_id": 6
+  },
+  {
+    "id": 3,
+    "subscription_id": 3,
+    "availability_id": 17
+  },
+  {
+    "id": 4,
+    "subscription_id": 4,
+    "availability_id": 22
+  },
+  {
+    "id": 5,
+    "subscription_id": 5,
+    "availability_id": 33
+  },
+  {
+    "id": 6,
+    "subscription_id": 6,
+    "availability_id": 38
+  },
+  {
+    "id": 7,
+    "subscription_id": 5,
+    "availability_id": 35
+  },
+  {
+    "id": 8,
+    "subscription_id": 8,
+    "availability_id": 13
+  },
+  {
+    "id": 9,
+    "subscription_id": 9,
+    "availability_id": 28
+  },
+  {
+    "id": 10,
+    "subscription_id": 10,
+    "availability_id": 49
+  }
+]

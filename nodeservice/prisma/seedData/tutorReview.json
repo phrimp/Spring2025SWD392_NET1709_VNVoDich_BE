@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "rating": 5,
+    "review_content": "Alice is a very patient and knowledgeable tutor. My child learned a lot in just a few sessions.",
+    "createAt": "2025-01-22T10:00:00Z",
+    "tutor_id": 1,
+    "parent_id": 2
+  },
+  {
+    "id": 2,
+    "rating": 4,
+    "review_content": "Bob did a good job teaching my child, though there were some challenges in communication.",
+    "createAt": "2025-01-23T11:30:00Z",
+    "tutor_id": 3,
+    "parent_id": 4
+  },
+  {
+    "id": 3,
+    "rating": 3,
+    "review_content": "Charlie was okay, but my child had some difficulties following the lessons.",
+    "createAt": "2025-01-22T15:00:00Z",
+    "tutor_id": 5,
+    "parent_id": 6
+  },
+  {
+    "id": 4,
+    "rating": 5,
+    "review_content": "Diana has been a fantastic tutor. She’s made learning fun and engaging for my child.",
+    "createAt": "2025-01-23T13:00:00Z",
+    "tutor_id": 7,
+    "parent_id": 8
+  },
+  {
+    "id": 5,
+    "rating": 2,
+    "review_content": "Edward did not meet my expectations. I felt the sessions were not very helpful.",
+    "createAt": "2025-01-22T14:30:00Z",
+    "tutor_id": 9,
+    "parent_id": 10
+  },
+  {
+    "id": 6,
+    "rating": 4,
+    "review_content": "Fiona is a solid tutor, but I believe she can improve on the pace of the lessons.",
+    "createAt": "2025-01-21T10:30:00Z",
+    "tutor_id": 7,
+    "parent_id": 2
+  },
+  {
+    "id": 7,
+    "rating": 5,
+    "review_content": "George is an exceptional tutor! He really knows how to explain complex topics in a simple way.",
+    "createAt": "2025-01-21T11:00:00Z",
+    "tutor_id": 1,
+    "parent_id": 4
+  },
+  {
+    "id": 8,
+    "rating": 3,
+    "review_content": "Hannah was good, but there’s room for improvement in keeping my child focused.",
+    "createAt": "2025-01-23T12:00:00Z",
+    "tutor_id": 5,
+    "parent_id": 8
+  },
+  {
+    "id": 9,
+    "rating": 4,
+    "review_content": "Ian’s lessons were very informative, but I think my child would benefit from more hands-on activities.",
+    "createAt": "2025-01-22T16:30:00Z",
+    "tutor_id": 9,
+    "parent_id": 6
+  },
+  {
+    "id": 10,
+    "rating": 5,
+    "review_content": "Jenna is a wonderful tutor. My child is always excited for the lessons.",
+    "createAt": "2025-01-23T14:00:00Z",
+    "tutor_id": 3,
+    "parent_id": 10
+  }
+]
