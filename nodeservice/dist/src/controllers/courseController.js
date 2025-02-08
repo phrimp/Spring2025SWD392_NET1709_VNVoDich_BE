@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCourse = exports.createCourse = exports.getCourse = exports.getCourses = void 0;
+exports.updateCourse = exports.deleteCourse = exports.createCourse = exports.getCourse = exports.getCourses = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -25,7 +25,7 @@ const getCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             filters.subject = { contains: subject };
         if (title)
             filters.title = { contains: title };
-        if (grade)
+        if (grade && grade !== "all")
             filters.grade = parseInt(grade, 10);
         if (status)
             filters.status = status;
@@ -159,3 +159,50 @@ const deleteCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.deleteCourse = deleteCourse;
+const updateCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const updateData = Object.assign({}, req.body);
+    // const { userId } = getAuth(req);
+    try {
+        if (updateData.price) {
+            const price = parseInt(updateData.price);
+            if (isNaN(price)) {
+                res.status(400).json({
+                    message: "Invaid price format",
+                    error: "Price must be a valid number",
+                });
+            }
+            updateData.price = price;
+        }
+        if (updateData.grade) {
+            const grade = parseInt(updateData.grade);
+            if (isNaN(grade)) {
+                res.status(400).json({
+                    message: "Invaid price format",
+                    error: "Grade must be a valid number",
+                });
+            }
+            updateData.grade = grade;
+        }
+        const course = yield prisma.course.update({
+            where: {
+                id: Number(id),
+                // AND: {
+                //   tutor_id: {
+                //     equals: tutorId
+                //   }
+                // }
+            },
+            data: updateData,
+        });
+        if (!course) {
+            res.status(404).json({ message: "Course not found" });
+            return;
+        }
+        res.json({ message: "Course updated successfully", data: course });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error updating course", error });
+    }
+});
+exports.updateCourse = updateCourse;
