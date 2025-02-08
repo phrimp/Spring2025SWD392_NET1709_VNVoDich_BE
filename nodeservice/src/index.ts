@@ -6,6 +6,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 // ROUTE IMPORTS
 import courseRoutes from "./routes/courseRoutes";
+import tutorRoutes from "./routes/tutorRoutes";
 
 // CONFIGURATIONS
 dotenv.config();
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/courses", courseRoutes);
+app.use("/tutors", tutorRoutes);
 
 // SERVER
 const port = Number(process.env.PORT) || 3000;
