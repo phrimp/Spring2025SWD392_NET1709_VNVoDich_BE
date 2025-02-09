@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import internal from "stream";
 
 const prisma = new PrismaClient();
 
@@ -12,6 +13,7 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
       qualifications,
       teachingStyle,
       isAvailable,
+      id,
       email,
       fullName,
       phone,
@@ -27,6 +29,7 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
       filters.teaching_style = { contains: teachingStyle as string };
     if (isAvailable !== undefined)
       filters.is_available = isAvailable === "true";
+    if (id) filters.user = { id: Number(id) }; // filer theo id
     if (email) filters.user = { email: { contains: email as string } }; // Filter theo email
     if (fullName)
       filters.user = { full_name: { contains: fullName as string } }; // Filter theo full_name
