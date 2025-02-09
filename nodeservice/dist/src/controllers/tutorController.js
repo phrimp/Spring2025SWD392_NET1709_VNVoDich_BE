@@ -15,7 +15,7 @@ const prisma = new client_1.PrismaClient();
 //  Lấy danh sách tất cả tutors với phân trang và bộ lọc
 const getTutors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { page = 1, pageSize = 10, qualifications, teachingStyle, isAvailable, } = req.query;
+        const { page = 1, pageSize = 10, qualifications, teachingStyle, isAvailable, email, fullName, phone, } = req.query;
         const pageNum = parseInt(page, 10);
         const pageSizeNum = parseInt(pageSize, 10);
         const filters = {};
@@ -25,6 +25,12 @@ const getTutors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             filters.teaching_style = { contains: teachingStyle };
         if (isAvailable !== undefined)
             filters.is_available = isAvailable === "true";
+        if (email)
+            filters.user = { email: { contains: email } }; // Filter theo email
+        if (fullName)
+            filters.user = { full_name: { contains: fullName } }; // Filter theo full_name
+        if (phone)
+            filters.user = { phone: { contains: phone } }; // Filter theo phone
         const skip = (pageNum - 1) * pageSizeNum;
         const tutors = yield prisma.tutor.findMany({
             where: filters,
