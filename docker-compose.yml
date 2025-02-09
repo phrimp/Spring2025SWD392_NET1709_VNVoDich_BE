@@ -28,7 +28,7 @@ services:
     environment:
       - PORT=${AUTH_SERVICE_PORT}
       - DB_HOST=mysql
-      - DB_PORT=${MYSQL_PORT}
+      - DB_PORT=3306
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
@@ -86,7 +86,7 @@ services:
   mysql:
     image: mysql:8.0
     ports:
-      - "${MYSQL_PORT}:${MYSQL_PORT}"
+      - "${MYSQL_PORT}:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${DB_NAME}
