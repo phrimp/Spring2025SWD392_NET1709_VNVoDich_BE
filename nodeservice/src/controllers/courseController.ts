@@ -225,3 +225,113 @@ export const updateCourse = async (
     res.status(500).json({ message: "Error updating course", error });
   }
 };
+
+export const addLessonToCourse = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { courseId } = req.params;
+    const { title, description, learning_objectives, materials_needed } =
+      req.body;
+
+    if (!courseId) {
+      res.status(404).json({ message: "Course Id is required" });
+      return;
+    }
+
+    const updateCourse = await prisma.course.update({
+      where: {
+        id: Number(courseId),
+      },
+      data: {
+        total_lessons: {
+          increment: 1,
+        },
+        lessons: {
+          create: {
+            title,
+            description,
+            learning_objectives,
+            materials_needed,
+          },
+        },
+      },
+    });
+
+    res.json({ message: "Lesson added successfully", data: updateCourse });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding lesson to course", error });
+  }
+};
+
+export const updateLesson = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { courseId, lessonId } = req.params;
+    const { title, description, learning_objectives, materials_needed } =
+      req.body;
+
+    if (!courseId || !lessonId) {
+      res.status(404).json({ message: "Course Id or Lesson Id is required" });
+      return;
+    }
+
+    const updateCourse = await prisma.course.update({
+      where: {
+        id: Number(courseId),
+      },
+      data: {
+        total_lessons: {
+          increment: 1,
+        },
+        lessons: {
+          update: {
+            where: { id: Number(lessonId) },
+            data: { title, description, learning_objectives, materials_needed },
+          },
+        },
+      },
+    });
+
+    res.json({ message: "Lesson added successfully", data: updateCourse });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding lesson to course", error });
+  }
+};
+
+export const deleteLesson = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { courseId, lessonId } = req.params;
+
+    if (!courseId || !lessonId) {
+      res.status(404).json({ message: "Course Id or Lesson Id is required" });
+      return;
+    }
+
+    const updateCourse = await prisma.course.update({
+      where: {
+        id: Number(courseId),
+      },
+      data: {
+        total_lessons: {
+          decrement: 1,
+        },
+        lessons: {
+          delete: {
+            id: Number(lessonId),
+          },
+        },
+      },
+    });
+
+    res.json({ message: "Lesson deleted successfully", data: updateCourse });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting lesson to course", error });
+  }
+};

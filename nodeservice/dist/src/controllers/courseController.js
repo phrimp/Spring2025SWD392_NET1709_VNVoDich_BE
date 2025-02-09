@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateCourse = exports.deleteCourse = exports.createCourse = exports.getCourse = exports.getCourses = void 0;
+exports.deleteLesson = exports.updateLesson = exports.addLessonToCourse = exports.updateCourse = exports.deleteCourse = exports.createCourse = exports.getCourse = exports.getCourses = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -206,3 +206,96 @@ const updateCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.updateCourse = updateCourse;
+const addLessonToCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { courseId } = req.params;
+        const { title, description, learning_objectives, materials_needed } = req.body;
+        if (!courseId) {
+            res.status(404).json({ message: "Course Id is required" });
+            return;
+        }
+        const updateCourse = yield prisma.course.update({
+            where: {
+                id: Number(courseId),
+            },
+            data: {
+                total_lessons: {
+                    increment: 1,
+                },
+                lessons: {
+                    create: {
+                        title,
+                        description,
+                        learning_objectives,
+                        materials_needed,
+                    },
+                },
+            },
+        });
+        res.json({ message: "Lesson added successfully", data: updateCourse });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error adding lesson to course", error });
+    }
+});
+exports.addLessonToCourse = addLessonToCourse;
+const updateLesson = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { courseId, lessonId } = req.params;
+        const { title, description, learning_objectives, materials_needed } = req.body;
+        if (!courseId || !lessonId) {
+            res.status(404).json({ message: "Course Id or Lesson Id is required" });
+            return;
+        }
+        const updateCourse = yield prisma.course.update({
+            where: {
+                id: Number(courseId),
+            },
+            data: {
+                total_lessons: {
+                    increment: 1,
+                },
+                lessons: {
+                    update: {
+                        where: { id: Number(lessonId) },
+                        data: { title, description, learning_objectives, materials_needed },
+                    },
+                },
+            },
+        });
+        res.json({ message: "Lesson added successfully", data: updateCourse });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error adding lesson to course", error });
+    }
+});
+exports.updateLesson = updateLesson;
+const deleteLesson = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { courseId, lessonId } = req.params;
+        if (!courseId || !lessonId) {
+            res.status(404).json({ message: "Course Id or Lesson Id is required" });
+            return;
+        }
+        const updateCourse = yield prisma.course.update({
+            where: {
+                id: Number(courseId),
+            },
+            data: {
+                total_lessons: {
+                    decrement: 1,
+                },
+                lessons: {
+                    delete: {
+                        id: Number(lessonId),
+                    },
+                },
+            },
+        });
+        res.json({ message: "Lesson deleted successfully", data: updateCourse });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error deleting lesson to course", error });
+    }
+});
+exports.deleteLesson = deleteLesson;
