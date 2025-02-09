@@ -7,6 +7,8 @@ import morgan from "morgan";
 // ROUTE IMPORTS
 import courseRoutes from "./routes/courseRoutes";
 import tutorRoutes from "./routes/tutorRoutes";
+import childRoutes from "./routes/childrenRoutes";
+import bookingRoutes from "./routes/bookingRoutes";
 
 // CONFIGURATIONS
 dotenv.config();
@@ -26,6 +28,8 @@ app.get("/", (req, res) => {
 
 app.use("/courses", courseRoutes);
 app.use("/tutors", tutorRoutes);
+app.use("/childrens", childRoutes);
+app.use("/api", bookingRoutes);
 
 // SERVER
 const port = Number(process.env.PORT) || 3000;

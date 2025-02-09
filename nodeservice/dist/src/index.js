@@ -12,6 +12,8 @@ const morgan_1 = __importDefault(require("morgan"));
 // ROUTE IMPORTS
 const courseRoutes_1 = __importDefault(require("./routes/courseRoutes"));
 const tutorRoutes_1 = __importDefault(require("./routes/tutorRoutes"));
+const childrenRoutes_1 = __importDefault(require("./routes/childrenRoutes"));
+const bookingRoutes_1 = __importDefault(require("./routes/bookingRoutes"));
 // CONFIGURATIONS
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -28,6 +30,8 @@ app.get("/", (req, res) => {
 });
 app.use("/courses", courseRoutes_1.default);
 app.use("/tutors", tutorRoutes_1.default);
+app.use("/childrens", childrenRoutes_1.default);
+app.use("/api", bookingRoutes_1.default);
 // SERVER
 const port = Number(process.env.PORT) || 3000;
 app.listen(port, "0.0.0.0", () => {
