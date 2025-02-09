@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "title": "Basic Mathematics",
+    "description": "Learn the fundamentals of mathematics.",
+    "price": 50.0,
+    "total_lessons": 10,
+    "grade": 3,
+    "subject": "Mathematics",
+    "status": "Published",
+    "tutor_id": 1
+  },
+  {
+    "id": 2,
+    "title": "Advanced English Grammar",
+    "description": "Master advanced grammar topics.",
+    "price": 75.0,
+    "total_lessons": 15,
+    "grade": 6,
+    "subject": "English",
+    "status": "Published",
+    "tutor_id": 1
+  },
+  {
+    "id": 3,
+    "title": "Introduction to Science",
+    "description": "Explore basic scientific concepts.",
+    "price": 60.0,
+    "total_lessons": 12,
+    "grade": 4,
+    "subject": "Science",
+    "status": "Draft",
+    "tutor_id": 3
+  },
+  {
+    "id": 4,
+    "title": "World History for Beginners",
+    "description": "Learn about key historical events worldwide.",
+    "price": 80.0,
+    "total_lessons": 20,
+    "grade": 7,
+    "subject": "History",
+    "status": "Published",
+    "tutor_id": 3
+  },
+  {
+    "id": 5,
+    "title": "Creative Writing Workshop",
+    "description": "Enhance your writing skills through creativity.",
+    "price": 90.0,
+    "total_lessons": 8,
+    "grade": 8,
+    "subject": "English",
+    "status": "Published",
+    "tutor_id": 5
+  },
+  {
+    "id": 6,
+    "title": "Physics Made Simple",
+    "description": "Understand the basics of physics with real-life examples.",
+    "price": 100.0,
+    "total_lessons": 14,
+    "grade": 9,
+    "subject": "Physics",
+    "status": "Draft",
+    "tutor_id": 5
+  },
+  {
+    "id": 7,
+    "title": "Chemistry Essentials",
+    "description": "Learn essential chemistry topics and experiments.",
+    "price": 110.0,
+    "total_lessons": 18,
+    "grade": 10,
+    "subject": "Chemistry",
+    "status": "Published",
+    "tutor_id": 7
+  },
+  {
+    "id": 8,
+    "title": "Art and Design Basics",
+    "description": "Learn the fundamentals of art and design.",
+    "price": 70.0,
+    "total_lessons": 6,
+    "grade": 5,
+    "subject": "Art",
+    "status": "Published",
+    "tutor_id": 7
+  },
+  {
+    "id": 9,
+    "title": "Introduction to Programming",
+    "description": "Learn how to code using Python.",
+    "price": 120.0,
+    "total_lessons": 10,
+    "grade": 8,
+    "subject": "Computer Science",
+    "status": "Published",
+    "tutor_id": 9
+  },
+  {
+    "id": 10,
+    "title": "Music Theory for Beginners",
+    "description": "Understand the basics of music theory.",
+    "price": 65.0,
+    "total_lessons": 12,
+    "grade": 6,
+    "subject": "Music",
+    "status": "Draft",
+    "tutor_id": 9
+  }
+]

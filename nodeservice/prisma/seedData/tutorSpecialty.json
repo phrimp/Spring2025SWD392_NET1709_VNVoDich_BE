@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "subject": "Mathematics",
+    "level": "High School",
+    "certification": "Certified Algebra Specialist",
+    "years_experience": 5,
+    "tutor_id": 1
+  },
+  {
+    "id": 2,
+    "subject": "Calculus",
+    "level": "Undergraduate",
+    "certification": "Advanced Calculus Tutor",
+    "years_experience": 7,
+    "tutor_id": 1
+  },
+  {
+    "id": 3,
+    "subject": "Physics",
+    "level": "Undergraduate",
+    "certification": "Certified Physics Tutor",
+    "years_experience": 6,
+    "tutor_id": 3
+  },
+  {
+    "id": 4,
+    "subject": "Astronomy",
+    "level": "High School",
+    "certification": "Astronomy Enthusiast",
+    "years_experience": 4,
+    "tutor_id": 3
+  },
+  {
+    "id": 5,
+    "subject": "English Literature",
+    "level": "Advanced",
+    "certification": "Certified English Tutor",
+    "years_experience": 8,
+    "tutor_id": 5
+  },
+  {
+    "id": 6,
+    "subject": "Creative Writing",
+    "level": "High School",
+    "certification": "Creative Writing Coach",
+    "years_experience": 10,
+    "tutor_id": 5
+  },
+  {
+    "id": 7,
+    "subject": "Chemistry",
+    "level": "Undergraduate",
+    "certification": "Ph.D. in Chemistry",
+    "years_experience": 12,
+    "tutor_id": 7
+  },
+  {
+    "id": 8,
+    "subject": "Organic Chemistry",
+    "level": "Advanced",
+    "certification": "Certified Organic Chemist",
+    "years_experience": 9,
+    "tutor_id": 7
+  },
+  {
+    "id": 9,
+    "subject": "Modern History",
+    "level": "High School",
+    "certification": "History Expert",
+    "years_experience": 6,
+    "tutor_id": 9
+  },
+  {
+    "id": 10,
+    "subject": "Medieval History",
+    "level": "Advanced",
+    "certification": "Published History Author",
+    "years_experience": 10,
+    "tutor_id": 9
+  }
+]
