@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "google_meet_id": "meet123",
+    "actual_start": "2025-01-21T10:00:00Z",
+    "actual_end": "2025-01-21T11:00:00Z",
+    "status": "Completed",
+    "topics_covered": "Addition and subtraction techniques",
+    "homework_assigned": "Worksheet on addition and subtraction",
+    "children_id": 1,
+    "lesson_id": 1
+  },
+  {
+    "id": 2,
+    "google_meet_id": "meet124",
+    "actual_start": "2025-01-21T11:30:00Z",
+    "actual_end": "2025-01-21T12:30:00Z",
+    "status": "Completed",
+    "topics_covered": "Multiplication and division basics",
+    "homework_assigned": "Multiplication table practice",
+    "children_id": 2,
+    "lesson_id": 2
+  },
+  {
+    "id": 3,
+    "google_meet_id": "meet125",
+    "actual_start": "2025-01-21T13:00:00Z",
+    "actual_end": "2025-01-21T14:00:00Z",
+    "status": "Completed",
+    "topics_covered": "Understanding nouns",
+    "homework_assigned": "Identify nouns in sentences",
+    "children_id": 3,
+    "lesson_id": 3
+  },
+  {
+    "id": 4,
+    "google_meet_id": "meet126",
+    "actual_start": "2025-01-21T14:30:00Z",
+    "actual_end": "2025-01-21T15:30:00Z",
+    "status": "Completed",
+    "topics_covered": "Advanced sentence structures",
+    "homework_assigned": "Write complex sentences",
+    "children_id": 4,
+    "lesson_id": 4
+  },
+  {
+    "id": 5,
+    "google_meet_id": "meet127",
+    "actual_start": "2025-01-22T10:00:00Z",
+    "actual_end": "2025-01-22T11:00:00Z",
+    "status": "Completed",
+    "topics_covered": "The Solar System",
+    "homework_assigned": "Research a planet in the solar system",
+    "children_id": 5,
+    "lesson_id": 6
+  },
+  {
+    "id": 6,
+    "google_meet_id": "meet128",
+    "actual_start": "2025-01-22T11:30:00Z",
+    "actual_end": "2025-01-22T12:30:00Z",
+    "status": "Completed",
+    "topics_covered": "Ancient Civilizations",
+    "homework_assigned": "Write a report on an ancient civilization",
+    "children_id": 6,
+    "lesson_id": 7
+  },
+  {
+    "id": 7,
+    "google_meet_id": "meet129",
+    "actual_start": "2025-01-22T13:00:00Z",
+    "actual_end": "2025-01-22T14:00:00Z",
+    "status": "Completed",
+    "topics_covered": "Creative Writing Techniques",
+    "homework_assigned": "Write a short story",
+    "children_id": 7,
+    "lesson_id": 9
+  },
+  {
+    "id": 8,
+    "google_meet_id": "meet130",
+    "actual_start": "2025-01-22T14:30:00Z",
+    "actual_end": "2025-01-22T15:30:00Z",
+    "status": "Completed",
+    "topics_covered": "Basic Music Notes",
+    "homework_assigned": "Practice playing basic notes",
+    "children_id": 8,
+    "lesson_id": 19
+  },
+  {
+    "id": 9,
+    "google_meet_id": "meet131",
+    "actual_start": "2025-01-23T10:00:00Z",
+    "actual_end": "2025-01-23T11:00:00Z",
+    "status": "Completed",
+    "topics_covered": "Introduction to Python",
+    "homework_assigned": "Write a simple Python program",
+    "children_id": 9,
+    "lesson_id": 17
+  },
+  {
+    "id": 10,
+    "google_meet_id": "meet132",
+    "actual_start": "2025-01-23T11:30:00Z",
+    "actual_end": "2025-01-23T12:30:00Z",
+    "status": "Completed",
+    "topics_covered": "Control Structures in Python",
+    "homework_assigned": "Solve problems using loops and conditionals",
+    "children_id": 10,
+    "lesson_id": 18
+  }
+]

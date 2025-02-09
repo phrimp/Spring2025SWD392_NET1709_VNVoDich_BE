@@ -1,0 +1,220 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int     @id @default(autoincrement())
+  email         String  @unique
+  password_hash String
+  full_name     String
+  phone         String?
+  role          Role
+  google_id     String? @unique
+  timezone      String?
+  is_verified   Boolean @default(false)
+
+  Tutor Tutor[]
+}
+
+model Tutor {
+  id             Int     @id
+  bio            String
+  qualifications String
+  teaching_style String
+  is_available   Boolean @default(false)
+  demo_video_url String?
+  image          String?
+
+  profile        User             @relation(fields: [id], references: [id])
+  tutorSpecialty TutorSpecialty[]
+  courses        Course[]
+  tutorReviews   TutorReview[]
+}
+
+model Parent {
+  id                   Int     @id
+  preferred_language   String
+  notifications_enable Boolean @default(false)
+
+  childrens     Children[]
+  tutorReviews  TutorReview[]
+  courseReviews CourseReview[]
+}
+
+model Children {
+  id             Int    @id @default(autoincrement())
+  age            Int
+  grade_level    String
+  learning_goals String
+  full_name      String
+  password       String
+
+  parent_id Int
+  parent    Parent @relation(fields: [parent_id], references: [id])
+
+  courseSubscriptions CourseSubscription[]
+  teachingSessions    TeachingSession[]
+}
+
+model TutorSpecialty {
+  id               Int    @id @default(autoincrement())
+  subject          String
+  level            String
+  certification    String
+  years_experience Int
+
+  tutor_id Int
+  Tutor    Tutor @relation(fields: [tutor_id], references: [id], onDelete: Cascade)
+}
+
+model Course {
+  id            Int          @id @default(autoincrement())
+  title         String
+  description   String?
+  price         Float
+  total_lessons Int
+  grade         Int
+  subject       String
+  status        CourseStatus @default(Draft)
+  image         String?
+
+  tutor    Tutor @relation(fields: [tutor_id], references: [id])
+  tutor_id Int
+
+  availabilitys       Availability[]
+  lessons             Lesson[]
+  courseSubscriptions CourseSubscription[]
+  courseReviews       CourseReview[]
+}
+
+model Lesson {
+  id                  Int     @id @default(autoincrement())
+  title               String
+  description         String?
+  learning_objectives String?
+  materials_needed    String?
+
+  course_id Int
+  Course    Course @relation(fields: [course_id], references: [id])
+
+  teachingSessions TeachingSession[]
+}
+
+model Availability {
+  id           Int      @id @default(autoincrement())
+  day_of_week  Day
+  start_time   DateTime
+  end_time     DateTime
+  timezone     String?
+  is_recurring Boolean  @default(false)
+
+  course_id Int
+  Course    Course @relation(fields: [course_id], references: [id])
+
+  courseSubscriptionSchedules CourseSubscriptionSchedule[]
+}
+
+model CourseSubscription {
+  id                 Int    @id @default(autoincrement())
+  status             String
+  sessions_remaining Int
+
+  course_id Int
+  course    Course @relation(fields: [course_id], references: [id])
+
+  children_id Int
+  children    Children @relation(fields: [children_id], references: [id])
+
+  courseSubscriptionSchedules CourseSubscriptionSchedule[]
+}
+
+model TeachingSession {
+  id                Int      @id @default(autoincrement())
+  google_meet_id    String?
+  actual_start      DateTime
+  actual_end        DateTime
+  status            String
+  topics_covered    String?
+  homework_assigned String?
+
+  children_id     Int
+  children        Children          @relation(fields: [children_id], references: [id])
+  lesson_id       Int
+  lesson          Lesson            @relation(fields: [lesson_id], references: [id])
+  sessionFeedback SessionFeedback[]
+}
+
+model SessionFeedback {
+  id               Int     @id @default(autoincrement())
+  rating           Int
+  comment          String?
+  teaching_quality String?
+
+  session_id Int
+  session    TeachingSession @relation(fields: [session_id], references: [id])
+}
+
+model CourseSubscriptionSchedule {
+  id              Int                @id @default(autoincrement())
+  subscription_id Int
+  availability_id Int
+  subscription    CourseSubscription @relation(fields: [subscription_id], references: [id])
+  availability    Availability       @relation(fields: [availability_id], references: [id])
+
+  @@unique([subscription_id, availability_id])
+}
+
+model TutorReview {
+  id             Int      @id @default(autoincrement())
+  rating         Int
+  review_content String?
+  createAt       DateTime @default(now())
+
+  tutor_id  Int
+  tutor     Tutor  @relation(fields: [tutor_id], references: [id])
+  parent_id Int
+  parent    Parent @relation(fields: [parent_id], references: [id])
+}
+
+model CourseReview {
+  id             Int      @id @default(autoincrement())
+  rating         Int
+  review_content String?
+  createAt       DateTime @default(now())
+
+  course_id Int
+  course    Course @relation(fields: [course_id], references: [id])
+  parent_id Int
+  parent    Parent @relation(fields: [parent_id], references: [id])
+}
+
+enum Role {
+  Tutor
+  Parent
+}
+
+enum CourseStatus {
+  Draft
+  Published
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}

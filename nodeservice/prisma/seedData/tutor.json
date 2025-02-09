@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "bio": "Experienced math tutor specializing in algebra and calculus.",
+    "qualifications": "B.Sc. in Mathematics, Certified Tutor",
+    "teaching_style": "Interactive and student-centered",
+    "is_available": true,
+    "demo_video_url": "https://example.com/videos/tutor1",
+    "image": "https://example.com/images/tutor1.jpg"
+  },
+  {
+    "id": 3,
+    "bio": "Science tutor with a passion for hands-on experiments.",
+    "qualifications": "M.Sc. in Physics",
+    "teaching_style": "Visual and practical demonstrations",
+    "is_available": true,
+    "demo_video_url": null,
+    "image": "https://example.com/images/tutor2.jpg"
+  },
+  {
+    "id": 5,
+    "bio": "English literature tutor with extensive teaching experience.",
+    "qualifications": "B.A. in English, Teaching Credential",
+    "teaching_style": "Discussion-based and analytical",
+    "is_available": false,
+    "demo_video_url": "https://example.com/videos/tutor3",
+    "image": "https://example.com/images/tutor3.jpg"
+  },
+  {
+    "id": 7,
+    "bio": "Chemistry tutor with a knack for simplifying complex topics.",
+    "qualifications": "Ph.D. in Chemistry",
+    "teaching_style": "Simplified and example-driven",
+    "is_available": true,
+    "demo_video_url": "https://example.com/videos/tutor4",
+    "image": null
+  },
+  {
+    "id": 9,
+    "bio": "History tutor focusing on modern and medieval eras.",
+    "qualifications": "M.A. in History, Published Author",
+    "teaching_style": "Storytelling and critical thinking",
+    "is_available": false,
+    "demo_video_url": "https://example.com/videos/tutor5",
+    "image": "https://example.com/images/tutor5.jpg"
+  }
+]
