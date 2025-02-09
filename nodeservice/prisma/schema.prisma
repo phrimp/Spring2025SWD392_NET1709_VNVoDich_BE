@@ -106,7 +106,7 @@ model Lesson {
   materials_needed    String?
 
   course_id Int
-  Course    Course @relation(fields: [course_id], references: [id])
+  Course    Course @relation(fields: [course_id], references: [id], onDelete: Cascade)
 
   teachingSessions TeachingSession[]
 }
