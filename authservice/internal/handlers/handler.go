@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"authservice/internal/repository"
-	"errors"
-	"fmt"
+	"authservice/internal/services"
+	"authservice/utils"
 	"os"
 	"time"
 
@@ -24,27 +24,14 @@ func HandleLogin(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req repository.LoginRequest
 		if err := c.BodyParser(&req); err != nil {
-			fmt.Println("Invalid request:", err)
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid request",
 			})
 		}
 
-		// Find user
-		var user repository.User
-		if err := db.Where("username = ?", req.Username).First(&user).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-					"error": "Invalid credentials",
-				})
-			}
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Database error",
-			})
-		}
-
-		// Check password
-		if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		// Forward to user service
+		user, err := services.GetUserFromUserService(utils.SERVICES_ROUTES.UserService, req.Username, req.Password)
+		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Invalid credentials",
 			})
@@ -62,10 +49,7 @@ func HandleLogin(db *gorm.DB) fiber.Handler {
 			Role:     user.Role,
 		}
 
-		// Create token with claims
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-		// Sign token
 		tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -73,12 +57,9 @@ func HandleLogin(db *gorm.DB) fiber.Handler {
 			})
 		}
 
-		// Clear password before sending
-		user.Password = ""
-
 		return c.JSON(repository.LoginResponse{
 			Token: tokenString,
-			User:  user,
+			User:  *user,
 		})
 	}
 }

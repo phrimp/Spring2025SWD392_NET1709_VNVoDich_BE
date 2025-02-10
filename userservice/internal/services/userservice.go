@@ -17,17 +17,40 @@ func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*mode
 		}
 		return nil, fmt.Errorf("database error: %v", err)
 	}
+
 	// Check password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return nil, fmt.Errorf("invalid credentials")
 	}
+
+	// Clear password before returning
+	user.Password = ""
 	return &user, nil
 }
 
 func AddUser(username, password, email, role string, db *gorm.DB) error {
-	user := models.User{Username: username, Password: password, Email: email, Role: role}
-	if err := db.Save(user).Error; err != nil {
-		return fmt.Errorf("add user error: %v", err)
+	// Check if user exists
+	var existingUser models.User
+	if err := db.Where("username = ?", username).First(&existingUser).Error; err == nil {
+		return fmt.Errorf("username already exists")
 	}
+
+	// Hash password before saving
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %v", err)
+	}
+
+	user := models.User{
+		Username: username,
+		Password: string(hashedPassword),
+		Email:    email,
+		Role:     role,
+	}
+
+	if err := db.Create(&user).Error; err != nil {
+		return fmt.Errorf("failed to create user: %v", err)
+	}
+
 	return nil
 }
