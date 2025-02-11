@@ -2,245 +2,245 @@
   {
     "id": 1,
     "availability_id": 1,
-    "day": "Monday",
+    "day": "MONDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 2,
     "availability_id": 1,
-    "day": "Tuesday",
+    "day": "TUESDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 3,
     "availability_id": 1,
-    "day": "Wednesday",
+    "day": "WEDNESDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 4,
     "availability_id": 1,
-    "day": "Thursday",
+    "day": "THURSDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 5,
     "availability_id": 1,
-    "day": "Friday",
+    "day": "FRIDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 6,
     "availability_id": 1,
-    "day": "Saturday",
+    "day": "SATURDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 7,
     "availability_id": 1,
-    "day": "Sunday",
+    "day": "SUNDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 8,
     "availability_id": 2,
-    "day": "Monday",
+    "day": "MONDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 9,
     "availability_id": 2,
-    "day": "Tuesday",
+    "day": "TUESDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 10,
     "availability_id": 2,
-    "day": "Wednesday",
+    "day": "WEDNESDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 11,
     "availability_id": 2,
-    "day": "Thursday",
+    "day": "THURSDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 12,
     "availability_id": 2,
-    "day": "Friday",
+    "day": "FRIDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 13,
     "availability_id": 2,
-    "day": "Saturday",
+    "day": "SATURDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 14,
     "availability_id": 2,
-    "day": "Sunday",
+    "day": "SUNDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 15,
     "availability_id": 3,
-    "day": "Monday",
+    "day": "MONDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 16,
     "availability_id": 3,
-    "day": "Tuesday",
+    "day": "TUESDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 17,
     "availability_id": 3,
-    "day": "Wednesday",
+    "day": "WEDNESDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 18,
     "availability_id": 3,
-    "day": "Thursday",
+    "day": "THURSDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 19,
     "availability_id": 3,
-    "day": "Friday",
+    "day": "FRIDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 20,
     "availability_id": 3,
-    "day": "Saturday",
+    "day": "SATURDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 21,
     "availability_id": 3,
-    "day": "Sunday",
+    "day": "SUNDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 22,
     "availability_id": 4,
-    "day": "Monday",
+    "day": "MONDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 23,
     "availability_id": 4,
-    "day": "Tuesday",
+    "day": "TUESDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 24,
     "availability_id": 4,
-    "day": "Wednesday",
+    "day": "WEDNESDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 25,
     "availability_id": 4,
-    "day": "Thursday",
+    "day": "THURSDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 26,
     "availability_id": 4,
-    "day": "Friday",
+    "day": "FRIDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 27,
     "availability_id": 4,
-    "day": "Saturday",
+    "day": "SATURDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 28,
     "availability_id": 4,
-    "day": "Sunday",
+    "day": "SUNDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 29,
     "availability_id": 5,
-    "day": "Monday",
+    "day": "MONDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 30,
     "availability_id": 5,
-    "day": "Tuesday",
+    "day": "TUESDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 31,
     "availability_id": 5,
-    "day": "Wednesday",
+    "day": "WEDNESDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 32,
     "availability_id": 5,
-    "day": "Thursday",
+    "day": "THURSDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 33,
     "availability_id": 5,
-    "day": "Friday",
+    "day": "FRIDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 34,
     "availability_id": 5,
-    "day": "Saturday",
+    "day": "SATURDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   },
   {
     "id": 35,
     "availability_id": 5,
-    "day": "Sunday",
+    "day": "SUNDAY",
     "startTime": "2025-02-11T06:00:00Z",
     "endTime": "2025-02-11T23:00:00Z"
   }
