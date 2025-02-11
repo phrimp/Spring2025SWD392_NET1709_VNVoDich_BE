@@ -27,20 +27,23 @@ async function main() {
     "user.json",
     "tutor.json",
     "parent.json",
-    "tutorSpecialty.json",
     "children.json",
     "course.json",
     "lesson.json",
     "availability.json",
+    "dayAvailability.json",
     "courseReview.json",
     "tutorReview.json",
     "courseSubscription.json",
     "courseSubscriptionSchedule.json",
     "teachingSession.json",
     "sessionFeedback.json",
+    "tutorSpecialty.json",
   ];
 
-  await deleteAllData(orderedFileNames);
+  const deleteFileNames = [...orderedFileNames].reverse();
+
+  await deleteAllData(deleteFileNames);
 
   for (const fileName of orderedFileNames) {
     const filePath = path.join(dataDirectory, fileName);

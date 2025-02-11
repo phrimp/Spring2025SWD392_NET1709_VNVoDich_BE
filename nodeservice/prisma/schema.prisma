@@ -40,6 +40,7 @@ model Tutor {
   tutorSpecialty TutorSpecialty[]
   courses        Course[]
   tutorReviews   TutorReview[]
+  availabilities Availability[]
 }
 
 model Parent {
@@ -92,7 +93,6 @@ model Course {
   tutor    Tutor @relation(fields: [tutor_id], references: [id])
   tutor_id Int
 
-  availabilitys       Availability[]
   lessons             Lesson[]
   courseSubscriptions CourseSubscription[]
   courseReviews       CourseReview[]
@@ -112,23 +112,32 @@ model Lesson {
 }
 
 model Availability {
-  id           Int      @id @default(autoincrement())
-  day_of_week  Day
-  start_time   DateTime
-  end_time     DateTime
-  timezone     String?
-  is_recurring Boolean  @default(false)
+  id       Int   @id @default(autoincrement())
+  tutor_id Int   @unique
+  tutor    Tutor @relation(fields: [tutor_id], references: [id])
 
-  course_id Int
-  Course    Course @relation(fields: [course_id], references: [id])
+  days DayAvailability[]
 
-  courseSubscriptionSchedules CourseSubscriptionSchedule[]
+  timeGap Int // Minimum gap between bookings in minutes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DayAvailability {
+  id              Int      @id @default(autoincrement())
+  availability_id Int
+  day             Day
+  startTime       DateTime
+  endTime         DateTime
+
+  availability Availability @relation(fields: [availability_id], references: [id], onDelete: Cascade)
 }
 
 model CourseSubscription {
   id                 Int    @id @default(autoincrement())
   status             String
-  sessions_remaining Int
+  sessions_remaining Int?
 
   course_id Int
   course    Course @relation(fields: [course_id], references: [id])
@@ -168,11 +177,11 @@ model SessionFeedback {
 model CourseSubscriptionSchedule {
   id              Int                @id @default(autoincrement())
   subscription_id Int
-  availability_id Int
   subscription    CourseSubscription @relation(fields: [subscription_id], references: [id])
-  availability    Availability       @relation(fields: [availability_id], references: [id])
 
-  @@unique([subscription_id, availability_id])
+  day       Day
+  startTime DateTime
+  endTime   DateTime
 }
 
 model TutorReview {
@@ -210,11 +219,11 @@ enum CourseStatus {
 }
 
 enum Day {
-  MONDAY
-  TUESDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-  SATURDAY
-  SUNDAY
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
 }

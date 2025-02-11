@@ -68,6 +68,15 @@ services:
       - app-network
     restart: unless-stopped
 
+  node-service: 
+    build:
+      context: ./nodeservice
+      dockerfile: Dockerfile
+    ports: 
+      - "${NODE}:${NODE}"
+    networks:
+      - app-network
+    restart: unless-stopped
   payment-service:
     build:
       context: ./paymentservice
@@ -92,7 +101,6 @@ services:
       - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_USER=${DB_USER}
       - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_TCP_PORT=${MYSQL_PORT}
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
