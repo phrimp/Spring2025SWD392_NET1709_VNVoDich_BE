@@ -40,7 +40,7 @@ model Tutor {
   tutorSpecialty TutorSpecialty[]
   courses        Course[]
   tutorReviews   TutorReview[]
-  availabilities Availability[]
+  availability   Availability?
 }
 
 model Parent {
@@ -219,11 +219,11 @@ enum CourseStatus {
 }
 
 enum Day {
-  Monday
-  Tuesday
-  Wednesday
-  Thursday
-  Friday
-  Saturday
-  Sunday
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }
