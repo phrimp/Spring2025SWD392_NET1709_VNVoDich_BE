@@ -77,6 +77,26 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+  user-service:
+    build: 
+      context: /userservice
+      dockerfile: Dockerfile
+    ports:
+      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
+    depends_on:
+      mysql:
+        condition: service_healthy 
+    networks:
+        - app-network
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+
+    restart: unless-stopped
+
   payment-service:
     build:
       context: ./paymentservice
