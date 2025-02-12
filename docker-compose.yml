@@ -68,6 +68,26 @@ services:
       - app-network
     restart: unless-stopped
 
+  user-service:
+    build: 
+      context: /userservice
+      dockerfile: Dockerfile
+    ports:
+      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
+    depends_on:
+      mysql:
+        condition: service_healthy 
+    networks:
+        - app-network
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+
+    restart: unless-stopped
+
   payment-service:
     build:
       context: ./paymentservice
@@ -92,7 +112,6 @@ services:
       - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_USER=${DB_USER}
       - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_TCP_PORT=${MYSQL_PORT}
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql

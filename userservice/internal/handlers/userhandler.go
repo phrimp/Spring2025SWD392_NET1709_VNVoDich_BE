@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"user-service/internal/services"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,12 +19,14 @@ func GetUserWithUsernamePasswordHandler(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req RequestParam
 		if err := c.BodyParser(&req); err != nil {
+			fmt.Println("Error Get User:", err)
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid request",
 			})
 		}
 		user, err := services.FindUserWithUsernamePassword(req.Username, req.Password, db)
 		if err != nil {
+			fmt.Println("Error Get User:", err)
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": err,
 			})
