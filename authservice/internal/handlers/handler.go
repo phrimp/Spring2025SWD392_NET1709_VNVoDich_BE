@@ -9,7 +9,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
-	"gorm.io/gorm"
 )
 
 type Claims struct {
@@ -19,7 +18,7 @@ type Claims struct {
 	Role     string `json:"role"`
 }
 
-func HandleLogin(db *gorm.DB) fiber.Handler {
+func HandleLogin() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req LoginRequest
 		if err := c.BodyParser(&req); err != nil {
@@ -64,7 +63,7 @@ func HandleLogin(db *gorm.DB) fiber.Handler {
 	}
 }
 
-func HandleRegister(db *gorm.DB) fiber.Handler {
+func HandleRegister() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req RegisterRequest
 		if err := c.BodyParser(&req); err != nil {
