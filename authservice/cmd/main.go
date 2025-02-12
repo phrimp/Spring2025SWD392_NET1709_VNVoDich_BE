@@ -2,7 +2,6 @@ package main
 
 import (
 	"authservice/internal/handlers"
-	"authservice/internal/repository"
 	"fmt"
 	"os"
 
@@ -38,8 +37,8 @@ func main() {
 	})
 
 	// Routes
-	auth.Post("/login", handlers.HandleLogin(repository.DB))
-	auth.Post("/register", handlers.HandleRegister(repository.DB))
+	auth.Post("/login", handlers.HandleLogin())
+	auth.Post("/register", handlers.HandleRegister())
 
 	port := os.Getenv("AUTH_SERVICE_PORT")
 	if port == "" {
