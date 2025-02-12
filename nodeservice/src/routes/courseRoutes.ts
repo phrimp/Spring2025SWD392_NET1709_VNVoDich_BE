@@ -10,6 +10,7 @@ import {
   updateCourse,
   updateLesson,
 } from "../controllers/courseController";
+import tutorAuth from "../middleware/tutorAuth";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });

@@ -8,9 +8,11 @@ export const getTutorAvailability = async (
   res: Response
 ): Promise<void> => {
   try {
+    const { userId } = req.body;
+
     const tutor = await prisma.tutor.findUnique({
       where: {
-        id: 1,
+        id: userId,
       },
       include: {
         availability: {
