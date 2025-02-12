@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCourse = exports.createCourse = exports.getCourse = exports.getCourses = void 0;
+exports.deleteLesson = exports.updateLesson = exports.addLessonToCourse = exports.updateCourse = exports.deleteCourse = exports.createCourse = exports.getCourse = exports.getCourses = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -25,7 +25,7 @@ const getCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             filters.subject = { contains: subject };
         if (title)
             filters.title = { contains: title };
-        if (grade)
+        if (grade && grade !== "all")
             filters.grade = parseInt(grade, 10);
         if (status)
             filters.status = status;
@@ -159,3 +159,143 @@ const deleteCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.deleteCourse = deleteCourse;
+const updateCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const updateData = Object.assign({}, req.body);
+    // const { userId } = getAuth(req);
+    try {
+        if (updateData.price) {
+            const price = parseInt(updateData.price);
+            if (isNaN(price)) {
+                res.status(400).json({
+                    message: "Invaid price format",
+                    error: "Price must be a valid number",
+                });
+            }
+            updateData.price = price;
+        }
+        if (updateData.grade) {
+            const grade = parseInt(updateData.grade);
+            if (isNaN(grade)) {
+                res.status(400).json({
+                    message: "Invaid price format",
+                    error: "Grade must be a valid number",
+                });
+            }
+            updateData.grade = grade;
+        }
+        const course = yield prisma.course.update({
+            where: {
+                id: Number(id),
+                // AND: {
+                //   tutor_id: {
+                //     equals: tutorId
+                //   }
+                // }
+            },
+            data: updateData,
+        });
+        if (!course) {
+            res.status(404).json({ message: "Course not found" });
+            return;
+        }
+        res.json({ message: "Course updated successfully", data: course });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error updating course", error });
+    }
+});
+exports.updateCourse = updateCourse;
+const addLessonToCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { courseId } = req.params;
+        const { title, description, learning_objectives, materials_needed } = req.body;
+        if (!courseId) {
+            res.status(404).json({ message: "Course Id is required" });
+            return;
+        }
+        const updateCourse = yield prisma.course.update({
+            where: {
+                id: Number(courseId),
+            },
+            data: {
+                total_lessons: {
+                    increment: 1,
+                },
+                lessons: {
+                    create: {
+                        title,
+                        description,
+                        learning_objectives,
+                        materials_needed,
+                    },
+                },
+            },
+        });
+        res.json({ message: "Lesson added successfully", data: updateCourse });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error adding lesson to course", error });
+    }
+});
+exports.addLessonToCourse = addLessonToCourse;
+const updateLesson = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { courseId, lessonId } = req.params;
+        const { title, description, learning_objectives, materials_needed } = req.body;
+        if (!courseId || !lessonId) {
+            res.status(404).json({ message: "Course Id or Lesson Id is required" });
+            return;
+        }
+        const updateCourse = yield prisma.course.update({
+            where: {
+                id: Number(courseId),
+            },
+            data: {
+                total_lessons: {
+                    increment: 1,
+                },
+                lessons: {
+                    update: {
+                        where: { id: Number(lessonId) },
+                        data: { title, description, learning_objectives, materials_needed },
+                    },
+                },
+            },
+        });
+        res.json({ message: "Lesson added successfully", data: updateCourse });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error adding lesson to course", error });
+    }
+});
+exports.updateLesson = updateLesson;
+const deleteLesson = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { courseId, lessonId } = req.params;
+        if (!courseId || !lessonId) {
+            res.status(404).json({ message: "Course Id or Lesson Id is required" });
+            return;
+        }
+        const updateCourse = yield prisma.course.update({
+            where: {
+                id: Number(courseId),
+            },
+            data: {
+                total_lessons: {
+                    decrement: 1,
+                },
+                lessons: {
+                    delete: {
+                        id: Number(lessonId),
+                    },
+                },
+            },
+        });
+        res.json({ message: "Lesson deleted successfully", data: updateCourse });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error deleting lesson to course", error });
+    }
+});
+exports.deleteLesson = deleteLesson;
