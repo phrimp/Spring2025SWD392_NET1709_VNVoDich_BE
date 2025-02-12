@@ -9,13 +9,3 @@ type User struct {
 	Email    string `json:"email"`
 	Role     string `json:"role"`
 }
-
-type LoginRequest struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
-}
-
-type LoginResponse struct {
-	Token string `json:"token"`
-	User  User   `json:"user"`
-}

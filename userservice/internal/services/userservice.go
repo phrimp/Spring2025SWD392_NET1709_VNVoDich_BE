@@ -47,6 +47,10 @@ func AddUser(username, password, email, role string, db *gorm.DB) error {
 		Email:    email,
 		Role:     role,
 	}
+	// Set default if no provide
+	if role == "" {
+		user.Role = "user"
+	}
 
 	if err := db.Create(&user).Error; err != nil {
 		return fmt.Errorf("failed to create user: %v", err)
