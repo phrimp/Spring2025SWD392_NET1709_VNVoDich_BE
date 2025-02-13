@@ -28,7 +28,7 @@ func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*mode
 	return &user, nil
 }
 
-func AddUser(username, password, email, role string, db *gorm.DB) error {
+func AddUser(username, password, email, role, full_name string, db *gorm.DB) error {
 	// Check if user exists
 	var existingUser models.User
 	if err := db.Where("username = ?", username).First(&existingUser).Error; err == nil {
@@ -46,6 +46,7 @@ func AddUser(username, password, email, role string, db *gorm.DB) error {
 		Password: string(hashedPassword),
 		Email:    email,
 		Role:     role,
+		Full_name: full_name,
 	}
 	// Set default if no provide
 	if role == "" {

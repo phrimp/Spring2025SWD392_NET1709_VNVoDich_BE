@@ -14,15 +14,19 @@ datasource db {
 }
 
 model User {
-  id            Int     @id @default(autoincrement())
-  email         String  @unique
-  password_hash String
-  full_name     String
-  phone         String?
-  role          Role
-  google_id     String? @unique
-  timezone      String?
-  is_verified   Boolean @default(false)
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  username    String?
+  password    String
+  full_name   String
+  phone       String?
+  role        Role
+  google_id   String?   @unique
+  timezone    String?
+  is_verified Boolean   @default(false)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  deleted_at  DateTime?
 
   Tutor Tutor[]
 }

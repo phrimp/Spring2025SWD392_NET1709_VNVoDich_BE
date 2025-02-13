@@ -13,6 +13,7 @@ type RequestParam struct {
 	Password string `json:"password"`
 	Email    string `json:"email"`
 	Role     string `json:"role"`
+	Full_name string `json:"fullname"`
 }
 
 func GetUserWithUsernamePasswordHandler(db *gorm.DB) fiber.Handler {
@@ -43,7 +44,7 @@ func AddUser(db *gorm.DB) fiber.Handler {
 				"error": "Invalid request",
 			})
 		}
-		err := services.AddUser(req.Username, req.Password, req.Email, req.Role, db)
+		err := services.AddUser(req.Username, req.Password, req.Email, req.Role, req.Full_name, db)
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": err,
