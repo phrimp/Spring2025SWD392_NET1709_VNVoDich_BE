@@ -15,6 +15,7 @@ type Gateway struct {
 	app    *fiber.App
 	auth   *handlers.AuthHandler
 	google *handlers.GoogleHandler
+	user   *handlers.UserServiceHandler
 }
 
 func NewGateway(config *config.Config) *Gateway {
@@ -39,6 +40,7 @@ func NewGateway(config *config.Config) *Gateway {
 		app:    app,
 		auth:   handlers.NewAuthHandler(config.AuthServiceURL),
 		google: handlers.NewGoogleHandler(config.GoogleServiceURL),
+		user:   handlers.NewUserService(config.UserServiceURL),
 	}
 
 	gateway.setupRoutes()
@@ -50,6 +52,7 @@ func (g *Gateway) setupRoutes() {
 	g.app.Post("/auth/login", g.auth.HandleLogin())
 	g.app.Post("/auth/register", g.auth.HandleRegister())
 	g.app.Get("/google/auth/login", g.google.HandleLogin())
+	g.app.Get("/public/user/:username", g.user.HandleGetUserwithUsername())
 
 	// Protected routes
 	api := g.app.Group("/api")
@@ -64,6 +67,9 @@ func (g *Gateway) setupRoutes() {
 	//admin.Get("/users", g.auth.HandleListUsers())
 	//admin.Delete("/users/:id", g.auth.HandleDeleteUser())
 
+	admin_api := api.Group("/admin")
+	admin_api.Use(middleware.RequireRole("admin"))
+	admin_api.Get("/get-all/user", g.user.HandleAllGetUser())
 	//// Specific role-based routes
 	//api.Get("/sensitive-data", middleware.RequireRole("admin", "data_analyst"), g.auth.HandleSensitiveData())
 }

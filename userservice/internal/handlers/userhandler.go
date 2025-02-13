@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"strconv"
 	"user-service/internal/services"
 
 	"github.com/gofiber/fiber/v2"
@@ -52,5 +53,40 @@ func AddUser(db *gorm.DB) fiber.Handler {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"status": "OK",
 		})
+	}
+}
+
+func GetUserWithUsername(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req RequestParam
+		if err := c.BodyParser(&req); err != nil {
+			fmt.Println("Error Get User:", err)
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid request",
+			})
+		}
+		user, err := services.FindUserWithUsername(req.Username, db)
+		if err != nil {
+			fmt.Println("Error Get User:", err)
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": err,
+			})
+		}
+		return c.JSON(user)
+	}
+}
+
+func GetAllUser(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		page, _ := strconv.Atoi(c.Query("page"))
+		limit, _ := strconv.Atoi(c.Query("limit"))
+		users, err := services.GetAllUser(db, page, limit)
+		if err != nil {
+			fmt.Println("Error Get User:", err)
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": err,
+			})
+		}
+		return c.JSON(users)
 	}
 }

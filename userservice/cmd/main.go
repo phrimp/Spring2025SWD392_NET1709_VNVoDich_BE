@@ -40,6 +40,8 @@ func main() {
 	// Routes
 	user.Post("/get", handlers.GetUserWithUsernamePasswordHandler(repository.DB))
 	user.Post("/add", handlers.AddUser(repository.DB))
+	user.Get("/get-public-user", handlers.GetUserWithUsername(repository.DB))
+	user.Get("/get-all-user", handlers.GetAllUser(repository.DB))
 
 	port := os.Getenv("PORT")
 	if port == "" {

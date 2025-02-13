@@ -58,3 +58,42 @@ func AddUser(username, password, email, role string, db *gorm.DB) error {
 
 	return nil
 }
+
+func FindUserWithUsername(username string, db *gorm.DB) (*models.User, error) {
+	if username == "" {
+		return nil, errors.New("username cannot be empty")
+	}
+
+	var user models.User
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.New("user not found")
+		}
+		return nil, fmt.Errorf("error finding user: %w", result.Error)
+	}
+	user.Password = ""
+
+	return &user, nil
+}
+
+func GetAllUser(db *gorm.DB, page, limit int) ([]models.User, error) {
+	var users []models.User
+
+	offset := (page - 1) * limit
+
+	result := db.Model(&models.User{}).
+		Order("created_at DESC").
+		Limit(limit).
+		Offset(offset).
+		Find(&users)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("error fetching users: %w", result.Error)
+	}
+
+	return users, nil
+}
