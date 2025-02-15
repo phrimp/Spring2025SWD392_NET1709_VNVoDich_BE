@@ -48,7 +48,7 @@ export const getCourses = async (
             },
           },
         },
-        lessons: true,
+        // lessons: true,
       },
     });
 
