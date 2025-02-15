@@ -8,4 +8,9 @@ type User struct {
 	Password string `json:"password"`
 	Email    string `json:"email"`
 	Role     string `json:"role"`
+	Full_name string `json:"fullname"`
+}
+
+func (User) TableName() string {
+	return "user"
 }

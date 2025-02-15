@@ -68,6 +68,16 @@ services:
       - app-network
     restart: unless-stopped
 
+  node-service: 
+    build:
+      context: ./nodeservice
+      dockerfile: Dockerfile
+    ports: 
+      - "${NODE}:${NODE}"
+    networks:
+      - app-network
+    restart: unless-stopped
+    
   user-service:
     build: 
       context: /userservice
@@ -80,11 +90,16 @@ services:
     networks:
         - app-network
     environment:
-      - DB_HOST=mysql
+      # - DB_HOST=mysql
+      # - DB_PORT=3306
+      # - DB_USER=${DB_USER}
+      # - DB_PASSWORD=${DB_PASSWORD}
+      # - DB_NAME=${DB_NAME}
+      - DB_HOST=host.docker.internal
       - DB_PORT=3306
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
+      - DB_USER=root
+      - DB_PASSWORD=123456
+      - DB_NAME=tutorplatform
 
     restart: unless-stopped
 
