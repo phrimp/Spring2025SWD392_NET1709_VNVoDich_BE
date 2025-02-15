@@ -69,7 +69,7 @@ services:
     
   user-service:
     build: 
-      context: /userservice
+      context: ./userservice
       dockerfile: Dockerfile
     ports:
       - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
