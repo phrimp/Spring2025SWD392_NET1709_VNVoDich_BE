@@ -69,7 +69,6 @@ model Children {
   parent    Parent @relation(fields: [parent_id], references: [id])
 
   courseSubscriptions CourseSubscription[]
-  teachingSessions    TeachingSession[]
 }
 
 model TutorSpecialty {
@@ -111,8 +110,6 @@ model Lesson {
 
   course_id Int
   Course    Course @relation(fields: [course_id], references: [id], onDelete: Cascade)
-
-  teachingSessions TeachingSession[]
 }
 
 model Availability {
@@ -150,21 +147,20 @@ model CourseSubscription {
   children    Children @relation(fields: [children_id], references: [id])
 
   courseSubscriptionSchedules CourseSubscriptionSchedule[]
+  teachingSessions            TeachingSession[]
 }
 
 model TeachingSession {
   id                Int      @id @default(autoincrement())
   google_meet_id    String?
-  actual_start      DateTime
-  actual_end        DateTime
+  startTime         DateTime
+  endTime           DateTime
   status            String
   topics_covered    String?
   homework_assigned String?
 
-  children_id     Int
-  children        Children          @relation(fields: [children_id], references: [id])
-  lesson_id       Int
-  lesson          Lesson            @relation(fields: [lesson_id], references: [id])
+  subscription_id Int
+  subscription    CourseSubscription @relation(fields: [subscription_id], references: [id])
   sessionFeedback SessionFeedback[]
 }
 
