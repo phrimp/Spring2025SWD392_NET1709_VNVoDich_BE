@@ -10,10 +10,10 @@ import (
 )
 
 type RequestParam struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	Role     string `json:"role"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
 	Full_name string `json:"fullname"`
 }
 
@@ -57,7 +57,7 @@ func AddUser(db *gorm.DB) fiber.Handler {
 	}
 }
 
-func GetUserWithUsername(db *gorm.DB) fiber.Handler {
+func GetPublicUser(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req RequestParam
 		if err := c.BodyParser(&req); err != nil {
@@ -89,5 +89,19 @@ func GetAllUser(db *gorm.DB) fiber.Handler {
 			})
 		}
 		return c.JSON(users)
+	}
+}
+
+func GetUserwithUsername(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		username := c.Query("username")
+		user, err := services.FindUserWithUsername(username, db)
+		if err != nil {
+			fmt.Println("Error Get User:", err)
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": err,
+			})
+		}
+		return c.JSON(user)
 	}
 }

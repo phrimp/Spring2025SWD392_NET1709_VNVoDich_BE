@@ -57,6 +57,7 @@ func (g *Gateway) setupRoutes() {
 	// Protected routes
 	api := g.app.Group("/api")
 	api.Use(middleware.JWTMiddleware(g.config.JWTSecret))
+	api.Get("/get/me", g.user.HandleGetMe())
 
 	// User routes (accessible by all authenticated users)
 	// api.Get("/profile", g.auth.HandleGetProfile())
