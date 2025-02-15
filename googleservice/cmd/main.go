@@ -27,7 +27,7 @@ func main() {
 
 	// Initialize handlers
 	googleHandler := handlers.NewGoogleHandler(cfg.GoogleAuth)
-	emailHandler := handlers.NewEmailHandler(&cfg.SMTP)
+	emailHandler := handlers.NewEmailHandler(cfg.Email)
 
 	// Routes
 	api := app.Group("/api")
@@ -39,7 +39,8 @@ func main() {
 
 	// Email routes
 	email := api.Group("/email")
-	email.Post("/email/send", emailHandler.HandleSendPlainEmail)
+	email.Post("/send", emailHandler.HandleSendPlainEmail)
+	// email.Post("/send/verification")
 
 	// Start server
 	port := os.Getenv("PORT")
