@@ -66,17 +66,6 @@ services:
         condition: service_healthy
     networks:
       - app-network
-    restart: unless-stopped
-
-  node-service: 
-    build:
-      context: ./nodeservice
-      dockerfile: Dockerfile
-    ports: 
-      - "${NODE}:${NODE}"
-    networks:
-      - app-network
-    restart: unless-stopped
     
   user-service:
     build: 
@@ -90,16 +79,11 @@ services:
     networks:
         - app-network
     environment:
-      # - DB_HOST=mysql
-      # - DB_PORT=3306
-      # - DB_USER=${DB_USER}
-      # - DB_PASSWORD=${DB_PASSWORD}
-      # - DB_NAME=${DB_NAME}
-      - DB_HOST=host.docker.internal
+      - DB_HOST=mysql
       - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=123456
-      - DB_NAME=tutorplatform
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
 
     restart: unless-stopped
 
@@ -137,7 +121,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
 
 volumes:
   mysql_data:

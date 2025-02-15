@@ -16,3 +16,7 @@ func GetUserwithUsername(req *fasthttp.Request, resp *fasthttp.Response, c *fibe
 func GetAllUser(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
 	return ForwardRequest(req, resp, c, url, "GET", c.Body())
 }
+
+func GetMe(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
+	return ForwardRequest(req, resp, c, url, "GET", c.Body())
+}
