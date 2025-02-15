@@ -8,10 +8,10 @@ import (
 )
 
 type EmailService struct {
-	config *config.SMTPConfig
+	config *config.EmailConfig
 }
 
-func NewEmailService(_config *config.SMTPConfig) *EmailService {
+func NewEmailService(_config *config.EmailConfig) *EmailService {
 	return &EmailService{config: _config}
 }
 
@@ -23,11 +23,11 @@ func (e *EmailService) SendEmail(title, body string, receipient []string) error 
 		"\r\n"+
 		"%s\r\n", strings.Join(to, ","), title, body))
 
-	auth := smtp.PlainAuth("", e.config.Username, e.config.Password, e.config.Host)
+	auth := smtp.PlainAuth("", e.config.SMTPConfig.Username, e.config.SMTPConfig.Password, e.config.SMTPConfig.Host)
 
-	addr := fmt.Sprintf("%s:$s", e.config.Host, e.config.Port)
+	addr := e.config.SMTPConfig.Host + ":" + e.config.SMTPConfig.Port
 
-	err := smtp.SendMail(addr, auth, e.config.From, to, message)
+	err := smtp.SendMail(addr, auth, e.config.SMTPConfig.From, to, message)
 	if err != nil {
 		fmt.Printf("Error sending email: %s", err)
 		return err

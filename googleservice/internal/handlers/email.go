@@ -11,7 +11,7 @@ type EmailHandler struct {
 	emailService *services.EmailService
 }
 
-func NewEmailHandler(config *config.SMTPConfig) *EmailHandler {
+func NewEmailHandler(config *config.EmailConfig) *EmailHandler {
 	return &EmailHandler{
 		emailService: services.NewEmailService(config),
 	}
