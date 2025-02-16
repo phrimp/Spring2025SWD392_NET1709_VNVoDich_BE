@@ -73,7 +73,7 @@ func HandleRegister() fiber.Handler {
 		err := services.AddUserUserService(utils.SERVICES_ROUTES.UserService, req.Username, req.Password, req.Email, req.Role)
 		if err != nil {
 			fmt.Println("Register Error:", err)
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err})
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 		}
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"Status": "User Created"})
 	}

@@ -24,10 +24,10 @@ func initMySQLDB() *gorm.DB {
 	if dbUser == "" || dbPass == "" || dbHost == "" || dbName == "" {
 		fmt.Println("Warning: Some database environment variables are missing. Using default values.")
 		// Fallback to default values if env vars are not set
-		dbUser = "user"
-		dbPass = "password"
+		dbUser = "appuser"
+		dbPass = "apppassword"
 		dbHost = "mysql"
-		dbName = "auth_db"
+		dbName = "online_tutoring_platform"
 	}
 	if dbPort == "" {
 		dbPort = "3306" // default MySQL port

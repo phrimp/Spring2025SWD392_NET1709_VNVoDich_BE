@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"strconv"
+	"user-service/internal/models"
 	"user-service/internal/services"
 
 	"github.com/gofiber/fiber/v2"
@@ -39,16 +40,16 @@ func GetUserWithUsernamePasswordHandler(db *gorm.DB) fiber.Handler {
 
 func AddUser(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var req RequestParam
+		var req models.UserCreationParams
 		if err := c.BodyParser(&req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid request",
 			})
 		}
-		err := services.AddUser(req.Username, req.Password, req.Email, req.Role, req.Full_name, db)
+		err := services.AddUser(req, db)
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": err,
+				"error": err.Error(),
 			})
 		}
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
