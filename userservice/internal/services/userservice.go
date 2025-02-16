@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Login
 func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*models.User, error) {
 	var user models.User
 	if err := db.Where("username = ?", username).First(&user).Error; err != nil {
@@ -17,10 +18,13 @@ func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*mode
 		}
 		return nil, fmt.Errorf("database error: %v", err)
 	}
-	fmt.Println(user)
+	if err := user.IsAccountValid(); err != nil {
+		return nil, fmt.Errorf("account invalid: %v", err)
+	}
 
 	// Check password
 	if err := user.CheckPassword(password); err != nil {
+		user.IncrementLoginAttempts()
 		return nil, fmt.Errorf("invalid credentials")
 	}
 
