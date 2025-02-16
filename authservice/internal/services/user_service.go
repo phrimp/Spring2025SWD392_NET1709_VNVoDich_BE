@@ -48,6 +48,5 @@ func AddUserUserService(userServiceURL, username, password, email, role string) 
 	if resp.StatusCode() != fiber.StatusOK {
 		return fmt.Errorf("add user failed: %s", string(resp.Body()))
 	}
-	fmt.Println(string(resp.Body()))
 	return nil
 }

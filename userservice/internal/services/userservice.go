@@ -3,9 +3,9 @@ package services
 import (
 	"errors"
 	"fmt"
+	"log"
 	"user-service/internal/models"
 
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -17,9 +17,10 @@ func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*mode
 		}
 		return nil, fmt.Errorf("database error: %v", err)
 	}
+	fmt.Println(user)
 
 	// Check password
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+	if err := user.CheckPassword(password); err != nil {
 		return nil, fmt.Errorf("invalid credentials")
 	}
 
@@ -28,33 +29,63 @@ func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*mode
 	return &user, nil
 }
 
-func AddUser(username, password, email, role, full_name string, db *gorm.DB) error {
-	// Check if user exists
+func AddUser(params models.UserCreationParams, db *gorm.DB) error {
+	// Check for existing username
+	log.Printf("Adding user with username: %s", params.Username)
+
 	var existingUser models.User
-	if err := db.Where("username = ?", username).First(&existingUser).Error; err == nil {
+	if err := db.Where("username = ?", params.Username).First(&existingUser).Error; err == nil {
 		return fmt.Errorf("username already exists")
 	}
 
-	// Hash password before saving
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return fmt.Errorf("failed to hash password: %v", err)
+	// Check for existing email
+	if err := db.Where("email = ?", params.Email).First(&existingUser).Error; err == nil {
+		return fmt.Errorf("email already exists")
 	}
 
+	// Create new user instance
 	user := models.User{
-		Username: username,
-		Password: string(hashedPassword),
-		Email:    email,
-		Role:     role,
-		Full_name: full_name,
-	}
-	// Set default if no provide
-	if role == "" {
-		user.Role = "user"
+		Username: params.Username,
+		Email:    params.Email,
+		Role:     models.UserRole(params.Role),
+		Status:   models.StatusInactive, // Default status
 	}
 
-	if err := db.Create(&user).Error; err != nil {
-		return fmt.Errorf("failed to create user: %v", err)
+	// Set optional fields if provided
+	if params.FullName != "" {
+		user.FullName = &params.FullName
+	}
+	if params.Phone != "" {
+		user.Phone = &params.Phone
+	}
+
+	user.Password = params.Password
+	log.Printf("User struct created with password: %s", user.Password)
+
+	// Set default role if not provided
+	if user.Role == "" {
+		user.Role = models.RoleParent
+	}
+
+	// Validate the entire user model
+	if err := user.Validate(); err != nil {
+		return fmt.Errorf("validation failed: %v", err)
+	}
+
+	// Create user in database within a transaction
+	err := db.Transaction(func(tx *gorm.DB) error {
+		log.Println("Starting transaction")
+		if err := tx.Create(&user).Error; err != nil {
+			log.Printf("Error creating user: %v", err)
+			return fmt.Errorf("failed to create user: %v", err)
+		}
+		log.Printf("User created with final password: %s", user.Password)
+		// more here
+
+		return nil
+	})
+	if err != nil {
+		return err
 	}
 
 	return nil
