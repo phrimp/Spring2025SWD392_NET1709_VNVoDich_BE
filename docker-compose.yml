@@ -50,6 +50,22 @@ services:
       - app-network
     restart: unless-stopped
 
+  node-service: 
+    build:
+      context: ./nodeservice
+      dockerfile: Dockerfile
+    ports: 
+      - "${NODE_SERVICE_PORT}:${NODE_SERVICE_PORT}"
+    environment:
+      - "PORT=${NODE_SERVICE_PORT}"
+      - "DATABASE_URL=${NODE_DATABASE_URL}"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+
   admin-service: 
     build:
       context: ./adminservice
