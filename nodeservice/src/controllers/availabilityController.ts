@@ -185,8 +185,11 @@ export const getCourseAvailability = async (req: Request, res: Response) => {
       return;
     }
 
-    const startDate = startOfDay(new Date());
+    const startDate = startOfDay(new Date().getTime() + 7 * 60 * 60 * 1000);
     const endDate = addDays(startDate, 7);
+    const sessions = course.courseSubscriptions.flatMap(
+      (sub) => sub.teachingSessions
+    );
 
     const availableDates = [];
 
@@ -202,7 +205,7 @@ export const getCourseAvailability = async (req: Request, res: Response) => {
         const slots = generateAvailableTimeSlots({
           startTime: dayAvailability.startTime,
           endTime: dayAvailability.endTime,
-          sessions: course.courseSubscriptions[0].teachingSessions,
+          sessions,
           dateStr,
           timeGap: course.tutor.availability?.timeGap,
         });
