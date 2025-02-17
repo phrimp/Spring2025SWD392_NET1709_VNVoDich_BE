@@ -14,47 +14,45 @@ datasource db {
 }
 
 enum UserRole {
-  parent
-  kid
-  tutor
-  admin
+  Parent
+  Children
+  Tutor
+  Admin
 }
 
 enum UserStatus {
-  active
-  inactive
-  suspended
-  banned
+  Active
+  Suspended
+  Banned
 }
 
 model User {
-  id                      Int     @id @default(autoincrement()) @db.UnsignedInt
-  created_at              DateTime   @default(now()) 
-  updated_at              DateTime   @default(now()) @updatedAt 
-  deleted_at              DateTime?  
-  
-  username                String     @unique @db.VarChar(50)
-  password               String     @db.VarChar(255)
-  email                  String     @unique @db.VarChar(255)
-  
-  role                   UserRole   @default(kid)
-  phone                  String?    @db.VarChar(20)
-  full_name             String?    @db.VarChar(255)
-  
-  is_verified           Boolean    @default(false)
-  status                UserStatus @default(inactive)
-  email_verification_token String? @db.VarChar(100)
-  
-  last_login_at         BigInt?
-  login_attempts        Int       @default(0) @db.UnsignedInt
-  account_locked        Boolean   @default(false)
-  password_changed_at   BigInt?
-  
-  password_reset_token  String?   @db.VarChar(100)
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  deleted_at DateTime?
+
+  username String @unique @db.VarChar(50)
+  password String @db.VarChar(255)
+  email    String @unique @db.VarChar(255)
+
+  role      UserRole @default(Parent)
+  phone     String?  @db.VarChar(20)
+  full_name String?  @db.VarChar(255)
+
+  is_verified              Boolean    @default(false)
+  status                   UserStatus @default(Active)
+  email_verification_token String?    @db.VarChar(100)
+
+  last_login_at       BigInt?
+  login_attempts      Int     @default(0) @db.UnsignedInt
+  account_locked      Boolean @default(false)
+  password_changed_at BigInt?
+
+  password_reset_token   String? @db.VarChar(100)
   password_reset_expires BigInt?
-  
-  // Relation to Tutor model (if you want to keep it)
-  Tutor                 Tutor[]
+
+  Tutor Tutor[]
 
   @@index([status])
   @@index([role])
@@ -70,7 +68,8 @@ model Tutor {
   demo_video_url String?
   image          String?
 
-  profile        User             @relation(fields: [id], references: [id])
+  profile User @relation(fields: [id], references: [id])
+
   tutorSpecialty TutorSpecialty[]
   courses        Course[]
   tutorReviews   TutorReview[]
@@ -99,7 +98,6 @@ model Children {
   parent    Parent @relation(fields: [parent_id], references: [id])
 
   courseSubscriptions CourseSubscription[]
-  teachingSessions    TeachingSession[]
 }
 
 model TutorSpecialty {
@@ -141,8 +139,6 @@ model Lesson {
 
   course_id Int
   Course    Course @relation(fields: [course_id], references: [id], onDelete: Cascade)
-
-  teachingSessions TeachingSession[]
 }
 
 model Availability {
@@ -180,21 +176,20 @@ model CourseSubscription {
   children    Children @relation(fields: [children_id], references: [id])
 
   courseSubscriptionSchedules CourseSubscriptionSchedule[]
+  teachingSessions            TeachingSession[]
 }
 
 model TeachingSession {
   id                Int      @id @default(autoincrement())
   google_meet_id    String?
-  actual_start      DateTime
-  actual_end        DateTime
+  startTime         DateTime
+  endTime           DateTime
   status            String
   topics_covered    String?
   homework_assigned String?
 
-  children_id     Int
-  children        Children          @relation(fields: [children_id], references: [id])
-  lesson_id       Int
-  lesson          Lesson            @relation(fields: [lesson_id], references: [id])
+  subscription_id Int
+  subscription    CourseSubscription @relation(fields: [subscription_id], references: [id])
   sessionFeedback SessionFeedback[]
 }
 
@@ -240,11 +235,6 @@ model CourseReview {
   course    Course @relation(fields: [course_id], references: [id])
   parent_id Int
   parent    Parent @relation(fields: [parent_id], references: [id])
-}
-
-enum Role {
-  Tutor
-  Parent
 }
 
 enum CourseStatus {

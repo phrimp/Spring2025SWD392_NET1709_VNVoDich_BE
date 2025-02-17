@@ -13,19 +13,18 @@ import (
 type UserRole string
 
 const (
-	RoleParent UserRole = "parent"
-	RoleKid    UserRole = "kid"
-	RoleTutor  UserRole = "tutor"
-	RoleAdmin  UserRole = "admin"
+	RoleParent UserRole = "Parent"
+	RoleKid    UserRole = "Kid"
+	RoleTutor  UserRole = "Tutor"
+	RoleAdmin  UserRole = "Admin"
 )
 
 type UserStatus string
 
 const (
-	StatusActive    UserStatus = "active"
-	StatusInactive  UserStatus = "inactive"
-	StatusSuspended UserStatus = "suspended"
-	StatusBanned    UserStatus = "banned"
+	StatusActive    UserStatus = "Active"
+	StatusSuspended UserStatus = "Suspended"
+	StatusBanned    UserStatus = "Banned"
 )
 
 type User struct {
@@ -38,7 +37,7 @@ type User struct {
 	FullName *string  `gorm:"type:varchar(255)" json:"full_name" validate:"omitempty,min=2,max=100"`
 
 	IsVerified             bool       `gorm:"default:false" json:"is_verified"`
-	Status                 UserStatus `gorm:"type:varchar(20);default:'inactive'" json:"status"`
+	Status                 UserStatus `gorm:"type:varchar(20);default:'Active'" json:"status"`
 	EmailVerificationToken *string    `json:"-"`
 
 	LastLoginAt       *int64 `json:"last_login_at,omitempty"`
@@ -51,7 +50,7 @@ type User struct {
 }
 
 func (User) TableName() string {
-	return "users"
+	return "User"
 }
 
 // BeforeSave handles any necessary modifications before saving to database
@@ -113,7 +112,6 @@ func (u *User) Validate() error {
 	// Status validation
 	validStatuses := map[UserStatus]bool{
 		StatusActive:    true,
-		StatusInactive:  true,
 		StatusSuspended: true,
 		StatusBanned:    true,
 	}
