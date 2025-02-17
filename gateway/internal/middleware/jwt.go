@@ -76,8 +76,3 @@ func RequireRole(roles ...string) fiber.Handler {
 		})
 	}
 }
-
-// RequireAdmin middleware specifically for admin access
-func RequireAdmin() fiber.Handler {
-	return RequireRole("admin")
-}

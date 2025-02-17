@@ -11,7 +11,7 @@ import (
 type Config struct {
 	Server     ServerConfig
 	GoogleAuth *GoogleOAuthConfig
-	SMTP       SMTPConfig
+	Email      *EmailConfig
 	JWT        JWTConfig
 }
 
@@ -23,7 +23,7 @@ type ServerConfig struct {
 
 type SMTPConfig struct {
 	Host     string
-	Port     int
+	Port     string
 	Username string
 	Password string
 	From     string
@@ -44,7 +44,7 @@ func New() *Config {
 	return &Config{
 		Server:     loadServerConfig(),
 		GoogleAuth: NewGoogleOAuthConfig(),
-		SMTP:       loadSMTPConfig(),
+		Email:      NewEmailConfig(),
 		JWT:        loadJWTConfig(),
 	}
 }
@@ -73,9 +73,9 @@ func loadServerConfig() ServerConfig {
 }
 
 func loadSMTPConfig() SMTPConfig {
-	port, err := strconv.Atoi(os.Getenv("SMTP_PORT"))
-	if err != nil {
-		port = 587 // default SMTP port
+	port := os.Getenv("SMTP_PORT")
+	if port == "" {
+		port = "587" // default SMTP port
 	}
 
 	return SMTPConfig{

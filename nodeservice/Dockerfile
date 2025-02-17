@@ -7,19 +7,20 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Copy .env file (optional if required during build)
-COPY .env .env
-
 # Install dependencies (including dev dependencies for building)
 RUN npm install
 
-# Copy the Prisma schema and generate the Prisma Client
+# Copy the Prisma schema
 COPY prisma ./prisma
+
+# Generate Prisma Client (this doesn't need database connection)
 RUN npx prisma generate
-RUN npx prisma db push
+
+# Copy the start script
+COPY start.js ./
 
 # Copy the rest of the application
 COPY . .
 
-# Start the application
-CMD ["npm", "run", "dev"]
+# Use the startup script as the entry point
+CMD ["node", "start.js"]
