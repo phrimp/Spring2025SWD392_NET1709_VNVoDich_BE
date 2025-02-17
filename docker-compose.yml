@@ -30,9 +30,6 @@ services:
       - JWT_SECRET=${JWT_SECRET}
     env_file:
       - ./authservice/.env
-    depends_on:
-      mysql:
-        condition: service_healthy
     networks:
       - app-network
     restart: unless-stopped
@@ -43,9 +40,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "${GOOGLE_SERVICE_PORT}:${GOOGLE_SERVICE_PORT}"
-    depends_on: 
-      mysql: 
-        condition: service_healthy
     networks:
       - app-network
     restart: unless-stopped
