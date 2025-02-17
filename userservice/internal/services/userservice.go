@@ -52,7 +52,7 @@ func AddUser(params models.UserCreationParams, db *gorm.DB) error {
 		Username: params.Username,
 		Email:    params.Email,
 		Role:     models.UserRole(params.Role),
-		Status:   models.StatusInactive, // Default status
+		Status:   models.StatusActive, // Default status
 	}
 
 	// Set optional fields if provided
