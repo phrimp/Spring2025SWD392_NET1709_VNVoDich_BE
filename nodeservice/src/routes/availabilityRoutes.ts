@@ -1,9 +1,15 @@
 import { Router } from "express";
-import { getTutorAvailability } from "../controllers/availabilityController";
+import {
+  getCourseAvailability,
+  getTutorAvailability,
+  updateAvailability,
+} from "../controllers/availabilityController";
 import tutorAuth from "../middleware/tutorAuth";
 
 const router = Router();
 
 router.get("/", tutorAuth, getTutorAvailability);
+router.get("/course/:courseId", tutorAuth, getCourseAvailability);
+router.put("/update", tutorAuth, updateAvailability);
 
 export default router;
