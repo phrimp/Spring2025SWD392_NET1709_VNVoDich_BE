@@ -13,22 +13,52 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          Int       @id @default(autoincrement())
-  email       String    @unique
-  username    String?
-  password    String
-  full_name   String
-  phone       String?
-  role        Role
-  google_id   String?   @unique
-  timezone    String?
-  is_verified Boolean   @default(false)
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
-  deleted_at  DateTime?
+enum UserRole {
+  parent
+  kid
+  tutor
+  admin
+}
 
-  Tutor Tutor[]
+enum UserStatus {
+  active
+  inactive
+  suspended
+  banned
+}
+
+model User {
+  id                      Int     @id @default(autoincrement()) @db.UnsignedInt
+  created_at              DateTime   @default(now()) 
+  updated_at              DateTime   @default(now()) @updatedAt 
+  deleted_at              DateTime?  
+  
+  username                String     @unique @db.VarChar(50)
+  password               String     @db.VarChar(255)
+  email                  String     @unique @db.VarChar(255)
+  
+  role                   UserRole   @default(kid)
+  phone                  String?    @db.VarChar(20)
+  full_name             String?    @db.VarChar(255)
+  
+  is_verified           Boolean    @default(false)
+  status                UserStatus @default(inactive)
+  email_verification_token String? @db.VarChar(100)
+  
+  last_login_at         BigInt?
+  login_attempts        Int       @default(0) @db.UnsignedInt
+  account_locked        Boolean   @default(false)
+  password_changed_at   BigInt?
+  
+  password_reset_token  String?   @db.VarChar(100)
+  password_reset_expires BigInt?
+  
+  // Relation to Tutor model (if you want to keep it)
+  Tutor                 Tutor[]
+
+  @@index([status])
+  @@index([role])
+  @@index([deleted_at])
 }
 
 model Tutor {
