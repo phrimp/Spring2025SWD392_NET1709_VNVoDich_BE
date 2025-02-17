@@ -13,7 +13,6 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
       qualifications,
       teachingStyle,
       isAvailable,
-      id,
       email,
       fullName,
       phone,
@@ -29,7 +28,6 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
       filters.teaching_style = { contains: teachingStyle as string };
     if (isAvailable !== undefined)
       filters.is_available = isAvailable === "true";
-    if (id) filters.user = { id: Number(id) }; // filer theo id
     if (email) filters.user = { email: { contains: email as string } }; // Filter theo email
     if (fullName)
       filters.user = { full_name: { contains: fullName as string } }; // Filter theo full_name
@@ -40,41 +38,22 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
       where: filters,
       skip,
       take: pageSizeNum,
+      include: {
+        profile: {
+          select: {
+            email: true,
+            full_name: true,
+            phone: true,
+          },
+        },
+      },
     });
 
     const totalTutors = await prisma.tutor.count({ where: filters });
 
-    // Tìm thông tin user tương ứng cho mỗi tutor
-    const formattedTutors = await Promise.all(
-      tutors.map(async (tutor) => {
-        const user = await prisma.user.findUnique({
-          where: { id: tutor.id },
-        });
-
-        return {
-          id: tutor.id,
-          bio: tutor.bio,
-          qualifications: tutor.qualifications,
-          teaching_style: tutor.teaching_style,
-          is_available: tutor.is_available,
-          demo_video_url: tutor.demo_video_url || null,
-          image: tutor.image || null,
-          user: user
-            ? {
-                email: user.email,
-                full_name: user.full_name,
-                phone: user.phone || null,
-                google_id: user.google_id || null,
-                timezone: user.timezone,
-              }
-            : null,
-        };
-      })
-    );
-
     res.json({
       message: "Tutors retrieved successfully",
-      data: formattedTutors,
+      data: tutors,
       pagination: {
         total: totalTutors,
         page: pageNum,
@@ -95,6 +74,15 @@ export const getTutor = async (req: Request, res: Response): Promise<void> => {
   try {
     const tutor = await prisma.tutor.findUnique({
       where: { id: Number(id) },
+      include: {
+        profile: {
+          select: {
+            email: true,
+            full_name: true,
+            phone: true,
+          },
+        },
+      },
     });
 
     if (!tutor) {
@@ -102,31 +90,7 @@ export const getTutor = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Tìm thông tin user tương ứng
-    const user = await prisma.user.findUnique({
-      where: { id: tutor.id },
-    });
-
-    const formattedTutor = {
-      id: tutor.id,
-      bio: tutor.bio,
-      qualifications: tutor.qualifications,
-      teaching_style: tutor.teaching_style,
-      is_available: tutor.is_available,
-      demo_video_url: tutor.demo_video_url || null,
-      image: tutor.image || null,
-      user: user
-        ? {
-            email: user.email,
-            full_name: user.full_name,
-            phone: user.phone || null,
-            google_id: user.google_id || null,
-            timezone: user.timezone,
-          }
-        : null,
-    };
-
-    res.json({ message: "Tutor retrieved successfully", data: formattedTutor });
+    res.json({ message: "Tutor retrieved successfully", data: tutor });
   } catch (error) {
     console.error("Error retrieving tutor:", error);
     res.status(500).json({ message: "Error retrieving tutor", error });
