@@ -1,10 +1,7 @@
 package utils
 
 import (
-	"fmt"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
 type ServicesRoute struct {
@@ -17,9 +14,6 @@ var (
 )
 
 func init() {
-	if err := godotenv.Load(".env"); err != nil {
-		fmt.Println("Warning: .env file not found, using environment variables")
-	}
 	API_KEY = os.Getenv("API_KEY")
 	SERVICES_ROUTES.UserService = "http://user-service:" + os.Getenv("USER_SERVICE_PORT")
 }

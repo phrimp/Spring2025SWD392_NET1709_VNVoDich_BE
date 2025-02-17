@@ -9,10 +9,18 @@ services:
       - "${GATEWAY_PORT}:${GATEWAY_PORT}"
     environment:
       - PORT=${GATEWAY_PORT}
-      - AUTH_SERVICE_URL=http://auth-service:${AUTH_SERVICE_PORT}
+      - API_KEY=${API_KEY}
+      - AUTH_SERVICE_URL=${AUTH_SERVICE_PORT}
       - JWT_SECRET=${JWT_SECRET}
-    env_file:
-      - ./gateway/.env
+      - GATEWAY_PORT=${GATEWAY_PORT}
+      - AUTH_SERVICE_URL=${AUTH_SERVICE_URL}
+      - NODE_SERVICE_URL=${NODE_SERVICE_URL}
+      - PAYMENT_SERVICE_URL=${PAYMENT_SERVICE_URL}
+      - ADMIN_SERVICE_URL=${ADMIN_SERVICE_URL}
+      - GOOGLE_SERVICE_URL=${GOOGLE_SERVICE_URL}
+      - USER_SERVICE_URL=${USER_SERVICE_URL}
+      - SERVER_READ_TIMEOUT=${SERVER_READ_TIMEOUT}
+      - SERVER_WRITE_TIMEOUT=${SERVER_WRITE_TIMEOUT}
     depends_on:
       - auth-service
     networks:
@@ -28,8 +36,9 @@ services:
     environment:
       - PORT=${AUTH_SERVICE_PORT}
       - JWT_SECRET=${JWT_SECRET}
-    env_file:
-      - ./authservice/.env
+      - API_KEY=${API_KEY}
+      - AUTH_SERVICE_PORT=${AUTH_SERVICE_PORT}
+      - USER_SERVICE_PORT=${USER_SERVICE_PORT}
     networks:
       - app-network
     restart: unless-stopped
@@ -38,6 +47,21 @@ services:
     build:
       context: ./googleservice
       dockerfile: Dockerfile
+    environment:
+      - PORT=${GOOGLE_SERVICE_PORT}
+      - SERVER_READ_TIMEOUT=${SERVER_READ_TIMEOUT}
+      - SERVER_WRITE_TIMEOUT=${SERVER_WRITE_TIMEOUT}
+      - API_KEY=${API_KEY}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URL=${GOOGLE_REDIRECT_URL}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM=${SMTP_FROM}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
     ports:
       - "${GOOGLE_SERVICE_PORT}:${GOOGLE_SERVICE_PORT}"
     networks:
@@ -84,6 +108,8 @@ services:
     networks:
         - app-network
     environment:
+      - PORT=${USER_SERVICE_PORT}
+      - API_KEY=${API_KEY}
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_USER=${DB_USER}
