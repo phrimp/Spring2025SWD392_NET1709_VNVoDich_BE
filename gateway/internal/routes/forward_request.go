@@ -31,8 +31,8 @@ func ForwardRequest(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx
 		data = nil
 		respErr = err
 		return c.Status(resp.StatusCode()).JSON(fiber.Map{
-			"data":  data,
-			"error": respErr,
+			"data":    data,
+			"message": respErr,
 		})
 	}
 
@@ -42,6 +42,9 @@ func ForwardRequest(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx
 			respErr = mapData["error"]
 			data = nil
 		}
+		if mapData["message"] != nil {
+			respErr = mapData["message"]
+		}
 	}
-	return c.Status(resp.StatusCode()).JSON(fiber.Map{"data": data, "error": respErr})
+	return c.Status(resp.StatusCode()).JSON(fiber.Map{"data": data, "message": respErr})
 }
