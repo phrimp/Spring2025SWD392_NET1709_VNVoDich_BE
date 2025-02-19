@@ -15,7 +15,7 @@ const prisma = new client_1.PrismaClient();
 //  Lấy danh sách tất cả tutors với phân trang và bộ lọc
 const getTutors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { page = 1, pageSize = 10, qualifications, teachingStyle, isAvailable, id, email, fullName, phone, } = req.query;
+        const { page = 1, pageSize = 10, qualifications, teachingStyle, isAvailable, email, fullName, phone, } = req.query;
         const pageNum = parseInt(page, 10);
         const pageSizeNum = parseInt(pageSize, 10);
         const filters = {};
@@ -25,8 +25,6 @@ const getTutors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             filters.teaching_style = { contains: teachingStyle };
         if (isAvailable !== undefined)
             filters.is_available = isAvailable === "true";
-        if (id)
-            filters.user = { id: Number(id) }; // filer theo id
         if (email)
             filters.user = { email: { contains: email } }; // Filter theo email
         if (fullName)
@@ -38,35 +36,20 @@ const getTutors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             where: filters,
             skip,
             take: pageSizeNum,
+            include: {
+                profile: {
+                    select: {
+                        email: true,
+                        full_name: true,
+                        phone: true,
+                    },
+                },
+            },
         });
         const totalTutors = yield prisma.tutor.count({ where: filters });
-        // Tìm thông tin user tương ứng cho mỗi tutor
-        const formattedTutors = yield Promise.all(tutors.map((tutor) => __awaiter(void 0, void 0, void 0, function* () {
-            const user = yield prisma.user.findUnique({
-                where: { id: tutor.id },
-            });
-            return {
-                id: tutor.id,
-                bio: tutor.bio,
-                qualifications: tutor.qualifications,
-                teaching_style: tutor.teaching_style,
-                is_available: tutor.is_available,
-                demo_video_url: tutor.demo_video_url || null,
-                image: tutor.image || null,
-                user: user
-                    ? {
-                        email: user.email,
-                        full_name: user.full_name,
-                        phone: user.phone || null,
-                        google_id: user.google_id || null,
-                        timezone: user.timezone,
-                    }
-                    : null,
-            };
-        })));
         res.json({
             message: "Tutors retrieved successfully",
-            data: formattedTutors,
+            data: tutors,
             pagination: {
                 total: totalTutors,
                 page: pageNum,
@@ -87,34 +70,21 @@ const getTutor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const tutor = yield prisma.tutor.findUnique({
             where: { id: Number(id) },
+            include: {
+                profile: {
+                    select: {
+                        email: true,
+                        full_name: true,
+                        phone: true,
+                    },
+                },
+            },
         });
         if (!tutor) {
             res.status(404).json({ message: "Tutor not found" });
             return;
         }
-        // Tìm thông tin user tương ứng
-        const user = yield prisma.user.findUnique({
-            where: { id: tutor.id },
-        });
-        const formattedTutor = {
-            id: tutor.id,
-            bio: tutor.bio,
-            qualifications: tutor.qualifications,
-            teaching_style: tutor.teaching_style,
-            is_available: tutor.is_available,
-            demo_video_url: tutor.demo_video_url || null,
-            image: tutor.image || null,
-            user: user
-                ? {
-                    email: user.email,
-                    full_name: user.full_name,
-                    phone: user.phone || null,
-                    google_id: user.google_id || null,
-                    timezone: user.timezone,
-                }
-                : null,
-        };
-        res.json({ message: "Tutor retrieved successfully", data: formattedTutor });
+        res.json({ message: "Tutor retrieved successfully", data: tutor });
     }
     catch (error) {
         console.error("Error retrieving tutor:", error);
