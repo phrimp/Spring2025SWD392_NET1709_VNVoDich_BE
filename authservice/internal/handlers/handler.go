@@ -1,16 +1,14 @@
 package handlers
 
 import (
-	"authservice/internal/repository"
-	"errors"
+	"authservice/internal/services"
+	"authservice/utils"
 	"fmt"
 	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 type Claims struct {
@@ -20,31 +18,19 @@ type Claims struct {
 	Role     string `json:"role"`
 }
 
-func HandleLogin(db *gorm.DB) fiber.Handler {
+func HandleLogin() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var req repository.LoginRequest
+		var req LoginRequest
 		if err := c.BodyParser(&req); err != nil {
-			fmt.Println("Invalid request:", err)
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid request",
 			})
 		}
 
-		// Find user
-		var user repository.User
-		if err := db.Where("username = ?", req.Username).First(&user).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-					"error": "Invalid credentials",
-				})
-			}
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Database error",
-			})
-		}
-
-		// Check password
-		if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		// Forward to user service
+		user, err := services.GetUserFromUserService(utils.SERVICES_ROUTES.UserService, req.Username, req.Password)
+		if err != nil {
+			fmt.Println("Login error:", err)
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Invalid credentials",
 			})
@@ -62,10 +48,7 @@ func HandleLogin(db *gorm.DB) fiber.Handler {
 			Role:     user.Role,
 		}
 
-		// Create token with claims
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-		// Sign token
 		tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -73,57 +56,25 @@ func HandleLogin(db *gorm.DB) fiber.Handler {
 			})
 		}
 
-		// Clear password before sending
-		user.Password = ""
-
-		return c.JSON(repository.LoginResponse{
+		return c.JSON(LoginResponse{
 			Token: tokenString,
-			User:  user,
+			User:  *user,
 		})
 	}
 }
 
-func HandleRegister(db *gorm.DB) fiber.Handler {
+func HandleRegister() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var user repository.User
-		if err := c.BodyParser(&user); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid request body",
-			})
+		var req RegisterRequest
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Request"})
 		}
 
-		// Check if username already exists
-		var existingUser repository.User
-		if err := db.Where("username = ?", user.Username).First(&existingUser).Error; err == nil {
-			return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-				"error": "Username already exists",
-			})
-		}
-
-		// Hash password
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		err := services.AddUserUserService(utils.SERVICES_ROUTES.UserService, req.Username, req.Password, req.Email, req.Role)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Could not hash password",
-			})
+			fmt.Println("Register Error:", err)
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 		}
-		user.Password = string(hashedPassword)
-
-		// Set default role if not provided
-		if user.Role == "" {
-			user.Role = "user"
-		}
-
-		// Create user
-		if err := db.Create(&user).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Could not create user",
-			})
-		}
-
-		// Clear password before sending response
-		user.Password = ""
-
-		return c.Status(fiber.StatusCreated).JSON(user)
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"Status": "User Created"})
 	}
 }

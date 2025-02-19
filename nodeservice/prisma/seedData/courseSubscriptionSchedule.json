@@ -2,51 +2,71 @@
   {
     "id": 1,
     "subscription_id": 1,
-    "availability_id": 1
+    "day": "MONDAY",
+    "startTime": "2023-10-02T09:00:00Z",
+    "endTime": "2023-10-02T11:00:00Z"
   },
   {
     "id": 2,
     "subscription_id": 2,
-    "availability_id": 6
+    "day": "TUESDAY",
+    "startTime": "2023-10-03T10:00:00Z",
+    "endTime": "2023-10-03T12:00:00Z"
   },
   {
     "id": 3,
     "subscription_id": 3,
-    "availability_id": 17
+    "day": "WEDNESDAY",
+    "startTime": "2023-10-04T13:00:00Z",
+    "endTime": "2023-10-04T15:00:00Z"
   },
   {
     "id": 4,
     "subscription_id": 4,
-    "availability_id": 22
+    "day": "THURSDAY",
+    "startTime": "2023-10-05T14:00:00Z",
+    "endTime": "2023-10-05T16:00:00Z"
   },
   {
     "id": 5,
     "subscription_id": 5,
-    "availability_id": 33
+    "day": "FRIDAY",
+    "startTime": "2023-10-06T09:00:00Z",
+    "endTime": "2023-10-06T11:00:00Z"
   },
   {
     "id": 6,
     "subscription_id": 6,
-    "availability_id": 38
+    "day": "MONDAY",
+    "startTime": "2023-10-09T10:00:00Z",
+    "endTime": "2023-10-09T12:00:00Z"
   },
   {
     "id": 7,
-    "subscription_id": 5,
-    "availability_id": 35
+    "subscription_id": 7,
+    "day": "TUESDAY",
+    "startTime": "2023-10-10T13:00:00Z",
+    "endTime": "2023-10-10T15:00:00Z"
   },
   {
     "id": 8,
     "subscription_id": 8,
-    "availability_id": 13
+    "day": "WEDNESDAY",
+    "startTime": "2023-10-11T14:00:00Z",
+    "endTime": "2023-10-11T16:00:00Z"
   },
   {
     "id": 9,
     "subscription_id": 9,
-    "availability_id": 28
+    "day": "THURSDAY",
+    "startTime": "2023-10-12T09:00:00Z",
+    "endTime": "2023-10-12T11:00:00Z"
   },
   {
     "id": 10,
     "subscription_id": 10,
-    "availability_id": 49
+    "day": "FRIDAY",
+    "startTime": "2023-10-13T10:00:00Z",
+    "endTime": "2023-10-13T12:00:00Z"
   }
 ]

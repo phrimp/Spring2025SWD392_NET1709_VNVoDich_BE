@@ -13,18 +13,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  Parent
+  Children
+  Tutor
+  Admin
+}
+
+enum UserStatus {
+  Active
+  Suspended
+  Banned
+}
+
 model User {
-  id            Int     @id @default(autoincrement())
-  email         String  @unique
-  password_hash String
-  full_name     String
-  phone         String?
-  role          Role
-  google_id     String? @unique
-  timezone      String?
-  is_verified   Boolean @default(false)
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  deleted_at DateTime?
+
+  username String @unique @db.VarChar(50)
+  password String @db.VarChar(255)
+  email    String @unique @db.VarChar(255)
+
+  role      UserRole @default(Parent)
+  phone     String?  @db.VarChar(20)
+  full_name String?  @db.VarChar(255)
+
+  is_verified              Boolean    @default(false)
+  status                   UserStatus @default(Active)
+  email_verification_token String?    @db.VarChar(100)
+
+  last_login_at       BigInt?
+  login_attempts      Int     @default(0) @db.UnsignedInt
+  account_locked      Boolean @default(false)
+  password_changed_at BigInt?
+
+  password_reset_token   String? @db.VarChar(100)
+  password_reset_expires BigInt?
 
   Tutor Tutor[]
+
+  @@index([status])
+  @@index([role])
+  @@index([deleted_at])
 }
 
 model Tutor {
@@ -36,10 +68,12 @@ model Tutor {
   demo_video_url String?
   image          String?
 
-  profile        User             @relation(fields: [id], references: [id])
+  profile User @relation(fields: [id], references: [id])
+
   tutorSpecialty TutorSpecialty[]
   courses        Course[]
   tutorReviews   TutorReview[]
+  availability   Availability?
 }
 
 model Parent {
@@ -64,7 +98,6 @@ model Children {
   parent    Parent @relation(fields: [parent_id], references: [id])
 
   courseSubscriptions CourseSubscription[]
-  teachingSessions    TeachingSession[]
 }
 
 model TutorSpecialty {
@@ -92,7 +125,6 @@ model Course {
   tutor    Tutor @relation(fields: [tutor_id], references: [id])
   tutor_id Int
 
-  availabilitys       Availability[]
   lessons             Lesson[]
   courseSubscriptions CourseSubscription[]
   courseReviews       CourseReview[]
@@ -106,29 +138,36 @@ model Lesson {
   materials_needed    String?
 
   course_id Int
-  Course    Course @relation(fields: [course_id], references: [id])
-
-  teachingSessions TeachingSession[]
+  Course    Course @relation(fields: [course_id], references: [id], onDelete: Cascade)
 }
 
 model Availability {
-  id           Int      @id @default(autoincrement())
-  day_of_week  Day
-  start_time   DateTime
-  end_time     DateTime
-  timezone     String?
-  is_recurring Boolean  @default(false)
+  id       Int   @id @default(autoincrement())
+  tutor_id Int   @unique
+  tutor    Tutor @relation(fields: [tutor_id], references: [id])
 
-  course_id Int
-  Course    Course @relation(fields: [course_id], references: [id])
+  days DayAvailability[]
 
-  courseSubscriptionSchedules CourseSubscriptionSchedule[]
+  timeGap Int // Minimum gap between bookings in minutes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DayAvailability {
+  id              Int      @id @default(autoincrement())
+  availability_id Int
+  day             Day
+  startTime       DateTime
+  endTime         DateTime
+
+  availability Availability @relation(fields: [availability_id], references: [id], onDelete: Cascade)
 }
 
 model CourseSubscription {
   id                 Int    @id @default(autoincrement())
   status             String
-  sessions_remaining Int
+  sessions_remaining Int?
 
   course_id Int
   course    Course @relation(fields: [course_id], references: [id])
@@ -137,21 +176,20 @@ model CourseSubscription {
   children    Children @relation(fields: [children_id], references: [id])
 
   courseSubscriptionSchedules CourseSubscriptionSchedule[]
+  teachingSessions            TeachingSession[]
 }
 
 model TeachingSession {
   id                Int      @id @default(autoincrement())
   google_meet_id    String?
-  actual_start      DateTime
-  actual_end        DateTime
+  startTime         DateTime
+  endTime           DateTime
   status            String
   topics_covered    String?
   homework_assigned String?
 
-  children_id     Int
-  children        Children          @relation(fields: [children_id], references: [id])
-  lesson_id       Int
-  lesson          Lesson            @relation(fields: [lesson_id], references: [id])
+  subscription_id Int
+  subscription    CourseSubscription @relation(fields: [subscription_id], references: [id])
   sessionFeedback SessionFeedback[]
 }
 
@@ -168,11 +206,11 @@ model SessionFeedback {
 model CourseSubscriptionSchedule {
   id              Int                @id @default(autoincrement())
   subscription_id Int
-  availability_id Int
   subscription    CourseSubscription @relation(fields: [subscription_id], references: [id])
-  availability    Availability       @relation(fields: [availability_id], references: [id])
 
-  @@unique([subscription_id, availability_id])
+  day       Day
+  startTime DateTime
+  endTime   DateTime
 }
 
 model TutorReview {
@@ -197,11 +235,6 @@ model CourseReview {
   course    Course @relation(fields: [course_id], references: [id])
   parent_id Int
   parent    Parent @relation(fields: [parent_id], references: [id])
-}
-
-enum Role {
-  Tutor
-  Parent
 }
 
 enum CourseStatus {
