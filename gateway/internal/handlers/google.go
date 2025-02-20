@@ -26,3 +26,13 @@ func (h *GoogleHandler) HandleLogin() fiber.Handler {
 		return routes.GoogleLoginRoute(req, resp, c, h.googleServiceURL+"/api/auth/google/login")
 	}
 }
+
+func (h *GoogleHandler) HandleCallback() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		req := fasthttp.AcquireRequest()
+		resp := fasthttp.AcquireResponse()
+		defer fasthttp.ReleaseRequest(req)
+		defer fasthttp.ReleaseResponse(resp)
+		return routes.GoogleLoginRoute(req, resp, c, h.googleServiceURL+"/api/auth/google/callback")
+	}
+}

@@ -54,6 +54,8 @@ func (g *Gateway) setupRoutes() {
 	g.app.Post("/auth/login", g.auth.HandleLogin())
 	g.app.Post("/auth/register", g.auth.HandleRegister())
 	g.app.Get("/google/auth/login", g.google.HandleLogin())
+	g.app.Get("/google/auth/login/callback", g.google.HandleCallback())
+
 	g.app.Get("/public/user/:username", g.user.HandleGetUserwithUsername())
 	g.app.Get("/public/course/all", g.node.HandleGetAllCourse())
 	g.app.Get("/public/course/:id", g.node.HandleGetACourse())
