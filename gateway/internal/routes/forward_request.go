@@ -23,32 +23,52 @@ func ForwardRequest(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx
 		})
 	}
 
-	c.Set("Content-Type", "application/json")
-	var data interface{}
-	var respErr interface{}
+	// Handle redirects
+	if resp.StatusCode() >= 300 && resp.StatusCode() < 400 {
+		redirectURL := string(resp.Header.Peek("Location"))
+		return c.Redirect(redirectURL, resp.StatusCode())
+	}
 
-	err := json.Unmarshal(resp.Body(), &data)
-	if err != nil {
-		fmt.Println("Error Converting Data to Response:", err)
-		data = nil
-		respErr = err
-		return c.Status(resp.StatusCode()).JSON(fiber.Map{
-			"data":    data,
-			"message": respErr,
+	c.Set("Content-Type", "application/json")
+
+	// Handle non-JSON responses (like during OAuth redirects)
+	contentType := string(resp.Header.Peek("Content-Type"))
+	if !strings.Contains(contentType, "application/json") {
+		return c.Status(resp.StatusCode()).Send(resp.Body())
+	}
+
+	// Parse JSON response
+	var responseData interface{}
+	if err := json.Unmarshal(resp.Body(), &responseData); err != nil {
+		log.Printf("Error parsing JSON response: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error":   "Invalid response format",
+			"details": err.Error(),
 		})
 	}
 
-	// Check if data is a map
-	if mapData, ok := data.(map[string]interface{}); ok {
-		if mapData["error"] != nil {
-			respErr = mapData["error"]
-			data = nil
+	// Process response data
+	var data interface{}
+	var respErr interface{}
+
+	switch v := responseData.(type) {
+	case map[string]interface{}:
+		// Handle error cases
+		if errorMsg, exists := v["error"]; exists {
+			respErr = errorMsg
+		} else if msg, exists := v["message"]; exists {
+			respErr = msg
+		} else {
+			data = v
 		}
-		if mapData["message"] != nil {
-			respErr = mapData["message"]
-		}
+	default:
+		data = v
 	}
-	return c.Status(resp.StatusCode()).JSON(fiber.Map{"data": data, "message": respErr})
+
+	return c.Status(resp.StatusCode()).JSON(fiber.Map{
+		"data":    data,
+		"message": respErr,
+	})
 }
 
 func GoogleForwardResquest(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url, method string, body []byte) error {
@@ -57,10 +77,8 @@ func GoogleForwardResquest(req *fasthttp.Request, resp *fasthttp.Response, c *fi
 		req.Header.SetBytesV(string(key), value)
 	})
 
-	// Build request with necessary headers and data
 	utils.BuildRequest(req, method, body, utils.API_KEY, url)
 
-	// Preserve query parameters if any (important for OAuth callback)
 	if c.Request().URI().QueryString() != nil {
 		req.URI().SetQueryStringBytes(c.Request().URI().QueryString())
 	}
@@ -74,7 +92,7 @@ func GoogleForwardResquest(req *fasthttp.Request, resp *fasthttp.Response, c *fi
 		})
 	}
 
-	// Handle redirects (important for OAuth flow)
+	// Handle redirects
 	if resp.StatusCode() >= 300 && resp.StatusCode() < 400 {
 		redirectURL := string(resp.Header.Peek("Location"))
 		return c.Redirect(redirectURL, resp.StatusCode())
