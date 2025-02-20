@@ -7,13 +7,11 @@ import (
 	"user-service/internal/repository"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
 )
 
 var API_KEY string
 
 func init() {
-	godotenv.Load(".env")
 	API_KEY = os.Getenv("API_KEY")
 }
 

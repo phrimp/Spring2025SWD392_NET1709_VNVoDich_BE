@@ -6,5 +6,5 @@ import (
 )
 
 func GoogleLoginRoute(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
-	return ForwardRequest(req, resp, c, url, "GET", c.Body())
+	return GoogleForwardResquest(req, resp, c, url, "GET", c.Body())
 }

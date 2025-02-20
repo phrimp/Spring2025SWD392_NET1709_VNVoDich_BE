@@ -7,32 +7,32 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-type GoogleHandler struct {
-	googleServiceURL string
+type NodeServiceHandler struct {
+	nodeServiceUrl string
 }
 
-func NewGoogleHandler(googleServiceURL string) *GoogleHandler {
-	return &GoogleHandler{
-		googleServiceURL: googleServiceURL,
+func NewNodeServiceHandler(nodeServiceURL string) *NodeServiceHandler {
+	return &NodeServiceHandler{
+		nodeServiceUrl: nodeServiceURL,
 	}
 }
 
-func (h *GoogleHandler) HandleLogin() fiber.Handler {
+func (h *NodeServiceHandler) HandleGetAllCourse() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		req := fasthttp.AcquireRequest()
 		resp := fasthttp.AcquireResponse()
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
-		return routes.GoogleLoginRoute(req, resp, c, h.googleServiceURL+"/api/auth/google/login")
+		return routes.GetAllCourse(req, resp, c, h.nodeServiceUrl+"/courses/")
 	}
 }
 
-func (h *GoogleHandler) HandleCallback() fiber.Handler {
+func (h *NodeServiceHandler) HandleGetACourse() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		req := fasthttp.AcquireRequest()
 		resp := fasthttp.AcquireResponse()
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
-		return routes.GoogleLoginRoute(req, resp, c, h.googleServiceURL+"/api/auth/google/callback")
+		return routes.GetACourse(req, resp, c, h.nodeServiceUrl+"/courses/"+c.Params("id"))
 	}
 }
