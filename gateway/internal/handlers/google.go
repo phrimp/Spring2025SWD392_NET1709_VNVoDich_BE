@@ -3,6 +3,7 @@ package handlers
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"gateway/internal/routes"
 	"time"
 
@@ -24,6 +25,7 @@ func (h *GoogleHandler) HandleLogin() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Generate state in gateway
 		state := generateRandomState()
+		fmt.Println("state", state)
 
 		c.Cookie(&fiber.Cookie{
 			Name:     "oauth_state",
@@ -39,7 +41,9 @@ func (h *GoogleHandler) HandleLogin() fiber.Handler {
 		resp := fasthttp.AcquireResponse()
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
-		return routes.GoogleLoginRoute(req, resp, c, h.googleServiceURL+"/api/auth/google/login?state="+state)
+
+		query_url := fmt.Sprintf("?state=%s", state)
+		return routes.GoogleLoginRoute(req, resp, c, h.googleServiceURL+"/api/auth/google/login"+query_url)
 	}
 }
 
