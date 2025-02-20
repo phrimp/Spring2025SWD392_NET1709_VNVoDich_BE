@@ -42,15 +42,10 @@ model User {
 
   is_verified              Boolean    @default(false)
   status                   UserStatus @default(Active)
-  email_verification_token String?    @db.VarChar(100)
 
   last_login_at       BigInt?
-  login_attempts      Int     @default(0) @db.UnsignedInt
   account_locked      Boolean @default(false)
   password_changed_at BigInt?
-
-  password_reset_token   String? @db.VarChar(100)
-  password_reset_expires BigInt?
 
   Tutor Tutor[]
 

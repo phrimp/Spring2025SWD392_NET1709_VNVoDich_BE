@@ -3,9 +3,11 @@ package services
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"google-service/internal/config"
 	"google-service/internal/models"
 	"io"
+	"net/http"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -38,21 +40,30 @@ func (s *GoogleOAuthService) Exchange(ctx context.Context, code string) (*oauth2
 	return s.oauth2Config.Exchange(ctx, code)
 }
 
-func (s *GoogleOAuthService) GetUserInfo(token *oauth2.Token) (*models.UserInfo, error) {
+func (s *GoogleOAuthService) GetUserInfo(token *oauth2.Token) (*models.GoogleUserInfo, error) {
 	client := s.oauth2Config.Client(context.Background(), token)
+
+	// Make request to Google's userinfo endpoint
 	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get user info: %w", err)
 	}
 	defer resp.Body.Close()
 
-	data, err := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("userinfo request failed with status: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
-	var userinfo models.UserInfo
-	if err := json.Unmarshal(data, &userinfo); err != nil {
-		return nil, err
+
+	// Parse user info
+	var userInfo models.GoogleUserInfo
+	if err := json.Unmarshal(body, &userInfo); err != nil {
+		return nil, fmt.Errorf("failed to parse user info: %w", err)
 	}
-	return &userinfo, nil
+
+	return &userInfo, nil
 }

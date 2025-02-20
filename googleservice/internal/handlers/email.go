@@ -23,3 +23,10 @@ func (e *EmailHandler) HandleSendPlainEmail(c *fiber.Ctx) error {
 	body := c.Query("body")
 	return e.emailService.SendEmail(title, body, []string{to})
 }
+
+func (e *EmailHandler) HandleVerifyEmail(c *fiber.Ctx) error {
+	title := "Email Verification"
+	to := c.Query("to")
+	body := c.Query("body")
+	return e.emailService.SendEmail(title, body, []string{to})
+}
