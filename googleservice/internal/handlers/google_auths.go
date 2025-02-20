@@ -41,10 +41,19 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 	}
 
 	code := c.Query("code")
+	if code == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Authorization code is missing",
+		})
+	}
+
 	token, err := h.oauthService.Exchange(c.Context(), code)
 	if err != nil {
+
+		fmt.Printf("Token exchange error: %v\n", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to exchange token",
+			"error":   "Failed to exchange token",
+			"details": err.Error(),
 		})
 	}
 
@@ -54,17 +63,6 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 			"error": "Failed to get user info",
 		})
 	}
-	fmt.Println(userInfo)
-
-	//// Initialize email service with the token
-	//emailService, err := services.NewEmailService(c.Context(), token, h.config)
-	//if err != nil {
-	//	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-	//		"error": "Failed to initialize email service",
-	//	})
-	//}
-
-	// h.emailService = emailService
 
 	return c.JSON(fiber.Map{
 		"token": token.AccessToken,

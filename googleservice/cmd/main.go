@@ -40,6 +40,7 @@ func main() {
 	// Email routes
 	email := api.Group("/email")
 	email.Post("/send", emailHandler.HandleSendPlainEmail)
+	email.Post("/send/verify/email", emailHandler.HandleVerifyEmail)
 	// email.Post("/send/verification")
 
 	// Start server
