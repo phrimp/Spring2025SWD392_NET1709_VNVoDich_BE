@@ -34,8 +34,8 @@ export const getChildren = async (
 export const getChild = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { parentId } = req.params;
-    if (!parentId) {
+    const { userId } = req.params;
+    if (!userId) {
       res.status(400).json({ message: "Parent ID is required" });
       return;
     }

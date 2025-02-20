@@ -1,8 +1,8 @@
 [
   {
     "id": 1,
-    "username": "john_doe",
-    "password": "hashed_password_1",
+    "username": "tutor",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
     "email": "john.doe@example.com",
     "role": "Tutor",
     "phone": "1234567890",
@@ -12,8 +12,8 @@
   },
   {
     "id": 2,
-    "username": "jane_smith",
-    "password": "hashed_password_2",
+    "username": "parent",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
     "email": "jane.smith@example.com",
     "role": "Parent",
     "phone": "9876543210",

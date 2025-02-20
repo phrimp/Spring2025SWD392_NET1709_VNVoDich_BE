@@ -219,7 +219,7 @@ export const getCourseAvailability = async (req: Request, res: Response) => {
 
     res.json({
       message: "Course Availability retrieved successfully",
-      data: { availableDates, course },
+      data: availableDates,
     });
   } catch (error: any) {
     res.status(500).json({ message: "Error retrieving availability", error });

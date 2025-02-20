@@ -9,7 +9,7 @@ import tutorAuth from "../middleware/tutorAuth";
 const router = Router();
 
 router.get("/", tutorAuth, getTutorAvailability);
-router.get("/course/:courseId", tutorAuth, getCourseAvailability);
+router.get("/course/:courseId", getCourseAvailability);
 router.put("/update", tutorAuth, updateAvailability);
 
 export default router;
