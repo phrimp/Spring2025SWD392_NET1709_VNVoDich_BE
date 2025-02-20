@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"google-service/internal/config"
 	"google-service/internal/services"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -22,14 +21,12 @@ func NewGoogleHandler(config *config.GoogleOAuthConfig) *GoogleHandler {
 }
 
 func (h *GoogleHandler) HandleGoogleLogin(c *fiber.Ctx) error {
-	state := generateRandomState()
-	c.Cookie(&fiber.Cookie{
-		Name:     "oauth_state",
-		Value:    state,
-		Expires:  time.Now().Add(time.Minute * 5),
-		HTTPOnly: true,
-		Secure:   true,
-	})
+	state := c.Query("state")
+	if state == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "State parameter required",
+		})
+	}
 
 	url := h.oauthService.GetAuthURL(state)
 	return c.Redirect(url)
