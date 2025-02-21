@@ -78,12 +78,14 @@ func (h *GoogleHandler) HandleSendVerificationEmail() fiber.Handler {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "cannot find username in token claim"})
 		}
 		current_email := claims.Email
+		code := generateRandomOTP()
+		code = code[:len(code)-4]
 		otp := OTP{}
 		if cur_OTP, ok := verification_code[current_email]; !ok {
-			otp = OTP{code: generateRandomOTP(), expired_time: time.Now().Unix()}
+			otp = OTP{code: code, expired_time: time.Now().Unix()}
 		} else {
 			if cur_OTP.expired_time < time.Now().Unix() {
-				otp = OTP{code: generateRandomOTP(), expired_time: time.Now().Unix()}
+				otp = OTP{code: code, expired_time: time.Now().Unix()}
 			} else {
 				otp = cur_OTP
 			}
