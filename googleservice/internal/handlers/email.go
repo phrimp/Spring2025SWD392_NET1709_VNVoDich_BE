@@ -21,12 +21,20 @@ func (e *EmailHandler) HandleSendPlainEmail(c *fiber.Ctx) error {
 	to := c.Query("to")
 	title := c.Query("title")
 	body := c.Query("body")
-	return e.emailService.SendEmail(title, body, []string{to})
+	err := e.emailService.SendEmail(title, body, []string{to})
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.JSON(fiber.Map{"message": "Email Sent"})
 }
 
 func (e *EmailHandler) HandleVerifyEmail(c *fiber.Ctx) error {
 	title := "Email Verification"
 	to := c.Query("to")
 	body := c.Query("body")
-	return e.emailService.SendEmail(title, body, []string{to})
+	err := e.emailService.SendEmail(title, body, []string{to})
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.JSON(fiber.Map{"message": "Email Sent"})
 }

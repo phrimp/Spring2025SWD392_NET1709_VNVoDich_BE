@@ -1,13 +1,17 @@
 package handlers
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"fmt"
 	"google-service/internal/config"
+	"google-service/internal/middleware"
 	"google-service/internal/services"
+	"google-service/utils"
+	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/valyala/fasthttp"
 )
 
 type GoogleHandler struct {
@@ -64,14 +68,53 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 		})
 	}
 
+	err = AddUser(userInfo.Name, userInfo.Email, userInfo.Picture)
+	if err != nil {
+		fmt.Println("GOOGLE SERVICE: Save User to Database failed:", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Save User to Database failed",
+		})
+	}
+
+	claims := middleware.Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Issuer:    "google-service",
+		},
+		Username: userInfo.Email,
+		Email:    userInfo.Email,
+		Role:     "Parent",
+	}
+
+	jwt_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	jwt_tokenString, err := jwt_token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "User is Signed in but could not generate jwt token",
+		})
+	}
+
 	return c.JSON(fiber.Map{
-		"token": token.AccessToken,
+		"token": jwt_tokenString,
 		"user":  userInfo,
 	})
 }
 
-func generateRandomState() string {
-	b := make([]byte, 32)
-	rand.Read(b)
-	return base64.URLEncoding.EncodeToString(b)
+func AddUser(name, email, picture string) error {
+	req := &fasthttp.Request{}
+	resp := &fasthttp.Response{}
+
+	body := fmt.Sprintf(`{"username":"%s","password":"%s", "email":"%s", "role":"%s", "picture":"%s"}`, email, "", email, "Parent", picture)
+	fmt.Println(config.Google_config.USER_SERVICE_URL + "/user/add")
+	utils.BuildRequest(req, "POST", []byte(body), config.Google_config.API_KEY, config.Google_config.USER_SERVICE_URL+"/user/add")
+
+	if err := fasthttp.Do(req, resp); err != nil {
+		return fmt.Errorf("user service unavailable: %v", err)
+	}
+
+	if resp.StatusCode() != fiber.StatusOK {
+		return fmt.Errorf("add user failed: %s", string(resp.Body()))
+	}
+	return nil
 }

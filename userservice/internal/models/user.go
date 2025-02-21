@@ -37,6 +37,7 @@ type User struct {
 	Role     UserRole `gorm:"type:varchar(50);not null;default:'user'" json:"role"`
 	Phone    *string  `gorm:"type:varchar(20)" json:"phone" validate:"omitempty,e164"`
 	FullName *string  `gorm:"type:varchar(255)" json:"full_name" validate:"omitempty,min=2,max=100"`
+	Picture  string   `gorm:"type:varchar(255)" json:"picture"`
 
 	IsVerified bool       `gorm:"default:false" json:"is_verified"`
 	Status     UserStatus `gorm:"type:varchar(20);default:'Active'" json:"status"`

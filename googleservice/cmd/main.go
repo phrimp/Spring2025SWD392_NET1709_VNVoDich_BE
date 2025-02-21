@@ -3,6 +3,7 @@ package main
 import (
 	"google-service/internal/config"
 	"google-service/internal/handlers"
+	"google-service/internal/middleware"
 	"log"
 	"os"
 
@@ -12,8 +13,7 @@ import (
 )
 
 func main() {
-	// Initialize configs
-	cfg := config.GetConfig()
+	cfg := config.Google_config
 
 	// Initialize app
 	app := fiber.New(fiber.Config{
@@ -21,16 +21,16 @@ func main() {
 		WriteTimeout: cfg.Server.WriteTimeout,
 	})
 
-	// Middleware
 	app.Use(cors.New())
 	app.Use(logger.New())
 
 	// Initialize handlers
 	googleHandler := handlers.NewGoogleHandler(cfg.GoogleAuth)
 	emailHandler := handlers.NewEmailHandler(cfg.Email)
+	meetHandler := handlers.NewMeetHandler(cfg.ServiceAccount)
 
 	// Routes
-	api := app.Group("/api")
+	api := app.Group("/api", middleware.Middleware(os.Getenv("API_KEY")))
 
 	// Google OAuth routes
 	auth := api.Group("/auth")
@@ -41,7 +41,10 @@ func main() {
 	email := api.Group("/email")
 	email.Post("/send", emailHandler.HandleSendPlainEmail)
 	email.Post("/send/verify/email", emailHandler.HandleVerifyEmail)
-	// email.Post("/send/verification")
+
+	// Meet routes
+	meet := api.Group("/meet")
+	meet.Post("/create", meetHandler.GenerateMeetLink)
 
 	// Start server
 	port := os.Getenv("PORT")

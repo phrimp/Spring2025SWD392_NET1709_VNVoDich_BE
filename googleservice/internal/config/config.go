@@ -1,16 +1,26 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"time"
 )
 
+var Google_config *Config
+
+func init() {
+	Google_config = GetConfig()
+}
+
 type Config struct {
-	Server     ServerConfig
-	GoogleAuth *GoogleOAuthConfig
-	Email      *EmailConfig
-	JWT        JWTConfig
+	Server           ServerConfig
+	GoogleAuth       *GoogleOAuthConfig
+	Email            *EmailConfig
+	JWT              JWTConfig
+	ServiceAccount   *ServiceAccountConfig
+	API_KEY          string
+	USER_SERVICE_URL string
 }
 
 type ServerConfig struct {
@@ -33,13 +43,20 @@ type JWTConfig struct {
 	RefreshSecret string
 }
 
+type ServiceAccountConfig struct {
+	CredentialsJSON []byte
+}
+
 // New creates a new Config instance with values from environment variables
 func New() *Config {
 	return &Config{
-		Server:     loadServerConfig(),
-		GoogleAuth: NewGoogleOAuthConfig(),
-		Email:      NewEmailConfig(),
-		JWT:        loadJWTConfig(),
+		Server:           loadServerConfig(),
+		GoogleAuth:       NewGoogleOAuthConfig(),
+		Email:            NewEmailConfig(),
+		JWT:              loadJWTConfig(),
+		ServiceAccount:   NewServiceAccountConfig(),
+		API_KEY:          os.Getenv("API_KEY"),
+		USER_SERVICE_URL: os.Getenv("USER_SERVICE_URL"),
 	}
 }
 
@@ -116,4 +133,25 @@ func GetConfig() *Config {
 		panic(err)
 	}
 	return config
+}
+
+func loadMeetCredentials() ([]byte, error) {
+	// Load from environment variable
+	if creds := os.Getenv("GOOGLE_SERVICE_ACCOUNT_CREDENTIALS"); creds != "" {
+		return []byte(creds), nil
+	}
+
+	// Or load from file
+	return os.ReadFile("./internal/config/credentials/service-account.json")
+}
+
+func NewServiceAccountConfig() *ServiceAccountConfig {
+	credentials, err := loadMeetCredentials()
+	if err != nil {
+		fmt.Println("Create New Service Account failed:", err)
+		return nil
+	}
+	return &ServiceAccountConfig{
+		CredentialsJSON: credentials,
+	}
 }
