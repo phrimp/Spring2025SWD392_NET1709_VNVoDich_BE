@@ -15,6 +15,7 @@ type Claims struct {
 	jwt.RegisteredClaims
 	UserID   uint   `json:"userId"`
 	Username string `json:"username"`
+	Email    string `json:"email"`
 	Role     string `json:"role"`
 }
 
@@ -45,6 +46,7 @@ func HandleLogin() fiber.Handler {
 			},
 			UserID:   user.ID,
 			Username: user.Username,
+			Email:    user.Email,
 			Role:     user.Role,
 		}
 

@@ -2,8 +2,10 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"regexp"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -35,18 +37,14 @@ type User struct {
 	Role     UserRole `gorm:"type:varchar(50);not null;default:'user'" json:"role"`
 	Phone    *string  `gorm:"type:varchar(20)" json:"phone" validate:"omitempty,e164"`
 	FullName *string  `gorm:"type:varchar(255)" json:"full_name" validate:"omitempty,min=2,max=100"`
+	Picture  string   `gorm:"type:varchar(255)" json:"picture"`
 
-	IsVerified             bool       `gorm:"default:false" json:"is_verified"`
-	Status                 UserStatus `gorm:"type:varchar(20);default:'Active'" json:"status"`
-	EmailVerificationToken *string    `json:"-"`
+	IsVerified bool       `gorm:"default:false" json:"is_verified"`
+	Status     UserStatus `gorm:"type:varchar(20);default:'Active'" json:"status"`
 
 	LastLoginAt       *int64 `json:"last_login_at,omitempty"`
-	LoginAttempts     uint   `gorm:"default:0" json:"-"`
 	AccountLocked     bool   `gorm:"default:false" json:"account_locked"`
 	PasswordChangedAt *int64 `json:"-"`
-
-	PasswordResetToken   *string `json:"-"`
-	PasswordResetExpires *int64  `json:"-"`
 }
 
 func (User) TableName() string {
@@ -73,6 +71,15 @@ func (u *User) BeforeSave(tx *gorm.DB) error {
 		log.Println("Password field has not changed")
 	}
 	return nil
+}
+
+func (u *User) EmailValidation() (bool, error) {
+	basicEmailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	email := strings.ToLower(u.Email)
+	if len(email) < 3 || len(email) > 254 {
+		return false, fmt.Errorf("email length is invalid")
+	}
+	return basicEmailRegex.MatchString(strings.ToLower(email)), fmt.Errorf("validation failed")
 }
 
 func (u *User) Validate() error {
@@ -126,13 +133,6 @@ func (u *User) CheckPassword(password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 }
 
-func (u *User) IncrementLoginAttempts() {
-	u.LoginAttempts++
-	if u.LoginAttempts >= 5 {
-		u.AccountLocked = true
-	}
-}
-
 func (u *User) IsAccountValid() error {
 	if u.AccountLocked {
 		return errors.New("account is locked due to too many failed login attempts")
@@ -143,4 +143,26 @@ func (u *User) IsAccountValid() error {
 	}
 
 	return nil
+}
+
+func (u *User) Lock(lock_time int) error {
+	u.AccountLocked = true
+	fmt.Println("Lock account", u.Username, "for", lock_time, "minutes")
+	go func() {
+		time.Sleep(time.Minute * time.Duration(lock_time))
+		if u.AccountLocked {
+			u.AccountLocked = false
+		}
+		fmt.Println("Account", u.Username, "is unlocked")
+	}()
+	return nil
+}
+
+func (u *User) Unlock() error {
+	if u.AccountLocked {
+		u.AccountLocked = false
+		fmt.Println("Account unlocked")
+		return nil
+	}
+	return fmt.Errorf("account is already unlocked")
 }

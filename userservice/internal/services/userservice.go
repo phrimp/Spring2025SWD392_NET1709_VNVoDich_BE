@@ -9,6 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var LoginAttempt map[string]int
+
 // Login
 func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*models.User, error) {
 	var user models.User
@@ -24,7 +26,15 @@ func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*mode
 
 	// Check password
 	if err := user.CheckPassword(password); err != nil {
-		user.IncrementLoginAttempts()
+		if login_attempt, exist := LoginAttempt[user.Username]; exist {
+			if login_attempt == 5 {
+				user.Lock(10)
+				return nil, fmt.Errorf("account is temporary locked due to exceeding number of logins allowed")
+			}
+			LoginAttempt[user.Username] = login_attempt + 1
+		} else {
+			LoginAttempt[user.Username] = 0
+		}
 		return nil, fmt.Errorf("invalid credentials")
 	}
 
@@ -53,6 +63,10 @@ func AddUser(params models.UserCreationParams, db *gorm.DB) error {
 		Email:    params.Email,
 		Role:     models.UserRole(params.Role),
 		Status:   models.StatusActive, // Default status
+	}
+
+	if ok, err := user.EmailValidation(); !ok {
+		return fmt.Errorf("email validation failed: %v", err)
 	}
 
 	// Set optional fields if provided

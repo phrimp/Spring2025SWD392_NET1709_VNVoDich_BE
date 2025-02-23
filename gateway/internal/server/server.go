@@ -64,6 +64,7 @@ func (g *Gateway) setupRoutes() {
 	api := g.app.Group("/api")
 	api.Use(middleware.JWTMiddleware(g.config.JWTSecret))
 	api.Get("/get/me", g.user.HandleGetMe())
+	api.Post("verify-email/send", g.google.HandleSendVerificationEmail())
 
 	// User routes (accessible by all authenticated users)
 	// api.Get("/profile", g.auth.HandleGetProfile())
