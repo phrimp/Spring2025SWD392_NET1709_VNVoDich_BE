@@ -205,7 +205,7 @@ const getCourseAvailability = (req, res) => __awaiter(void 0, void 0, void 0, fu
         }
         res.json({
             message: "Course Availability retrieved successfully",
-            data: { availableDates, course },
+            data: availableDates,
         });
     }
     catch (error) {

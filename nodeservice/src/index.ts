@@ -31,7 +31,7 @@ app.use("/courses", courseRoutes);
 app.use("/availabilities", availabilityRoutes);
 app.use("/tutors", tutorRoutes);
 app.use("/childrens", childRoutes);
-app.use("/api", bookingRoutes);
+app.use("/bookings", bookingRoutes);
 
 // SERVER
 const port = Number(process.env.PORT) || 3000;
