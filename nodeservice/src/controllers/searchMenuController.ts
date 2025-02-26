@@ -3,8 +3,40 @@ import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
 
-// Tìm kiếm khóa học và gia sư
-export const searchTutorsAndCourses = async (
+// export const searchTutorsAndCourses = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const { query, page = 1, pageSize = 10 } = req.query;
+
+//     const pageNum = parseInt(page as string, 10);
+//     const pageSizeNum = parseInt(pageSize as string, 10);
+//     const skip = (pageNum - 1) * pageSizeNum;
+
+//     const tutors = await prisma.tutor.findMany({
+//       where: { profile: { full_name: { contains: query as string } } },
+//       skip,
+//       take: pageSizeNum,
+//       include: { profile: true },
+//     });
+
+//     const courses = await prisma.course.findMany({
+//       where: { title: { contains: query as string } },
+//       skip,
+//       take: pageSizeNum,
+//     });
+
+//     res.json({
+//       message: "Search results retrieved successfully",
+//       data: { tutors, courses },
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error searching", error });
+//   }
+// };
+
+export const searchTutors = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -14,14 +46,29 @@ export const searchTutorsAndCourses = async (
     const pageNum = parseInt(page as string, 10);
     const pageSizeNum = parseInt(pageSize as string, 10);
     const skip = (pageNum - 1) * pageSizeNum;
-
     const tutors = await prisma.tutor.findMany({
       where: { profile: { full_name: { contains: query as string } } },
       skip,
       take: pageSizeNum,
       include: { profile: true },
     });
-
+    res.json({
+      message: "Search results retrieved successfully",
+      data: { tutors },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error searching tutors", error });
+  }
+};
+export const searchCourses = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { query, page = 1, pageSize = 10 } = req.query;
+    const pageNum = parseInt(page as string, 10);
+    const pageSizeNum = parseInt(pageSize as string, 10);
+    const skip = (pageNum - 1) * pageSizeNum;
     const courses = await prisma.course.findMany({
       where: { title: { contains: query as string } },
       skip,
@@ -30,13 +77,12 @@ export const searchTutorsAndCourses = async (
 
     res.json({
       message: "Search results retrieved successfully",
-      data: { tutors, courses },
+      data: { courses },
     });
   } catch (error) {
-    res.status(500).json({ message: "Error searching", error });
+    res.status(500).json({ message: "Error searching courses", error });
   }
 };
-
 // Tìm kiếm lịch trình có sẵn
 // export const searchSchedules = async (
 //   req: Request,
