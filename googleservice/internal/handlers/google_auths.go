@@ -67,6 +67,7 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 			"error": "Failed to get user info",
 		})
 	}
+	fmt.Println(userInfo)
 
 	err = AddUser(userInfo.Name, userInfo.Email, userInfo.Picture)
 	if err != nil {

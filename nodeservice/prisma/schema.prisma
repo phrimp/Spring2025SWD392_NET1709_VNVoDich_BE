@@ -39,10 +39,10 @@ model User {
   role      UserRole @default(Parent)
   phone     String?  @db.VarChar(20)
   full_name String?  @db.VarChar(255)
-  picture   String?  
+  picture   String?
 
-  is_verified              Boolean    @default(false)
-  status                   UserStatus @default(Active)
+  is_verified Boolean    @default(false)
+  status      UserStatus @default(Active)
 
   last_login_at       BigInt?
   account_locked      Boolean @default(false)
