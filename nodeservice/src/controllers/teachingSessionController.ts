@@ -16,6 +16,13 @@ export const getChildrenTeachingSessions = async (
           children_id: Number(children_id),
         },
       },
+      include: {
+        subscription: {
+          select: {
+            course: true,
+          },
+        },
+      },
     });
 
     res.json({

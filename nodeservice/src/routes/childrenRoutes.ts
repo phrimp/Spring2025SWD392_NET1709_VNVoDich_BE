@@ -6,11 +6,12 @@ import {
   updateChild,
   deleteChild,
 } from "../controllers/childrenController";
+import tutorAuth from "../middleware/tutorAuth";
 
 const router = Router();
 
-router.get("/", getChildren);
-router.get("/:id", getChild);
+router.get("/", tutorAuth, getChildren);
+router.get("/:id", tutorAuth, getChild);
 router.post("/", createChild);
 router.put("/:id", updateChild);
 router.delete("/:id", deleteChild);

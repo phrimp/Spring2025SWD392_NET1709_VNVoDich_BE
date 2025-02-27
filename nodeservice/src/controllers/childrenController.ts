@@ -9,15 +9,15 @@ export const getChildren = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { parentId } = req.params;
+    const { userId } = req.body;
 
-    if (!parentId) {
+    if (!userId) {
       res.status(400).json({ message: "Parent ID is required" });
       return;
     }
 
     const children = await prisma.children.findMany({
-      where: { parent_id: Number(parentId) },
+      where: { parent_id: Number(userId) },
     });
 
     res.json({
@@ -34,7 +34,7 @@ export const getChildren = async (
 export const getChild = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { userId } = req.params;
+    const { userId } = req.body;
     if (!userId) {
       res.status(400).json({ message: "Parent ID is required" });
       return;
