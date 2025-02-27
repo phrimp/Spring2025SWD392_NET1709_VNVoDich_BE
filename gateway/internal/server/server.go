@@ -69,6 +69,8 @@ func (g *Gateway) setupRoutes() {
 	// User routes (accessible by all authenticated users)
 	// api.Get("/profile", g.auth.HandleGetProfile())
 
+	tutor_api := api.Group("/tutor").Use(middleware.RequireRole("Tutor"))
+	tutor_api.Get("/meet", g.google.HandleCreateMeetLink())
 	//// Admin routes
 	//admin := api.Group("/admin")
 	//admin.Use(middleware.RequireAdmin())
@@ -76,7 +78,7 @@ func (g *Gateway) setupRoutes() {
 	//admin.Delete("/users/:id", g.auth.HandleDeleteUser())
 
 	admin_api := api.Group("/admin")
-	admin_api.Use(middleware.RequireRole("admin"))
+	admin_api.Use(middleware.RequireRole("Admin"))
 	admin_api.Get("/get-all/user", g.user.HandleAllGetUser())
 	//// Specific role-based routes
 	//api.Get("/sensitive-data", middleware.RequireRole("admin", "data_analyst"), g.auth.HandleSensitiveData())

@@ -22,6 +22,7 @@ func NewMeetService(config config.ServiceAccountConfig) (*MeetService, error) {
 	jwtConfig, err := google.JWTConfigFromJSON(config.CredentialsJSON,
 		calendar.CalendarEventsScope,
 		calendar.CalendarScope,
+		"https://www.googleapis.com/auth/calendar.events",
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create JWT config: %v", err)

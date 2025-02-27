@@ -86,7 +86,10 @@ func (u *User) Validate() error {
 	// Username validation
 	usernameRegex := regexp.MustCompile("^[a-zA-Z0-9_]+$")
 	if !usernameRegex.MatchString(u.Username) {
-		return errors.New("username can only contain alphanumeric characters and underscores")
+		basicEmailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+		if !basicEmailRegex.MatchString(u.Username) {
+			return errors.New("username can only contain alphanumeric characters and underscores")
+		}
 	}
 
 	// Phone validation
@@ -112,7 +115,7 @@ func (u *User) Validate() error {
 		RoleTutor:  true,
 		RoleAdmin:  true,
 	}
-	if !validRoles[u.Role] {
+	if !validRoles[u.Role] || u.Role == RoleAdmin {
 		return errors.New("invalid user role")
 	}
 

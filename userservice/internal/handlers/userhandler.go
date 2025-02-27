@@ -38,7 +38,7 @@ func GetUserWithUsernamePasswordHandler(db *gorm.DB) fiber.Handler {
 	}
 }
 
-func AddUser(db *gorm.DB) fiber.Handler {
+func AddUser(db *gorm.DB, had_admin bool) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req models.UserCreationParams
 		if err := c.BodyParser(&req); err != nil {
@@ -46,7 +46,7 @@ func AddUser(db *gorm.DB) fiber.Handler {
 				"error": "Invalid request",
 			})
 		}
-		err := services.AddUser(req, db)
+		err := services.AddUser(req, had_admin, db)
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": err.Error(),

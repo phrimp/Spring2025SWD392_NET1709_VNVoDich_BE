@@ -3,7 +3,6 @@ package services
 import (
 	"errors"
 	"fmt"
-	"log"
 	"user-service/internal/models"
 
 	"gorm.io/gorm"
@@ -43,9 +42,9 @@ func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*mode
 	return &user, nil
 }
 
-func AddUser(params models.UserCreationParams, db *gorm.DB) error {
+func AddUser(params models.UserCreationParams, had_admin bool, db *gorm.DB) error {
 	// Check for existing username
-	log.Printf("Adding user with username: %s", params.Username)
+	fmt.Printf("Adding user with username: %s", params.Username)
 
 	var existingUser models.User
 	if err := db.Where("username = ?", params.Username).First(&existingUser).Error; err == nil {
@@ -78,26 +77,32 @@ func AddUser(params models.UserCreationParams, db *gorm.DB) error {
 	}
 
 	user.Password = params.Password
-	log.Printf("User struct created with password: %s", user.Password)
+	fmt.Printf("User struct created with password: %s\n", user.Password)
+	if user.Password == "" {
+		fmt.Println("Password param is empty, create random password for user", user.Username)
+		user.Password = "thisisrandom"
+	}
 
 	// Set default role if not provided
 	if user.Role == "" {
 		user.Role = models.RoleParent
 	}
 
-	// Validate the entire user model
-	if err := user.Validate(); err != nil {
-		return fmt.Errorf("validation failed: %v", err)
+	if had_admin {
+		// Validate the entire user model
+		if err := user.Validate(); err != nil {
+			return fmt.Errorf("validation failed: %v", err)
+		}
 	}
 
 	// Create user in database within a transaction
 	err := db.Transaction(func(tx *gorm.DB) error {
-		log.Println("Starting transaction")
+		fmt.Println("Starting transaction")
 		if err := tx.Create(&user).Error; err != nil {
-			log.Printf("Error creating user: %v", err)
+			fmt.Printf("Error creating user: %v", err)
 			return fmt.Errorf("failed to create user: %v", err)
 		}
-		log.Printf("User created with final password: %s", user.Password)
+		fmt.Printf("User created with final password: %s", user.Password)
 		// more here
 
 		return nil

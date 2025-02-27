@@ -4,15 +4,27 @@ import (
 	"fmt"
 	"os"
 	"user-service/internal/handlers"
+	"user-service/internal/models"
 	"user-service/internal/repository"
+	"user-service/internal/services"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-var API_KEY string
+var (
+	API_KEY   string
+	had_admin bool = false
+)
 
 func init() {
 	API_KEY = os.Getenv("API_KEY")
+	err := services.AddUser(models.UserCreationParams{Username: "admin", Password: "admin", Role: "Admin", Email: "thaiphienn@gmail.com"}, had_admin, repository.DB)
+	if err != nil {
+		fmt.Println("Init admin account failed:", err)
+		had_admin = false
+		return
+	}
+	had_admin = true
 }
 
 func main() {
@@ -37,7 +49,7 @@ func main() {
 
 	// Routes
 	user.Post("/get", handlers.GetUserWithUsernamePasswordHandler(repository.DB))
-	user.Post("/add", handlers.AddUser(repository.DB))
+	user.Post("/add", handlers.AddUser(repository.DB, had_admin))
 	user.Get("/get-public-user", handlers.GetPublicUser(repository.DB))
 	user.Get("/get-all-user", handlers.GetAllUser(repository.DB))
 	user.Get("", handlers.GetUserwithUsername(repository.DB))
