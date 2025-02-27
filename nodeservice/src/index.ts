@@ -10,6 +10,7 @@ import tutorRoutes from "./routes/tutorRoutes";
 import childRoutes from "./routes/childrenRoutes";
 import bookingRoutes from "./routes/bookingRoutes";
 import availabilityRoutes from "./routes/availabilityRoutes";
+import searchRoutes from "./routes/searchMenuRoutes";
 
 // CONFIGURATIONS
 dotenv.config();
@@ -32,6 +33,7 @@ app.use("/availabilities", availabilityRoutes);
 app.use("/tutors", tutorRoutes);
 app.use("/childrens", childRoutes);
 app.use("/api", bookingRoutes);
+app.use("/search", searchRoutes);
 
 // SERVER
 const port = Number(process.env.PORT) || 3000;
