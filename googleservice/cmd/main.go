@@ -27,8 +27,14 @@ func main() {
 	// Initialize handlers
 	googleHandler := handlers.NewGoogleHandler(cfg.GoogleAuth)
 	emailHandler := handlers.NewEmailHandler(cfg.Email)
-	meetHandler := handlers.NewMeetHandler(cfg.ServiceAccount)
+	meetHandler := handlers.NewMeetHandler(cfg.GoogleAuth)
 
+	app.Get("/health", func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"status":  "ok",
+			"service": "google-service",
+		})
+	})
 	// Routes
 	api := app.Group("/api", middleware.Middleware(os.Getenv("API_KEY")))
 
@@ -44,7 +50,7 @@ func main() {
 
 	// Meet routes
 	meet := api.Group("/meet")
-	meet.Post("/create", meetHandler.GenerateMeetLink)
+	meet.Post("/create", meetHandler.CreateMeetWithEmail)
 
 	// Start server
 	port := os.Getenv("PORT")

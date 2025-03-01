@@ -40,9 +40,11 @@ func main() {
 		},
 	})
 
-	// Health check for docker compose
 	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.SendString("OK")
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"status":  "ok",
+			"service": "user-service",
+		})
 	})
 
 	user := app.Group("/user", Middleware(API_KEY))

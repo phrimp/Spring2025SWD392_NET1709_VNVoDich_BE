@@ -51,6 +51,12 @@ func NewGateway(config *config.Config) *Gateway {
 
 func (g *Gateway) setupRoutes() {
 	// Public routes
+	g.app.Get("/health", func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"status":  "ok",
+			"service": "gateway",
+		})
+	})
 	g.app.Post("/auth/login", g.auth.HandleLogin())
 	g.app.Post("/auth/register", g.auth.HandleRegister())
 	g.app.Get("/google/auth/login", g.google.HandleLogin())

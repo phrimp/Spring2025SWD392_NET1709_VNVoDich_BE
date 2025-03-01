@@ -92,6 +92,7 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 			"error": "User is Signed in but could not generate jwt token",
 		})
 	}
+	h.oauthService.StoreUserToken(userInfo.Email, token)
 
 	return c.JSON(fiber.Map{
 		"token": jwt_tokenString,

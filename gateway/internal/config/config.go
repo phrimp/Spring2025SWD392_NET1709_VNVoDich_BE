@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -33,9 +34,10 @@ type ServerConfig struct {
 }
 
 func loadServerConfig() ServerConfig {
-	port := os.Getenv("GATEWAY_PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
-		port = "3000"
+		fmt.Println("PORT env is empty")
+		port = "8080"
 	}
 
 	readTimeout, err := strconv.Atoi(os.Getenv("SERVER_READ_TIMEOUT"))

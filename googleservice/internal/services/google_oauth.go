@@ -18,6 +18,12 @@ type GoogleOAuthService struct {
 	oauth2Config *oauth2.Config
 }
 
+var TokenStorage map[string]*oauth2.Token
+
+func init() {
+	TokenStorage = make(map[string]*oauth2.Token)
+}
+
 func NewGoogleOAuthService(config *config.GoogleOAuthConfig) *GoogleOAuthService {
 	oauth2Config := oauth2.Config{
 		ClientID:     config.ClientID,
@@ -66,4 +72,17 @@ func (s *GoogleOAuthService) GetUserInfo(token *oauth2.Token) (*models.GoogleUse
 	}
 
 	return &userInfo, nil
+}
+
+func (s *GoogleOAuthService) StoreUserToken(email string, token *oauth2.Token) {
+	fmt.Printf("Storing token for user %s\n", email)
+	TokenStorage[email] = token
+}
+
+func (s *GoogleOAuthService) GetUserToken(email string) (*oauth2.Token, error) {
+	token, ok := TokenStorage[email]
+	if !ok {
+		return nil, fmt.Errorf("token not found for user %s", email)
+	}
+	return token, nil
 }
