@@ -16,6 +16,7 @@ COPY prisma ./prisma
 # Generate Prisma Client (this doesn't need database connection)
 RUN npx prisma generate
 
+
 # Copy the start script
 COPY start.js ./
 
