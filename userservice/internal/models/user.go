@@ -24,9 +24,9 @@ const (
 type UserStatus string
 
 const (
-	StatusActive    UserStatus = "Active"
-	StatusSuspended UserStatus = "Suspended"
-	StatusBanned    UserStatus = "Banned"
+	StatusActive  UserStatus = "Active"
+	StatusDeleted UserStatus = "Deleted"
+	StatusBanned  UserStatus = "Banned"
 )
 
 type User struct {
@@ -121,9 +121,9 @@ func (u *User) Validate() error {
 
 	// Status validation
 	validStatuses := map[UserStatus]bool{
-		StatusActive:    true,
-		StatusSuspended: true,
-		StatusBanned:    true,
+		StatusActive:  true,
+		StatusDeleted: true,
+		StatusBanned:  true,
 	}
 	if !validStatuses[u.Status] {
 		return errors.New("invalid user status")

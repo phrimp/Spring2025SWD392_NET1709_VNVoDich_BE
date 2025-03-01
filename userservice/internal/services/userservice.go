@@ -42,9 +42,52 @@ func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*mode
 	return &user, nil
 }
 
+func RegisterUserWithRole(params models.UserCreationParams, db *gorm.DB) error {
+	// Start a database transaction
+	return db.Transaction(func(tx *gorm.DB) error {
+		user := models.User{
+			Username: params.Username,
+			Email:    params.Email,
+			Role:     models.UserRole(params.Role),
+			Status:   models.StatusActive,
+			Password: params.Password,
+		}
+
+		// Set optional fields if provided
+		if params.FullName != "" {
+			user.FullName = &params.FullName
+		}
+		if params.Phone != "" {
+			user.Phone = &params.Phone
+		}
+
+		// Validate user data
+		if err := user.Validate(); err != nil {
+			return fmt.Errorf("validation failed: %v", err)
+		}
+
+		// Create user in database
+		if err := tx.Create(&user).Error; err != nil {
+			return fmt.Errorf("failed to create user: %v", err)
+		}
+
+		switch user.Role {
+		case models.RoleParent:
+			return createParentRecord(tx, user.ID)
+		case models.RoleTutor:
+			return createTutorRecord(tx, user.ID)
+		case models.RoleAdmin:
+			// Admin role doesn't need additional records
+			return nil
+		default:
+			return errors.New("unsupported user role")
+		}
+	})
+}
+
 func AddUser(params models.UserCreationParams, had_admin bool, db *gorm.DB) error {
 	// Check for existing username
-	fmt.Printf("Adding user with username: %s", params.Username)
+	fmt.Printf("Adding user with username: %s\n", params.Username)
 
 	var existingUser models.User
 	if err := db.Where("username = ?", params.Username).First(&existingUser).Error; err == nil {
@@ -56,62 +99,28 @@ func AddUser(params models.UserCreationParams, had_admin bool, db *gorm.DB) erro
 		return fmt.Errorf("email already exists")
 	}
 
-	// Create new user instance
-	user := models.User{
-		Username: params.Username,
-		Email:    params.Email,
-		Role:     models.UserRole(params.Role),
-		Status:   models.StatusActive, // Default status
-	}
-
-	if ok, err := user.EmailValidation(); !ok {
-		return fmt.Errorf("email validation failed: %v", err)
-	}
-
-	// Set optional fields if provided
-	if params.FullName != "" {
-		user.FullName = &params.FullName
-	}
-	if params.Phone != "" {
-		user.Phone = &params.Phone
-	}
-
-	user.Password = params.Password
-	fmt.Printf("User struct created with password: %s\n", user.Password)
-	if user.Password == "" {
-		fmt.Println("Password param is empty, create random password for user", user.Username)
-		user.Password = "thisisrandom"
-	}
-
-	// Set default role if not provided
-	if user.Role == "" {
-		user.Role = models.RoleParent
-	}
-
-	if had_admin {
-		// Validate the entire user model
-		if err := user.Validate(); err != nil {
-			return fmt.Errorf("validation failed: %v", err)
+	// If we're adding an admin user and this is the first admin, we'll skip some validations
+	if params.Role == string(models.RoleAdmin) && !had_admin {
+		// Create admin user with standard user creation flow
+		user := models.User{
+			Username: params.Username,
+			Email:    params.Email,
+			Role:     models.RoleAdmin,
+			Status:   models.StatusActive,
+			Password: params.Password,
 		}
-	}
 
-	// Create user in database within a transaction
-	err := db.Transaction(func(tx *gorm.DB) error {
-		fmt.Println("Starting transaction")
-		if err := tx.Create(&user).Error; err != nil {
-			fmt.Printf("Error creating user: %v", err)
-			return fmt.Errorf("failed to create user: %v", err)
+		if params.FullName != "" {
+			user.FullName = &params.FullName
 		}
-		fmt.Printf("User created with final password: %s", user.Password)
-		// more here
 
+		if err := db.Create(&user).Error; err != nil {
+			return fmt.Errorf("failed to create admin user: %v", err)
+		}
 		return nil
-	})
-	if err != nil {
-		return err
 	}
 
-	return nil
+	return RegisterUserWithRole(params, db)
 }
 
 func FindUserWithUsername(username string, db *gorm.DB) (*models.User, error) {
@@ -151,4 +160,65 @@ func GetAllUser(db *gorm.DB, page, limit int) ([]models.User, error) {
 	}
 
 	return users, nil
+}
+
+func DeleteUser(db *gorm.DB, email string) error {
+	// Find user
+	var user models.User
+	if result := db.First(&user, email); result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return fmt.Errorf("user not found: %s", result.Error)
+		}
+		return fmt.Errorf("failed to fetch user: %s", result.Error)
+	}
+
+	// Perform soft delete
+	if result := db.Delete(&user); result.Error != nil {
+		return fmt.Errorf("failed to delete user: %s", result.Error)
+	}
+
+	fmt.Println("User successfully deleted")
+	return nil
+}
+
+func createParentRecord(tx *gorm.DB, userID uint) error {
+	parent := models.Parent{
+		ID:                   userID,
+		PreferredLanguage:    "English", // Default language
+		NotificationsEnabled: true,      // Default to enabled
+	}
+
+	if err := tx.Create(&parent).Error; err != nil {
+		return fmt.Errorf("failed to create parent record: %v", err)
+	}
+
+	return nil
+}
+
+func createTutorRecord(tx *gorm.DB, userID uint) error {
+	tutor := models.Tutor{
+		ID:             userID,
+		Bio:            "",    // Empty bio initially
+		Qualifications: "",    // Empty qualifications initially
+		TeachingStyle:  "",    // Empty teaching style initially
+		IsAvailable:    false, // Not available by default
+		DemoVideoURL:   "",    // No demo video initially
+		Image:          "",    // No image initially
+	}
+
+	if err := tx.Create(&tutor).Error; err != nil {
+		return fmt.Errorf("failed to create tutor record: %v", err)
+	}
+
+	// Create default availability for the tutor
+	availability := models.Availability{
+		TutorID: userID,
+		TimeGap: 10, // Default 10-minute gap between sessions
+	}
+
+	if err := tx.Create(&availability).Error; err != nil {
+		return fmt.Errorf("failed to create tutor availability: %v", err)
+	}
+
+	return nil
 }

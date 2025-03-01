@@ -2,14 +2,43 @@
 package main
 
 import (
+	"adminservice/internal/config"
+	"adminservice/internal/handlers"
+	"adminservice/internal/middleware"
+	"adminservice/internal/repository"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
-	app := fiber.New()
+	cfg := config.New()
+
+	// Initialize database connection
+	db, err := repository.InitDB(cfg.DatabaseConfig)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+
+	// Initialize the app
+	app := fiber.New(fiber.Config{
+		ReadTimeout:  cfg.Server.ReadTimeout,
+		WriteTimeout: cfg.Server.WriteTimeout,
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			code := fiber.StatusInternalServerError
+			if e, ok := err.(*fiber.Error); ok {
+				code = e.Code
+			}
+			return c.Status(code).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		},
+	})
+
+	app.Use(cors.New())
 
 	// Health check endpoint
 	app.Get("/health", func(c *fiber.Ctx) error {
@@ -18,6 +47,10 @@ func main() {
 			"service": "admin-service",
 		})
 	})
+
+	// API routes with API key middleware
+	api := app.Group("/api", middleware.Middleware(cfg.APIKey))
+	api.Get("/", handlers.TestHandler(db))
 
 	port := os.Getenv("PORT")
 	if port == "" {

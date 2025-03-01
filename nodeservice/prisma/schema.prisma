@@ -75,7 +75,7 @@ model Tutor {
 model Parent {
   id                   Int     @id
   preferred_language   String
-  notifications_enable Boolean @default(false)
+  notifications_enabled Boolean @default(false)
 
   childrens     Children[]
   tutorReviews  TutorReview[]

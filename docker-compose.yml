@@ -107,8 +107,14 @@ services:
       - "${ADMIN_SERVICE_PORT}:${ADMIN_SERVICE_PORT}"
     environment:
       - PORT=${ADMIN_SERVICE_PORT}
+      - SERVER_READ_TIMEOUT=${SERVER_READ_TIMEOUT}
+      - SERVER_WRITE_TIMEOUT=${SERVER_WRITE_TIMEOUT}
       - API_KEY=${API_KEY}
-      - JWT_SECRET=${JWT_SECRET}
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
     depends_on:
       mysql:
         condition: service_healthy

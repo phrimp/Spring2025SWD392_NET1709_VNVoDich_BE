@@ -16,6 +16,7 @@ type RequestParam struct {
 	Email     string `json:"email"`
 	Role      string `json:"role"`
 	Full_name string `json:"fullname"`
+	Phone     string `json:"phone"`
 }
 
 func GetUserWithUsernamePasswordHandler(db *gorm.DB) fiber.Handler {
@@ -40,20 +41,34 @@ func GetUserWithUsernamePasswordHandler(db *gorm.DB) fiber.Handler {
 
 func AddUser(db *gorm.DB, had_admin bool) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var req models.UserCreationParams
+		var req RequestParam
 		if err := c.BodyParser(&req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid request",
 			})
 		}
-		err := services.AddUser(req, had_admin, db)
+
+		// Convert RequestParam to UserCreationParams
+		params := models.UserCreationParams{
+			Username: req.Username,
+			Password: req.Password,
+			Email:    req.Email,
+			Role:     req.Role,
+			FullName: req.Full_name,
+			Phone:    req.Phone,
+		}
+
+		// Use our updated AddUser function that handles role-specific records
+		err := services.AddUser(params, had_admin, db)
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": err.Error(),
 			})
 		}
+
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"status": "OK",
+			"status":  "OK",
+			"message": "User created successfully with " + req.Role + " role",
 		})
 	}
 }
@@ -74,7 +89,39 @@ func GetPublicUser(db *gorm.DB) fiber.Handler {
 				"error": err,
 			})
 		}
-		return c.JSON(user)
+
+		// Get role-specific information
+		switch user.Role {
+		case models.RoleTutor:
+			// Get tutor details
+			var tutor models.Tutor
+			if err := db.Where("id = ?", user.ID).First(&tutor).Error; err != nil {
+				fmt.Println("Error getting tutor details:", err)
+				// Return basic user info if tutor details not found
+				return c.JSON(user)
+			}
+			// Return combined user and tutor info
+			return c.JSON(fiber.Map{
+				"user":  user,
+				"tutor": tutor,
+			})
+		case models.RoleParent:
+			// Get parent details
+			var parent models.Parent
+			if err := db.Where("id = ?", user.ID).First(&parent).Error; err != nil {
+				fmt.Println("Error getting parent details:", err)
+				// Return basic user info if parent details not found
+				return c.JSON(user)
+			}
+			// Return combined user and parent info
+			return c.JSON(fiber.Map{
+				"user":   user,
+				"parent": parent,
+			})
+		default:
+			// For other roles, just return the user info
+			return c.JSON(user)
+		}
 	}
 }
 
