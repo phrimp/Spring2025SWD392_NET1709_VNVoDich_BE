@@ -18,7 +18,7 @@ type Gateway struct {
 	user    *handlers.UserServiceHandler
 	node    *handlers.NodeServiceHandler
 	admin   *handlers.AdminServiceHandler
-	payemnt *handlers.PaymentHandler
+	payment *handlers.PaymentHandler
 }
 
 func NewGateway(config *config.Config) *Gateway {
@@ -46,7 +46,7 @@ func NewGateway(config *config.Config) *Gateway {
 		user:    handlers.NewUserService(config.UserServiceURL),
 		node:    handlers.NewNodeServiceHandler(config.NodeServiceURL),
 		admin:   handlers.NewAdminService(config.AdminServiceURL),
-		payemnt: handlers.NewPaymentHandler(config.PaymentServiceURL),
+		payment: handlers.NewPaymentHandler(config.PaymentServiceURL),
 	}
 
 	gateway.setupRoutes()
@@ -75,7 +75,7 @@ func (g *Gateway) setupRoutes() {
 	api.Use(middleware.JWTMiddleware(g.config.JWTSecret))
 	api.Get("/get/me", g.user.HandleGetMe())
 	api.Post("verify-email/send", g.google.HandleSendVerificationEmail())
-	api.Post("/payment/create")
+	api.Post("/payment/create", g.payment.HandleCreatePayment())
 
 	// User routes (accessible by all authenticated users)
 	// api.Get("/profile", g.auth.HandleGetProfile())
