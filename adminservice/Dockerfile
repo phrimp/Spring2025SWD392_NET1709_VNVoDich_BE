@@ -1,24 +1,39 @@
-FROM golang:1.23-alpine
+# Stage 1: Build
+FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
 
-# Install required dependencies
+# Install build dependencies
 RUN apk add --no-cache git
 
-# Copy go mod and sum files
+# Copy and download dependencies first (better caching)
 COPY go.mod go.sum ./
-
-# Download dependencies
 RUN go mod download
 
 # Copy source code
 COPY . .
 
-# Copy .env file (optional if required during build)
-COPY .env .env
+# Build the binary
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./cmd
 
-# Build the application
-RUN go build -o main ./cmd
+# Stage 2: Production
+FROM alpine:3.18
 
-# Run the application
+WORKDIR /app
+
+# Add CA certificates and create non-root user
+RUN apk --no-cache add ca-certificates && \
+    addgroup -g 1001 appgroup && \
+    adduser -D -u 1001 -G appgroup appuser
+
+# Copy the binary from builder
+COPY --from=builder /app/main .
+
+# Set ownership
+RUN chown -R appuser:appgroup /app
+
+# Use non-root user
+USER appuser
+
+# Run the binary
 CMD ["./main"]

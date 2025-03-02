@@ -38,6 +38,7 @@ func (h *GoogleHandler) HandleGoogleLogin(c *fiber.Ctx) error {
 
 func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 	state := c.Cookies("oauth_state")
+	fmt.Println("COOKIE:", state, "\nQUERY:", c.Query("state"))
 	if state != c.Query("state") {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Invalid state",
@@ -67,14 +68,10 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 			"error": "Failed to get user info",
 		})
 	}
-	fmt.Println(userInfo)
 
 	err = AddUser(userInfo.Name, userInfo.Email, userInfo.Picture)
 	if err != nil {
 		fmt.Println("GOOGLE SERVICE: Save User to Database failed:", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Save User to Database failed",
-		})
 	}
 
 	claims := middleware.Claims{
@@ -95,6 +92,7 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 			"error": "User is Signed in but could not generate jwt token",
 		})
 	}
+	h.oauthService.StoreUserToken(userInfo.Email, token)
 
 	return c.JSON(fiber.Map{
 		"token": jwt_tokenString,

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -11,6 +12,7 @@ type Config struct {
 	NodeServiceURL   string
 	GoogleServiceURL string
 	UserServiceURL   string
+	AdminServiceURL  string
 	JWTSecret        string
 	ServerCfg        ServerConfig
 }
@@ -21,6 +23,7 @@ func New() *Config {
 		NodeServiceURL:   os.Getenv("NODE_SERVICE_URL"),
 		GoogleServiceURL: os.Getenv("GOOGLE_SERVICE_URL"),
 		UserServiceURL:   os.Getenv("USER_SERVICE_URL"),
+		AdminServiceURL:  os.Getenv("ADMIN_SERVICE_URL"),
 		JWTSecret:        os.Getenv("JWT_SECRET"),
 		ServerCfg:        loadServerConfig(),
 	}
@@ -33,9 +36,10 @@ type ServerConfig struct {
 }
 
 func loadServerConfig() ServerConfig {
-	port := os.Getenv("GATEWAY_PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
-		port = "3000"
+		fmt.Println("PORT env is empty")
+		port = "8080"
 	}
 
 	readTimeout, err := strconv.Atoi(os.Getenv("SERVER_READ_TIMEOUT"))
