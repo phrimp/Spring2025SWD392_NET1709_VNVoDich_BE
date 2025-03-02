@@ -11,12 +11,14 @@ import (
 )
 
 type Gateway struct {
-	config *config.Config
-	app    *fiber.App
-	auth   *handlers.AuthHandler
-	google *handlers.GoogleHandler
-	user   *handlers.UserServiceHandler
-	node   *handlers.NodeServiceHandler
+	config  *config.Config
+	app     *fiber.App
+	auth    *handlers.AuthHandler
+	google  *handlers.GoogleHandler
+	user    *handlers.UserServiceHandler
+	node    *handlers.NodeServiceHandler
+	admin   *handlers.AdminServiceHandler
+	payemnt *handlers.PaymentHandler
 }
 
 func NewGateway(config *config.Config) *Gateway {
@@ -37,12 +39,14 @@ func NewGateway(config *config.Config) *Gateway {
 	}))
 
 	gateway := &Gateway{
-		config: config,
-		app:    app,
-		auth:   handlers.NewAuthHandler(config.AuthServiceURL),
-		google: handlers.NewGoogleHandler(config.GoogleServiceURL),
-		user:   handlers.NewUserService(config.UserServiceURL),
-		node:   handlers.NewNodeServiceHandler(config.NodeServiceURL),
+		config:  config,
+		app:     app,
+		auth:    handlers.NewAuthHandler(config.AuthServiceURL),
+		google:  handlers.NewGoogleHandler(config.GoogleServiceURL),
+		user:    handlers.NewUserService(config.UserServiceURL),
+		node:    handlers.NewNodeServiceHandler(config.NodeServiceURL),
+		admin:   handlers.NewAdminService(config.AdminServiceURL),
+		payemnt: handlers.NewPaymentHandler(config.PaymentServiceURL),
 	}
 
 	gateway.setupRoutes()
@@ -71,6 +75,7 @@ func (g *Gateway) setupRoutes() {
 	api.Use(middleware.JWTMiddleware(g.config.JWTSecret))
 	api.Get("/get/me", g.user.HandleGetMe())
 	api.Post("verify-email/send", g.google.HandleSendVerificationEmail())
+	api.Post("/payment/create")
 
 	// User routes (accessible by all authenticated users)
 	// api.Get("/profile", g.auth.HandleGetProfile())
