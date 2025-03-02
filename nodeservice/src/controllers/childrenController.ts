@@ -99,7 +99,7 @@ export const createChild = async (
         age: Number(age),
         grade_level,
         learning_goals,
-        password: hashedPassword, // Lưu mật khẩu đã hash
+        password: hashedPassword, 
         parent_id: Number(parent_id),
       },
     });

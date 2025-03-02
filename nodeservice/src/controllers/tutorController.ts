@@ -46,6 +46,7 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
             phone: true,
           },
         },
+        tutorReviews: true,
       },
     });
 
@@ -80,6 +81,20 @@ export const getTutor = async (req: Request, res: Response): Promise<void> => {
             email: true,
             full_name: true,
             phone: true,
+          },
+        },
+        tutorReviews: {
+          include: {
+            parent: {
+              select: {
+                profile: {
+                  select: {
+                    full_name: true,
+                    picture: true,
+                  },
+                },
+              },
+            },
           },
         },
       },

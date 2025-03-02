@@ -64,7 +64,7 @@ export const getTutorReviewsForParent = async (
     res.json({
       tutor_id: tutorId,
       tutor_name: tutor.profile?.full_name || "Unknown Tutor",
-      average_rating: Number(averageRating.toFixed(1)), // Trả về dạng số
+      average_rating: Number(averageRating.toFixed(1)),
       reviews: reviews.map((review) => ({
         parent_id: review.parent?.id || null,
         parent_name: review.parent?.profile?.full_name || "Anonymous",
