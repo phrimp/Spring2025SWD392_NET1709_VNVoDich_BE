@@ -16,10 +16,7 @@ type Gateway struct {
 	auth   *handlers.AuthHandler
 	google *handlers.GoogleHandler
 	user   *handlers.UserServiceHandler
-<<<<<<< HEAD
 	node   *handlers.NodeServiceHandler
-=======
->>>>>>> 40c1d973c64e6142c981c1aec3090c7de7fa1333
 }
 
 func NewGateway(config *config.Config) *Gateway {
@@ -45,10 +42,7 @@ func NewGateway(config *config.Config) *Gateway {
 		auth:   handlers.NewAuthHandler(config.AuthServiceURL),
 		google: handlers.NewGoogleHandler(config.GoogleServiceURL),
 		user:   handlers.NewUserService(config.UserServiceURL),
-<<<<<<< HEAD
 		node:   handlers.NewNodeServiceHandler(config.NodeServiceURL),
-=======
->>>>>>> 40c1d973c64e6142c981c1aec3090c7de7fa1333
 	}
 
 	gateway.setupRoutes()

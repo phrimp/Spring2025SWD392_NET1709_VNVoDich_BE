@@ -48,7 +48,8 @@ model User {
   account_locked      Boolean @default(false)
   password_changed_at BigInt?
 
-  Tutor Tutor[]
+  Tutor  Tutor[]
+  Parent Parent[]
 
   @@index([status])
   @@index([role])
@@ -76,6 +77,8 @@ model Parent {
   id                   Int     @id
   preferred_language   String
   notifications_enable Boolean @default(false)
+
+  profile User @relation(fields: [id], references: [id])
 
   childrens     Children[]
   tutorReviews  TutorReview[]
