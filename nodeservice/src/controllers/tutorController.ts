@@ -28,10 +28,10 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
       filters.teaching_style = { contains: teachingStyle as string };
     if (isAvailable !== undefined)
       filters.is_available = isAvailable === "true";
-    if (email) filters.user = { email: { contains: email as string } }; // Filter theo email
+    if (email) filters.user = { email: { contains: email as string } }; 
     if (fullName)
-      filters.user = { full_name: { contains: fullName as string } }; // Filter theo full_name
-    if (phone) filters.user = { phone: { contains: phone as string } }; // Filter theo phone
+      filters.user = { full_name: { contains: fullName as string } }; 
+    if (phone) filters.user = { phone: { contains: phone as string } }; 
 
     const skip = (pageNum - 1) * pageSizeNum;
     const tutors = await prisma.tutor.findMany({
