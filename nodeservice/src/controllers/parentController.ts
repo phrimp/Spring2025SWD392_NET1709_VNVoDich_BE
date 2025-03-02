@@ -17,6 +17,14 @@ export const getParents = async (
       skip,
       take: pageSizeNum,
       include: {
+        childrens: {
+          select: {
+            age: true,
+            grade_level: true,
+            learning_goals: true,
+            full_name: true,
+          },
+        },
         profile: {
           select: {
             email: true,
