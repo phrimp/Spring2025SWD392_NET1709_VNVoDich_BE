@@ -12,6 +12,7 @@ type Config struct {
 	NodeServiceURL   string
 	GoogleServiceURL string
 	UserServiceURL   string
+	AdminServiceURL  string
 	JWTSecret        string
 	ServerCfg        ServerConfig
 }
@@ -22,6 +23,7 @@ func New() *Config {
 		NodeServiceURL:   os.Getenv("NODE_SERVICE_URL"),
 		GoogleServiceURL: os.Getenv("GOOGLE_SERVICE_URL"),
 		UserServiceURL:   os.Getenv("USER_SERVICE_URL"),
+		AdminServiceURL:  os.Getenv("ADMIN_SERVICE_URL"),
 		JWTSecret:        os.Getenv("JWT_SECRET"),
 		ServerCfg:        loadServerConfig(),
 	}

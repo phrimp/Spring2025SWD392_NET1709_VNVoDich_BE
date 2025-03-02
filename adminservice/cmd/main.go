@@ -38,6 +38,8 @@ func main() {
 		},
 	})
 
+	adminHandler := handlers.NewAdminHandler(cfg)
+
 	app.Use(cors.New())
 
 	// Health check endpoint
@@ -51,6 +53,7 @@ func main() {
 	// API routes with API key middleware
 	api := app.Group("/api", middleware.Middleware(cfg.APIKey))
 	api.Get("/", handlers.TestHandler(db))
+	api.Get("/users", adminHandler.GetAllUsersHandler())
 
 	port := os.Getenv("PORT")
 	if port == "" {

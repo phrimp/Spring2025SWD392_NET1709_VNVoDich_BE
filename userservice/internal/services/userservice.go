@@ -3,6 +3,8 @@ package services
 import (
 	"errors"
 	"fmt"
+	"math"
+	"strings"
 	"user-service/internal/models"
 
 	"gorm.io/gorm"
@@ -99,9 +101,7 @@ func AddUser(params models.UserCreationParams, had_admin bool, db *gorm.DB) erro
 		return fmt.Errorf("email already exists")
 	}
 
-	// If we're adding an admin user and this is the first admin, we'll skip some validations
 	if params.Role == string(models.RoleAdmin) && !had_admin {
-		// Create admin user with standard user creation flow
 		user := models.User{
 			Username: params.Username,
 			Email:    params.Email,
@@ -144,13 +144,73 @@ func FindUserWithUsername(username string, db *gorm.DB) (*models.User, error) {
 	return &user, nil
 }
 
-func GetAllUser(db *gorm.DB, page, limit int) ([]models.User, error) {
+func GetAllUser(db *gorm.DB, page, limit int, filters map[string]interface{}) (*models.PaginatedResponse, error) {
+	// Default values if not provided
+	if page <= 0 {
+		page = 1
+	}
+	if limit <= 0 || limit > 100 {
+		limit = 10 // Default limit with max cap at 100
+	}
+
 	var users []models.User
+	query := db.Model(&models.User{})
+
+	if filters != nil {
+		// Filter by role
+		if role, ok := filters["role"].(string); ok && role != "" {
+			query = query.Where("role = ?", role)
+		}
+
+		// Filter by status
+		if status, ok := filters["status"].(string); ok && status != "" {
+			query = query.Where("status = ?", status)
+		}
+
+		// Filter by search term (username, email, or full_name)
+		if search, ok := filters["search"].(string); ok && search != "" {
+			searchTerm := "%" + search + "%"
+			query = query.Where("username LIKE ? OR email LIKE ? OR full_name LIKE ?",
+				searchTerm, searchTerm, searchTerm)
+		}
+
+		// Filter by verified status
+		if verified, ok := filters["is_verified"].(bool); ok {
+			query = query.Where("is_verified = ?", verified)
+		}
+
+		// Filter by created date range
+		if from, ok := filters["created_from"].(string); ok && from != "" {
+			query = query.Where("created_at >= ?", from)
+		}
+
+		if to, ok := filters["created_to"].(string); ok && to != "" {
+			query = query.Where("created_at <= ?", to)
+		}
+	}
+
+	var total int64
+	if err := query.Count(&total).Error; err != nil {
+		return nil, fmt.Errorf("error counting users: %w", err)
+	}
+
+	// Apply sorting - default to newest first
+	sortBy := "created_at"
+	sortDir := "DESC"
+
+	if sort, ok := filters["sort"].(string); ok && sort != "" {
+		sortBy = sort
+	}
+
+	if dir, ok := filters["sort_dir"].(string); ok &&
+		(strings.ToUpper(dir) == "ASC" || strings.ToUpper(dir) == "DESC") {
+		sortDir = strings.ToUpper(dir)
+	}
 
 	offset := (page - 1) * limit
 
-	result := db.Model(&models.User{}).
-		Order("created_at DESC").
+	// Execute the query with pagination
+	result := query.Order(fmt.Sprintf("%s %s", sortBy, sortDir)).
 		Limit(limit).
 		Offset(offset).
 		Find(&users)
@@ -159,7 +219,25 @@ func GetAllUser(db *gorm.DB, page, limit int) ([]models.User, error) {
 		return nil, fmt.Errorf("error fetching users: %w", result.Error)
 	}
 
-	return users, nil
+	for i := range users {
+		users[i].Password = ""
+	}
+
+	// Calculate total pages
+	totalPages := int(math.Ceil(float64(total) / float64(limit)))
+
+	// Prepare paginated response
+	response := &models.PaginatedResponse{
+		Data: users,
+		Pagination: models.Pagination{
+			Total:      total,
+			Page:       page,
+			PageSize:   limit,
+			TotalPages: totalPages,
+		},
+	}
+
+	return response, nil
 }
 
 func DeleteUser(db *gorm.DB, email string) error {

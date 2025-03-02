@@ -20,7 +20,8 @@ func NewAdminService(cfg *config.Config) *AdminService {
 	}
 }
 
-func (s *AdminService) GetAllUsers(page, limit int, role, status, search string) ([]models.User, int, error) {
+// AdminService in adminservice/internal/services/admin_service.go
+func (s *AdminService) GetAllUsers(page, limit int, role, status, search string, isVerified *bool, dateFrom, dateTo, sort, sortDir string) (*models.PaginatedResponse, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseRequest(req)
@@ -30,6 +31,7 @@ func (s *AdminService) GetAllUsers(page, limit int, role, status, search string)
 	url := fmt.Sprintf("%s/user/get-all-user?page=%d&limit=%d",
 		s.config.ExternalServices.UserService, page, limit)
 
+	// Add filters to the query string
 	if role != "" {
 		url += fmt.Sprintf("&role=%s", role)
 	}
@@ -42,40 +44,46 @@ func (s *AdminService) GetAllUsers(page, limit int, role, status, search string)
 		url += fmt.Sprintf("&search=%s", search)
 	}
 
+	if isVerified != nil {
+		url += fmt.Sprintf("&is_verified=%t", *isVerified)
+	}
+
+	if dateFrom != "" {
+		url += fmt.Sprintf("&created_from=%s", dateFrom)
+	}
+
+	if dateTo != "" {
+		url += fmt.Sprintf("&created_to=%s", dateTo)
+	}
+
+	if sort != "" {
+		url += fmt.Sprintf("&sort=%s", sort)
+	}
+
+	if sortDir != "" {
+		url += fmt.Sprintf("&sort_dir=%s", sortDir)
+	}
+
 	utils.BuildRequest(req, "GET", nil, s.config.APIKey, url)
 
 	if err := fasthttp.Do(req, resp); err != nil {
-		return nil, 0, fmt.Errorf("failed to connect to user service: %v", err)
+		return nil, fmt.Errorf("failed to connect to user service: %v", err)
 	}
 
 	if resp.StatusCode() != fasthttp.StatusOK {
-		return nil, 0, fmt.Errorf("user service returned error: %s", resp.Body())
+		return nil, fmt.Errorf("user service returned error: %s", resp.Body())
 	}
 
 	// Parse response
-	var response struct {
-		Data       []models.User `json:"data"`
-		Pagination struct {
-			Total int `json:"total"`
-		} `json:"pagination"`
-	}
+	var response models.PaginatedResponse
 
 	if err := json.Unmarshal(resp.Body(), &response); err != nil {
-		// If the structure doesn't match, try just unmarshaling the users array
-		var users []models.User
-		if innerErr := json.Unmarshal(resp.Body(), &users); innerErr != nil {
-			return nil, 0, fmt.Errorf("failed to parse user data: %v", err)
-		}
-
-		// If successful, use the array length as an estimate for the total
-		total := len(users) + (page-1)*limit
-		return users, total, nil
+		return nil, fmt.Errorf("failed to parse user service response: %v", err)
 	}
 
-	return response.Data, response.Pagination.Total, nil
+	return &response, nil
 }
 
-// DeleteUser deletes a user
 func (s *AdminService) DeleteUser(id uint) error {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()

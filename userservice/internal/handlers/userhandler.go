@@ -127,16 +127,55 @@ func GetPublicUser(db *gorm.DB) fiber.Handler {
 
 func GetAllUser(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		page, _ := strconv.Atoi(c.Query("page"))
-		limit, _ := strconv.Atoi(c.Query("limit"))
-		users, err := services.GetAllUser(db, page, limit)
+		page, _ := strconv.Atoi(c.Query("page", "1"))
+		limit, _ := strconv.Atoi(c.Query("limit", "10"))
+
+		filters := make(map[string]interface{})
+
+		if role := c.Query("role"); role != "" {
+			filters["role"] = role
+		}
+
+		if status := c.Query("status"); status != "" {
+			filters["status"] = status
+		}
+		if search := c.Query("search"); search != "" {
+			filters["search"] = search
+		}
+
+		if verified := c.Query("is_verified"); verified != "" {
+			isVerified, err := strconv.ParseBool(verified)
+			if err == nil {
+				filters["is_verified"] = isVerified
+			}
+		}
+
+		if from := c.Query("created_from"); from != "" {
+			filters["created_from"] = from
+		}
+
+		if to := c.Query("created_to"); to != "" {
+			filters["created_to"] = to
+		}
+
+		if sort := c.Query("sort"); sort != "" {
+			filters["sort"] = sort
+		}
+
+		if sortDir := c.Query("sort_dir"); sortDir != "" {
+			filters["sort_dir"] = sortDir
+		}
+
+		// Get paginated users with filters
+		response, err := services.GetAllUser(db, page, limit, filters)
 		if err != nil {
-			fmt.Println("Error Get User:", err)
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": err,
+			fmt.Println("Error getting users:", err)
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to retrieve users: " + err.Error(),
 			})
 		}
-		return c.JSON(users)
+
+		return c.JSON(response)
 	}
 }
 
