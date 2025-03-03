@@ -8,3 +8,11 @@ type UserCreationParams struct {
 	FullName string `json:"full_name"`
 	Phone    string `json:"phone"`
 }
+
+type UserUpdateParams struct {
+	Email    string `json:"email"`
+	FullName string `json:"full_name"`
+	Phone    string `json:"phone"`
+	Picture  string `json:"picture"`
+	Status   string `json:"status"`
+}

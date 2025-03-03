@@ -192,3 +192,41 @@ func GetUserwithUsername(db *gorm.DB) fiber.Handler {
 		return c.JSON(user)
 	}
 }
+
+func UpdateUser(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		username := c.Query("username")
+
+		var updateReq models.UserUpdateParams
+		if err := c.BodyParser(&updateReq); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid request body",
+			})
+		}
+
+		updatedUser, err := services.UpdateUser(username, updateReq, db)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		return c.JSON(updatedUser)
+	}
+}
+
+func UpdateUserStatus(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		username := c.Query("username")
+		status := c.Query("status")
+
+		updatedUser, err := services.UpdateUserStatus(username, status, db)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		return c.JSON(updatedUser)
+	}
+}

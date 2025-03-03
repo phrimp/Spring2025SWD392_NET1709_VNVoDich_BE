@@ -74,17 +74,14 @@ func (g *Gateway) setupRoutes() {
 	api := g.app.Group("/api")
 	api.Use(middleware.JWTMiddleware(g.config.JWTSecret))
 	api.Get("/get/me", g.user.HandleGetMe())
+	api.Put("/update/me", g.user.HandleUpdateMe())
 	api.Post("verify-email/send", g.google.HandleSendVerificationEmail())
 	api.Post("/payment/create", g.payment.HandleCreatePayment())
 
-	// User routes (accessible by all authenticated users)
-	// api.Get("/profile", g.auth.HandleGetProfile())
-
+	// Tutor routes
 	tutor_api := api.Group("/tutor").Use(middleware.RequireRole("Tutor"))
 	tutor_api.Get("/meet", g.google.HandleCreateMeetLink())
 	//// Admin routes
-	//admin.Delete("/users/:id", g.auth.HandleDeleteUser())
-
 	admin_api := api.Group("/admin")
 	admin_api.Use(middleware.RequireRole("Admin"))
 	admin_api.Get("/users", g.user.HandleAllGetUser())

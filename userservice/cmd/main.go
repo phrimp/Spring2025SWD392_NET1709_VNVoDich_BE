@@ -24,7 +24,7 @@ func init() {
 		had_admin = false
 		return
 	}
-	had_admin = true
+	had_admin = false
 }
 
 func main() {
@@ -55,6 +55,8 @@ func main() {
 	user.Get("/get-public-user", handlers.GetPublicUser(repository.DB))
 	user.Get("/get-all-user", handlers.GetAllUser(repository.DB))
 	user.Get("", handlers.GetUserwithUsername(repository.DB))
+	user.Put("/update", handlers.UpdateUser(repository.DB))
+	user.Patch("/update/status", handlers.UpdateUserStatus(repository.DB))
 
 	port := os.Getenv("PORT")
 	if port == "" {
