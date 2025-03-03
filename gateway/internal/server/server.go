@@ -69,7 +69,8 @@ func (g *Gateway) setupRoutes() {
 	g.app.Get("/public/user/:username", g.user.HandleGetUserwithUsername())
 	g.app.Get("/public/course/all", g.node.HandleGetAllCourse())
 	g.app.Get("/public/course/:id", g.node.HandleGetACourse())
-
+	g.app.Get("/payment/success", g.payment.HandleCompletePayPalPayment())
+	g.app.Get("/payment/cancel", g.payment.HandleCancelPayPalPayment())
 	// Protected routes
 	api := g.app.Group("/api")
 	api.Use(middleware.JWTMiddleware(g.config.JWTSecret))
