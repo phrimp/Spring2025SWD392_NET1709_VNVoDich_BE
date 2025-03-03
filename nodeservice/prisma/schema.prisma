@@ -207,7 +207,6 @@ model CourseSubscriptionSchedule {
   subscription_id Int
   subscription    CourseSubscription @relation(fields: [subscription_id], references: [id])
 
-  day       Day
   startTime DateTime
   endTime   DateTime
 }

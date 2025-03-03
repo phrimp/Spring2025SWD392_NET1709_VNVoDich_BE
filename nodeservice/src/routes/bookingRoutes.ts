@@ -1,17 +1,13 @@
 // bookingRoutes.ts
 import express from "express";
 import {
-  bookCourse,
-  createBooking,
-  getSubscriptions,
+  createStripePaymentIntent,
+  createTrialBooking,
 } from "../controllers/bookingController";
 
 const router = express.Router();
 
-// Route để phụ huynh book khóa học
-router.post("/book", createBooking);
-
-// Route để lấy danh sách đăng ký của một phụ huynh
-router.get("/subscriptions/:parent_id", getSubscriptions);
+router.post("/stripe/payment-intent", createStripePaymentIntent);
+router.post("/create-trial-booking", createTrialBooking);
 
 export default router;
