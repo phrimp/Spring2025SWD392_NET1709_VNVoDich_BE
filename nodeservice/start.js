@@ -8,15 +8,15 @@ async function waitForDatabase() {
 
   while (retryCount < maxRetries) {
     try {
+      // Generate the Prisma client
+      console.log("Generating Prisma Client...");
+      execSync("npx prisma generate", { stdio: "inherit" });
+
       // Force reset and push the new schema
       console.log("Pushing new schema to database (with reset)...");
       execSync("npx prisma db push --force-reset --accept-data-loss", {
         stdio: "inherit",
       });
-
-      // Generate the Prisma client
-      console.log("Generating Prisma Client...");
-      execSync("npx prisma generate", { stdio: "inherit" });
 
       console.log("Database schema is ready!");
 

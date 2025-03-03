@@ -89,9 +89,12 @@ services:
     ports: 
       - "${NODE_SERVICE_PORT}:${NODE_SERVICE_PORT}"
     environment:
-      - PORT=${NODE_SERVICE_PORT}
-      - DATABASE_URL=${NODE_DATABASE_URL}
-      - JWT_SECRET=${JWT_SECRET}
+      - "PORT=${NODE_SERVICE_PORT}"
+      - "DATABASE_URL=${NODE_DATABASE_URL}"
+      - "JWT_SECRET=${JWT_SECRET}"
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URL=${GOOGLE_REDIRECT_URL}
     depends_on:
       mysql:
         condition: service_healthy
@@ -191,6 +194,7 @@ services:
   mysql:
     image: mysql:8.0
     ports:
+      - "${MYSQL_PORT}:3306"
       - "${MYSQL_PORT}:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}

@@ -1,6 +1,7 @@
 // bookingController.ts
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { google } from "googleapis";
 
 const prisma = new PrismaClient();
 
@@ -92,5 +93,53 @@ export const getSubscriptions = async (
   } catch (error) {
     console.error("Error retrieving subscriptions:", error);
     res.status(500).json({ message: "Error retrieving subscriptions", error });
+  }
+};
+
+export const createBooking = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const token =
+      "ya29.a0AXeO80SooUv6oGZlijcgMGjSpPjmzwHW39bP6ScX8tCiF_CrwmogGe_ih3GVfefEsstW0BmR52Y0DXeOryMYdGChGFy4cvEddcX4G1cVlwAmPeR-10mq6Z38XZKDrcXdBw4bY43YiOz8PsYLXwUC92OUen6dSozZQhVGAewaaCgYKAWESARISFQHGX2Mi2jqY4rjeuu3FqbDUr-6lxA0175";
+
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_REDIRECT_URI
+    );
+    oauth2Client.setCredentials({ access_token: token });
+
+    const calendar = google.calendar({ version: "v3", auth: oauth2Client });
+
+    const meetResponse = await calendar.events.insert({
+      calendarId: "primary",
+      conferenceDataVersion: 1,
+      requestBody: {
+        summary: "Tech Talk with Arindam",
+        location: "Google Meet",
+        description: "Demo event for Arindam's Blog Post.",
+        start: {
+          dateTime: "2024-03-14T19:30:00+05:30",
+          timeZone: "Asia/Kolkata",
+        },
+        end: {
+          dateTime: "2024-03-14T20:30:00+05:30",
+          timeZone: "Asia/Kolkata",
+        },
+        attendees: [{ email: "quansieuquay2013@gmail.com" }],
+        conferenceData: {
+          createRequest: { requestId: `1-${Date.now()}` },
+        },
+      },
+    });
+
+    const meetLink = meetResponse.data.hangoutLink;
+    console.log(meetLink);
+
+    res.json({ message: "Booking created successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error creating booking", error });
   }
 };
