@@ -77,6 +77,6 @@ func HandleRegister() fiber.Handler {
 			fmt.Println("Register Error:", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 		}
-		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"Status": "User Created"})
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User Created"})
 	}
 }

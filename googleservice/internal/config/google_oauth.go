@@ -1,12 +1,19 @@
 package config
 
-import "os"
+import (
+	"os"
+
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/calendar/v3"
+)
 
 type GoogleOAuthConfig struct {
 	ClientID     string
 	ClientSecret string
 	RedirectURL  string
 	Scopes       []string
+	Endpoint     oauth2.Endpoint
 }
 
 func NewGoogleOAuthConfig() *GoogleOAuthConfig {
@@ -17,7 +24,9 @@ func NewGoogleOAuthConfig() *GoogleOAuthConfig {
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",
-			"https://www.googleapis.com/auth/calendar",
+			calendar.CalendarScope,
+			calendar.CalendarEventsScope,
 		},
+		Endpoint: google.Endpoint,
 	}
 }

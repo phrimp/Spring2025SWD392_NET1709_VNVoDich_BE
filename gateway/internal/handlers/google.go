@@ -27,7 +27,12 @@ func (h *GoogleHandler) HandleLogin() fiber.Handler {
 		// Generate state in gateway
 		state := generateRandomState()
 		state = state[:len(state)-1]
-		fmt.Println("state", state)
+
+		if len(state) < 32 {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to generate secure state",
+			})
+		}
 
 		c.Cookie(&fiber.Cookie{
 			Name:     "oauth_state",
@@ -35,9 +40,11 @@ func (h *GoogleHandler) HandleLogin() fiber.Handler {
 			Expires:  time.Now().Add(time.Minute * 5),
 			HTTPOnly: true,
 			Secure:   true,
-			SameSite: "Lax",
+			SameSite: "None",
 			Path:     "/",
 		})
+
+		fmt.Println("Set cookie:", c.Response().Header.Peek("Set-Cookie"))
 
 		req := fasthttp.AcquireRequest()
 		resp := fasthttp.AcquireResponse()
@@ -51,6 +58,22 @@ func (h *GoogleHandler) HandleLogin() fiber.Handler {
 
 func (h *GoogleHandler) HandleCallback() fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		fmt.Println("Incoming cookies:", string(c.Request().Header.Peek("Cookie")))
+
+		stateCookie := c.Cookies("oauth_state")
+		stateParam := c.Query("state")
+
+		fmt.Println("State from cookie:", stateCookie)
+		fmt.Println("State from param:", stateParam)
+
+		if stateCookie == "" || stateParam == "" || stateCookie != stateParam {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error":        "Invalid state parameter",
+				"cookie_state": stateCookie,
+				"param_state":  stateParam,
+			})
+		}
+
 		query := string(c.Request().URI().QueryString())
 		req := fasthttp.AcquireRequest()
 		resp := fasthttp.AcquireResponse()
@@ -93,6 +116,17 @@ func (h *GoogleHandler) HandleSendVerificationEmail() fiber.Handler {
 
 		query_url := fmt.Sprintf("?to=%s&body=%s", current_email, otp.code)
 		return routes.SendVerificationEmail(req, resp, c, h.googleServiceURL+"/api/email/send/verify/email"+query_url)
+	}
+}
+
+func (h *GoogleHandler) HandleCreateMeetLink() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		req := fasthttp.AcquireRequest()
+		resp := fasthttp.AcquireResponse()
+		defer fasthttp.ReleaseRequest(req)
+		defer fasthttp.ReleaseResponse(resp)
+		query_url := fmt.Sprintf("?title=%s", c.Query("title"))
+		return routes.CreateMeetLink(req, resp, c, h.googleServiceURL+"/api/meet/create"+query_url)
 	}
 }
 

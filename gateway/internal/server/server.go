@@ -11,12 +11,14 @@ import (
 )
 
 type Gateway struct {
-	config *config.Config
-	app    *fiber.App
-	auth   *handlers.AuthHandler
-	google *handlers.GoogleHandler
-	user   *handlers.UserServiceHandler
-	node   *handlers.NodeServiceHandler
+	config  *config.Config
+	app     *fiber.App
+	auth    *handlers.AuthHandler
+	google  *handlers.GoogleHandler
+	user    *handlers.UserServiceHandler
+	node    *handlers.NodeServiceHandler
+	admin   *handlers.AdminServiceHandler
+	payment *handlers.PaymentHandler
 }
 
 func NewGateway(config *config.Config) *Gateway {
@@ -37,12 +39,14 @@ func NewGateway(config *config.Config) *Gateway {
 	}))
 
 	gateway := &Gateway{
-		config: config,
-		app:    app,
-		auth:   handlers.NewAuthHandler(config.AuthServiceURL),
-		google: handlers.NewGoogleHandler(config.GoogleServiceURL),
-		user:   handlers.NewUserService(config.UserServiceURL),
-		node:   handlers.NewNodeServiceHandler(config.NodeServiceURL),
+		config:  config,
+		app:     app,
+		auth:    handlers.NewAuthHandler(config.AuthServiceURL),
+		google:  handlers.NewGoogleHandler(config.GoogleServiceURL),
+		user:    handlers.NewUserService(config.UserServiceURL),
+		node:    handlers.NewNodeServiceHandler(config.NodeServiceURL),
+		admin:   handlers.NewAdminService(config.AdminServiceURL),
+		payment: handlers.NewPaymentHandler(config.PaymentServiceURL),
 	}
 
 	gateway.setupRoutes()
@@ -51,6 +55,12 @@ func NewGateway(config *config.Config) *Gateway {
 
 func (g *Gateway) setupRoutes() {
 	// Public routes
+	g.app.Get("/health", func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"status":  "ok",
+			"service": "gateway",
+		})
+	})
 	g.app.Post("/auth/login", g.auth.HandleLogin())
 	g.app.Post("/auth/register", g.auth.HandleRegister())
 	g.app.Get("/google/auth/login", g.google.HandleLogin())
@@ -65,19 +75,19 @@ func (g *Gateway) setupRoutes() {
 	api.Use(middleware.JWTMiddleware(g.config.JWTSecret))
 	api.Get("/get/me", g.user.HandleGetMe())
 	api.Post("verify-email/send", g.google.HandleSendVerificationEmail())
+	api.Post("/payment/create", g.payment.HandleCreatePayment())
 
 	// User routes (accessible by all authenticated users)
 	// api.Get("/profile", g.auth.HandleGetProfile())
 
+	tutor_api := api.Group("/tutor").Use(middleware.RequireRole("Tutor"))
+	tutor_api.Get("/meet", g.google.HandleCreateMeetLink())
 	//// Admin routes
-	//admin := api.Group("/admin")
-	//admin.Use(middleware.RequireAdmin())
-	//admin.Get("/users", g.auth.HandleListUsers())
 	//admin.Delete("/users/:id", g.auth.HandleDeleteUser())
 
 	admin_api := api.Group("/admin")
-	admin_api.Use(middleware.RequireRole("admin"))
-	admin_api.Get("/get-all/user", g.user.HandleAllGetUser())
+	admin_api.Use(middleware.RequireRole("Admin"))
+	admin_api.Get("/users", g.user.HandleAllGetUser())
 	//// Specific role-based routes
 	//api.Get("/sensitive-data", middleware.RequireRole("admin", "data_analyst"), g.auth.HandleSensitiveData())
 }

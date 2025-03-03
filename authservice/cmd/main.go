@@ -29,12 +29,14 @@ func main() {
 		},
 	})
 
-	auth := app.Group("", Middleware(API_KEY))
-
-	// Health check for docker compose
-	auth.Get("/health", func(c *fiber.Ctx) error {
-		return c.SendString("OK")
+	app.Get("/health", func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"status":  "ok",
+			"service": "auth-service",
+		})
 	})
+
+	auth := app.Group("", Middleware(API_KEY))
 
 	// Routes
 	auth.Post("/login", handlers.HandleLogin())
