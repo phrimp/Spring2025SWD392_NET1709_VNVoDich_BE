@@ -8,24 +8,26 @@ import (
 )
 
 type Config struct {
-	AuthServiceURL   string
-	NodeServiceURL   string
-	GoogleServiceURL string
-	UserServiceURL   string
-	AdminServiceURL  string
-	JWTSecret        string
-	ServerCfg        ServerConfig
+	AuthServiceURL    string
+	NodeServiceURL    string
+	GoogleServiceURL  string
+	UserServiceURL    string
+	AdminServiceURL   string
+	PaymentServiceURL string
+	JWTSecret         string
+	ServerCfg         ServerConfig
 }
 
 func New() *Config {
 	return &Config{
-		AuthServiceURL:   os.Getenv("AUTH_SERVICE_URL"),
-		NodeServiceURL:   os.Getenv("NODE_SERVICE_URL"),
-		GoogleServiceURL: os.Getenv("GOOGLE_SERVICE_URL"),
-		UserServiceURL:   os.Getenv("USER_SERVICE_URL"),
-		AdminServiceURL:  os.Getenv("ADMIN_SERVICE_URL"),
-		JWTSecret:        os.Getenv("JWT_SECRET"),
-		ServerCfg:        loadServerConfig(),
+		AuthServiceURL:    os.Getenv("AUTH_SERVICE_URL"),
+		NodeServiceURL:    os.Getenv("NODE_SERVICE_URL"),
+		GoogleServiceURL:  os.Getenv("GOOGLE_SERVICE_URL"),
+		UserServiceURL:    os.Getenv("USER_SERVICE_URL"),
+		AdminServiceURL:   os.Getenv("ADMIN_SERVICE_URL"),
+		PaymentServiceURL: os.Getenv("PAYMENT_SERVICE_URL"),
+		JWTSecret:         os.Getenv("JWT_SECRET"),
+		ServerCfg:         loadServerConfig(),
 	}
 }
 

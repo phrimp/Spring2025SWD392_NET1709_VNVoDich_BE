@@ -67,6 +67,7 @@ func (u *User) BeforeSave(tx *gorm.DB) error {
 		now := time.Now().Unix()
 		u.PasswordChangedAt = &now
 		log.Printf("Password after hash: %s", u.Password)
+		log.Printf("Password changed at %s:%v ", u.Username, u.PasswordChangedAt)
 	} else {
 		log.Println("Password field has not changed")
 	}

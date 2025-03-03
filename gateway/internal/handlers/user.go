@@ -55,3 +55,51 @@ func (h *UserServiceHandler) HandleGetMe() fiber.Handler {
 		return routes.GetMe(req, resp, c, h.userServiceURL+"/user"+query_url)
 	}
 }
+
+func (h *UserServiceHandler) HandleDeleteMe() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		req := fasthttp.AcquireRequest()
+		resp := fasthttp.AcquireResponse()
+		defer fasthttp.ReleaseRequest(req)
+		defer fasthttp.ReleaseResponse(resp)
+		claims, ok := c.Locals("user").(*middleware.Claims)
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "cannot find username in token claim"})
+		}
+		current_username := claims.Username
+		query_url := fmt.Sprintf("?username=%s", current_username)
+		return routes.DeleteMe(req, resp, c, h.userServiceURL+"/delete"+query_url)
+	}
+}
+
+func (h *UserServiceHandler) HandleCancelDeleteMe() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		req := fasthttp.AcquireRequest()
+		resp := fasthttp.AcquireResponse()
+		defer fasthttp.ReleaseRequest(req)
+		defer fasthttp.ReleaseResponse(resp)
+		claims, ok := c.Locals("user").(*middleware.Claims)
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "cannot find username in token claim"})
+		}
+		current_username := claims.Username
+		query_url := fmt.Sprintf("?username=%s", current_username)
+		return routes.CancelDeleteMe(req, resp, c, h.userServiceURL+"/delete/cancel"+query_url)
+	}
+}
+
+func (h *UserServiceHandler) HandleUpdateMe() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		req := fasthttp.AcquireRequest()
+		resp := fasthttp.AcquireResponse()
+		defer fasthttp.ReleaseRequest(req)
+		defer fasthttp.ReleaseResponse(resp)
+		claims, ok := c.Locals("user").(*middleware.Claims)
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "cannot find username in token claim"})
+		}
+		current_username := claims.Username
+		query_url := fmt.Sprintf("?username=%s", current_username)
+		return routes.UpdateMe(req, resp, c, h.userServiceURL+"/user/update"+query_url)
+	}
+}

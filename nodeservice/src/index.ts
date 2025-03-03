@@ -12,6 +12,10 @@ import bookingRoutes from "./routes/bookingRoutes";
 import availabilityRoutes from "./routes/availabilityRoutes";
 import teachingSessionRoutes from "./routes/teachingSessionRoutes";
 import searchRoutes from "./routes/searchMenuRoutes";
+import reviewTutorRoutes from "./routes/reviewTutorRoutes";
+import reviewCourseRoutes from "./routes/reviewCourseRoutes";
+import transactionRoutes from "./routes/transactionRoutes";
+import parentRoutes from "./routes/parentRoutes";
 
 // CONFIGURATIONS
 dotenv.config();
@@ -36,6 +40,10 @@ app.use("/childrens", childRoutes);
 app.use("/bookings", bookingRoutes);
 app.use("/teaching-sessions", teachingSessionRoutes);
 app.use("/search", searchRoutes);
+app.use("/reviewsTutor", reviewTutorRoutes);
+app.use("/reviewsCourse", reviewCourseRoutes);
+app.use("/transactions", transactionRoutes);
+app.use("/parent", parentRoutes);
 
 // SERVER
 const port = Number(process.env.PORT) || 3000;

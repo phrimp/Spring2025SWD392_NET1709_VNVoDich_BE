@@ -28,7 +28,6 @@ func main() {
 	googleHandler := handlers.NewGoogleHandler(cfg.GoogleAuth)
 	emailHandler := handlers.NewEmailHandler(cfg.Email)
 	meetHandler := handlers.NewMeetHandler(cfg.GoogleAuth)
-
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"status":  "ok",

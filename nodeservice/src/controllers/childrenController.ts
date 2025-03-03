@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -72,6 +73,7 @@ export const createChild = async (
       res.status(400).json({ message: "Parent ID is required" });
       return;
     }
+
     const { full_name, age, grade_level, learning_goals, password, parent_id } =
       req.body;
 
@@ -87,13 +89,17 @@ export const createChild = async (
       return;
     }
 
+    // Hash password trước khi lưu
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     const newChild = await prisma.children.create({
       data: {
         full_name,
         age: Number(age),
         grade_level,
         learning_goals,
-        password,
+        password: hashedPassword, 
         parent_id: Number(parent_id),
       },
     });

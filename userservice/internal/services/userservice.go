@@ -101,17 +101,6 @@ func AddUser(params models.UserCreationParams, had_admin bool, db *gorm.DB) erro
 		return fmt.Errorf("email already exists")
 	}
 
-	// Create new user instance
-	user := models.User{
-		Username: params.Username,
-		Email:    params.Email,
-		Role:     models.UserRole(params.Role),
-		Status:   models.StatusActive, // Default status
-	}
-
-	if ok, err := user.EmailValidation(); !ok {
-		return fmt.Errorf("email validation failed: %v", err)
-	}
 	if params.Role == string(models.RoleAdmin) && !had_admin {
 		user := models.User{
 			Username: params.Username,
@@ -251,14 +240,22 @@ func GetAllUser(db *gorm.DB, page, limit int, filters map[string]interface{}) (*
 	return response, nil
 }
 
-func DeleteUser(db *gorm.DB, email string) error {
+func DeleteUser(db *gorm.DB, username string) error {
 	// Find user
 	var user models.User
-	if result := db.First(&user, email); result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			return fmt.Errorf("user not found: %s", result.Error)
+	if username == "" {
+		return errors.New("username cannot be empty")
+	}
+
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
 		}
-		return fmt.Errorf("failed to fetch user: %s", result.Error)
+		return fmt.Errorf("error finding user: %w", result.Error)
 	}
 
 	// Perform soft delete
@@ -310,4 +307,115 @@ func createTutorRecord(tx *gorm.DB, userID uint) error {
 	}
 
 	return nil
+}
+
+func UpdateUser(username string, params models.UserUpdateParams, db *gorm.DB) (*models.User, error) {
+	// Find user
+	var user models.User
+	if username == "" {
+		return nil, errors.New("username cannot be empty")
+	}
+
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.New("user not found")
+		}
+		return nil, fmt.Errorf("error finding user: %w", result.Error)
+	}
+	// Update fields if provided
+	updates := make(map[string]interface{})
+
+	if params.Email != "" {
+		// Validate email
+		emailValidation, _ := (&models.User{Email: params.Email}).EmailValidation()
+		if !emailValidation {
+			return nil, fmt.Errorf("invalid email format")
+		}
+
+		// Check if email already exists for another user
+		var existingUser models.User
+		if err := db.Where("email = ?", params.Email).First(&existingUser).Error; err == nil {
+			return nil, fmt.Errorf("email already in use by another account")
+		}
+
+		updates["email"] = params.Email
+	}
+
+	if params.FullName != "" {
+		fullName := params.FullName
+		updates["full_name"] = &fullName
+	}
+
+	if params.Phone != "" {
+		phone := params.Phone
+		updates["phone"] = &phone
+	}
+
+	if params.Picture != "" {
+		updates["picture"] = params.Picture
+	}
+
+	if params.Status != "" {
+		// Validate status
+		switch models.UserStatus(params.Status) {
+		case models.StatusActive, models.StatusBanned:
+			updates["status"] = params.Status
+		default:
+			return nil, fmt.Errorf("invalid status value")
+		}
+	}
+	// Apply updates
+	if len(updates) > 0 {
+		if err := db.Model(&user).Updates(updates).Error; err != nil {
+			return nil, fmt.Errorf("failed to update user: %w", err)
+		}
+
+		// Fetch updated user
+		if err := db.First(&user, user.ID).Error; err != nil {
+			return nil, fmt.Errorf("error retrieving updated user: %w", err)
+		}
+	}
+	user.Password = ""
+	return &user, nil
+}
+
+func UpdateUserStatus(username string, status string, db *gorm.DB) (*models.User, error) {
+	// Find user
+	var user models.User
+	if username == "" {
+		return nil, errors.New("username cannot be empty")
+	}
+
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.New("user not found")
+		}
+		return nil, fmt.Errorf("error finding user: %w", result.Error)
+	}
+
+	switch models.UserStatus(status) {
+	case models.StatusActive:
+		user.Status = models.StatusActive
+	case models.StatusBanned:
+		user.Status = models.StatusBanned
+	default:
+		return nil, fmt.Errorf("invalid status value: must be 'active', 'banned', or 'pending'")
+	}
+
+	// Save updated status
+	if err := db.Save(&user).Error; err != nil {
+		return nil, fmt.Errorf("failed to update user status: %w", err)
+	}
+
+	user.Password = ""
+
+	return &user, nil
 }
