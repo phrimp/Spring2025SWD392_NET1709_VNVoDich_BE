@@ -34,6 +34,7 @@ public class PayPalService implements IPayment {
 
     // Convert VND to USD if necessary (PayPal doesn't support VND)
     BigDecimal usdAmount = convertToUSD(total);
+    System.out.println("VND to USD: " + usdAmount);
 
     Amount amount = new Amount();
     amount.setCurrency("USD");
