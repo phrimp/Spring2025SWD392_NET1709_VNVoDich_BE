@@ -22,6 +22,10 @@ type Course struct {
 	Tutor   Tutor `gorm:"foreignKey:TutorID"`
 }
 
+func (Course) TableName() string {
+	return "Course"
+}
+
 type CourseReview struct {
 	gorm.Model
 	ID            uint `gorm:"primaryKey;autoIncrement"`
@@ -35,6 +39,10 @@ type CourseReview struct {
 	Parent   Parent `gorm:"foreignKey:ParentID"`
 }
 
+func (CourseReview) TableName() string {
+	return "CourseReview"
+}
+
 type Availability struct {
 	gorm.Model
 	ID      uint  `gorm:"primaryKey;autoIncrement"`
@@ -44,6 +52,10 @@ type Availability struct {
 	TimeGap int // Minimum gap between bookings in minutes
 
 	Days []DayAvailability `gorm:"foreignKey:AvailabilityID"`
+}
+
+func (Availability) TableName() string {
+	return "Availability"
 }
 
 type CourseSubscription struct {
@@ -59,6 +71,10 @@ type CourseSubscription struct {
 	Children   Children `gorm:"foreignKey:ChildrenID"`
 }
 
+func (CourseSubscription) TableName() string {
+	return "CourseSubscription"
+}
+
 type DayAvailability struct {
 	gorm.Model
 	ID             uint `gorm:"primaryKey;autoIncrement"`
@@ -68,4 +84,8 @@ type DayAvailability struct {
 	EndTime        time.Time
 
 	Availability Availability `gorm:"foreignKey:AvailabilityID"`
+}
+
+func (DayAvailability) TableName() string {
+	return "DayAvailability"
 }

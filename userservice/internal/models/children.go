@@ -13,3 +13,7 @@ type Children struct {
 
 	CourseSubscriptions []CourseSubscription `gorm:"foreignKey:ChildrenID"`
 }
+
+func (Children) TableName() string {
+	return "Children"
+}

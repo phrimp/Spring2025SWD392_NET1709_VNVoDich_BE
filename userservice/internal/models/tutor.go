@@ -25,6 +25,10 @@ type Tutor struct {
 	Availability     *Availability    `gorm:"foreignKey:TutorID"`
 }
 
+func (Tutor) TableName() string {
+	return "Tutor"
+}
+
 type TutorSpecialty struct {
 	gorm.Model
 	ID              uint   `gorm:"primaryKey;autoIncrement"`
@@ -35,6 +39,10 @@ type TutorSpecialty struct {
 
 	TutorID uint
 	Tutor   Tutor `gorm:"foreignKey:TutorID"`
+}
+
+func (TutorSpecialty) TableName() string {
+	return "TutorSpecialty"
 }
 
 type TutorReview struct {
@@ -48,4 +56,8 @@ type TutorReview struct {
 	Tutor    Tutor `gorm:"foreignKey:TutorID"`
 	ParentID uint
 	Parent   Parent `gorm:"foreignKey:ParentID"`
+}
+
+func (TutorReview) TableName() string {
+	return "TutorReview"
 }

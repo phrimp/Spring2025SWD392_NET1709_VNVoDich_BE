@@ -12,3 +12,7 @@ func CreatePayment(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx,
 func CompletePayment(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
 	return ForwardRequest(req, resp, c, url, "GET", nil)
 }
+
+func CancelPayment(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
+	return ForwardRequest(req, resp, c, url, "GET", nil)
+}
