@@ -44,7 +44,7 @@ func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*mode
 	return &user, nil
 }
 
-func RegisterUserWithRole(params models.UserCreationParams, db *gorm.DB) error {
+func RegisterUserWithRole(params models.UserCreationParams, google_access_token string, db *gorm.DB) error {
 	// Start a database transaction
 	return db.Transaction(func(tx *gorm.DB) error {
 		user := models.User{
@@ -61,6 +61,9 @@ func RegisterUserWithRole(params models.UserCreationParams, db *gorm.DB) error {
 		}
 		if params.Phone != "" {
 			user.Phone = &params.Phone
+		}
+		if google_access_token != "" {
+			user.GoogleToken = google_access_token
 		}
 
 		// Validate user data
@@ -87,7 +90,7 @@ func RegisterUserWithRole(params models.UserCreationParams, db *gorm.DB) error {
 	})
 }
 
-func AddUser(params models.UserCreationParams, had_admin bool, db *gorm.DB) error {
+func AddUser(params models.UserCreationParams, had_admin bool, google_access_token string, db *gorm.DB) error {
 	// Check for existing username
 	fmt.Printf("Adding user with username: %s\n", params.Username)
 
@@ -120,7 +123,7 @@ func AddUser(params models.UserCreationParams, had_admin bool, db *gorm.DB) erro
 		return nil
 	}
 
-	return RegisterUserWithRole(params, db)
+	return RegisterUserWithRole(params, google_access_token, db)
 }
 
 func FindUserWithUsername(username string, db *gorm.DB) (*models.User, error) {

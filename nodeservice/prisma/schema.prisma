@@ -40,6 +40,7 @@ model User {
   phone     String?  @db.VarChar(20)
   full_name String?  @db.VarChar(255)
   picture   String?  
+  google_token String? @db.Varchar(255)
 
   is_verified              Boolean    @default(false)
   status                   UserStatus @default(Active)

@@ -47,6 +47,7 @@ func AddUser(db *gorm.DB, had_admin bool) fiber.Handler {
 				"error": "Invalid request",
 			})
 		}
+		google_access_token := c.Query("google_token")
 
 		// Convert RequestParam to UserCreationParams
 		params := models.UserCreationParams{
@@ -59,7 +60,7 @@ func AddUser(db *gorm.DB, had_admin bool) fiber.Handler {
 		}
 
 		// Use our updated AddUser function that handles role-specific records
-		err := services.AddUser(params, had_admin, db)
+		err := services.AddUser(params, had_admin, google_access_token, db)
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": err.Error(),

@@ -18,7 +18,7 @@ var (
 
 func init() {
 	API_KEY = os.Getenv("API_KEY")
-	err := services.AddUser(models.UserCreationParams{Username: "admin", Password: "admin", Role: "Admin", Email: "thaiphienn@gmail.com"}, had_admin, repository.DB)
+	err := services.AddUser(models.UserCreationParams{Username: "admin", Password: "admin", Role: "Admin", Email: "thaiphienn@gmail.com"}, had_admin, "", repository.DB)
 	if err != nil {
 		fmt.Println("Init admin account failed:", err)
 		had_admin = false
