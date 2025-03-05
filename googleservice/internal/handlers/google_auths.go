@@ -113,8 +113,8 @@ func AddUser(name, email, picture, access_token string) error {
 		return fmt.Errorf("user service unavailable: %v", err)
 	}
 
-	if resp.StatusCode() != fiber.StatusOK {
-		return fmt.Errorf("add user failed: %s", string(resp.Body()))
+	if resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
+		return nil
 	}
-	return nil
+	return fmt.Errorf("add user failed: %s", string(resp.Body()))
 }

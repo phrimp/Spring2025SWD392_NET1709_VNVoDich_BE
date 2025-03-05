@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"gateway/internal/config"
 	"gateway/internal/routes"
 
 	"github.com/gofiber/fiber/v2"
@@ -10,11 +11,13 @@ import (
 
 type AdminServiceHandler struct {
 	adminServiceURL string
+	userServiceURL  string
 }
 
-func NewAdminService(adminServiceURL string) *AdminServiceHandler {
+func NewAdminService(config *config.Config) *AdminServiceHandler {
 	return &AdminServiceHandler{
-		adminServiceURL: adminServiceURL,
+		adminServiceURL: config.AdminServiceURL,
+		userServiceURL:  config.UserServiceURL,
 	}
 }
 
@@ -26,5 +29,23 @@ func (a *AdminServiceHandler) HandleAllGetUser() fiber.Handler {
 		defer fasthttp.ReleaseResponse(resp)
 		query_url := fmt.Sprintf("?page=%s&limit=%s", c.Query("page"), c.Query("limit"))
 		return routes.GetAllUser(req, resp, c, a.adminServiceURL+"/api/users"+query_url)
+	}
+}
+
+func (a *AdminServiceHandler) HandleAdminUpdateUser() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		req := fasthttp.AcquireRequest()
+		resp := fasthttp.AcquireResponse()
+		defer fasthttp.ReleaseRequest(req)
+		defer fasthttp.ReleaseResponse(resp)
+
+		username := c.Params("username")
+		if username == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Username is required",
+			})
+		}
+
+		return routes.AdminUpdateUser(req, resp, c, a.userServiceURL+"/admin/users/"+username)
 	}
 }

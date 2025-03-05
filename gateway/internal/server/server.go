@@ -45,7 +45,7 @@ func NewGateway(config *config.Config) *Gateway {
 		google:  handlers.NewGoogleHandler(config.GoogleServiceURL),
 		user:    handlers.NewUserService(config.UserServiceURL),
 		node:    handlers.NewNodeServiceHandler(config.NodeServiceURL),
-		admin:   handlers.NewAdminService(config.AdminServiceURL),
+		admin:   handlers.NewAdminService(config),
 		payment: handlers.NewPaymentHandler(config.PaymentServiceURL),
 	}
 
@@ -66,7 +66,7 @@ func (g *Gateway) setupRoutes() {
 	g.app.Get("/google/auth/login", g.google.HandleLogin())
 	g.app.Get("/google/auth/login/callback", g.google.HandleCallback())
 
-	g.app.Get("/public/user/:username", g.user.HandleGetUserwithUsername())
+	g.app.Get("/public/user/:username", g.user.HandleGetPublicUserProfile())
 	g.app.Get("/public/course/all", g.node.HandleGetAllCourse())
 	g.app.Get("/public/course/:id", g.node.HandleGetACourse())
 	g.app.Get("/payment/success", g.payment.HandleCompletePayPalPayment())
@@ -76,6 +76,8 @@ func (g *Gateway) setupRoutes() {
 	api.Use(middleware.JWTMiddleware(g.config.JWTSecret))
 	api.Get("/get/me", g.user.HandleGetMe())
 	api.Put("/update/me", g.user.HandleUpdateMe())
+	api.Delete("/delete/me", g.user.HandleDeleteMe())
+	api.Post("/delete/me/cancel", g.user.HandleCancelDeleteMe())
 	api.Post("verify-email/send", g.google.HandleSendVerificationEmail())
 	api.Post("/payment/create", g.payment.HandleCreatePayment())
 
@@ -86,6 +88,7 @@ func (g *Gateway) setupRoutes() {
 	admin_api := api.Group("/admin")
 	admin_api.Use(middleware.RequireRole("Admin"))
 	admin_api.Get("/users", g.user.HandleAllGetUser())
+	admin_api.Put("/users/:username", g.admin.HandleAdminUpdateUser())
 	//// Specific role-based routes
 	//api.Get("/sensitive-data", middleware.RequireRole("admin", "data_analyst"), g.auth.HandleSensitiveData())
 }

@@ -45,7 +45,7 @@ type User struct {
 
 	LastLoginAt       *int64 `json:"last_login_at,omitempty"`
 	AccountLocked     bool   `gorm:"default:false" json:"account_locked"`
-	PasswordChangedAt *int64 `json:"-"`
+	PasswordChangedAt *int64 `json:"password_changed_at"`
 }
 
 func (User) TableName() string {
