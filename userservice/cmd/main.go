@@ -7,6 +7,7 @@ import (
 	"user-service/internal/models"
 	"user-service/internal/repository"
 	"user-service/internal/services"
+	"user-service/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -25,6 +26,8 @@ func init() {
 		return
 	}
 	had_admin = false
+
+	utils.SetupTimeZone()
 }
 
 func main() {
