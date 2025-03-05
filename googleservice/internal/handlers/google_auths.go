@@ -107,7 +107,7 @@ func AddUser(name, email, picture, access_token string) error {
 	body := fmt.Sprintf(`{"username":"%s","password":"%s", "email":"%s", "role":"%s", "picture":"%s"}`, email, "", email, "Parent", picture)
 	query := fmt.Sprintf("?google_token=%s", access_token)
 	fmt.Println(config.Google_config.USER_SERVICE_URL + "/user/add" + query)
-	utils.BuildRequest(req, "POST", []byte(body), config.Google_config.API_KEY, config.Google_config.USER_SERVICE_URL+"/user/add")
+	utils.BuildRequest(req, "POST", []byte(body), config.Google_config.API_KEY, config.Google_config.USER_SERVICE_URL+"/user/add"+query)
 
 	if err := fasthttp.Do(req, resp); err != nil {
 		return fmt.Errorf("user service unavailable: %v", err)

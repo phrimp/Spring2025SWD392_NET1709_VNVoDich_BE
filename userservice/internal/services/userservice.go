@@ -618,3 +618,223 @@ func VerifyUser(username string, db *gorm.DB) error {
 	}
 	return nil
 }
+
+func HardDeleteUser(username string, db *gorm.DB) error {
+	// Find user
+	var user models.User
+	if username == "" {
+		return errors.New("username cannot be empty")
+	}
+
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return fmt.Errorf("error finding user: %w", result.Error)
+	}
+
+	// Start a transaction to ensure all related records are deleted correctly
+	return db.Transaction(func(tx *gorm.DB) error {
+		// Delete related records based on user role
+		switch user.Role {
+		case models.RoleParent:
+			// Delete parent record
+			if err := tx.Where("id = ?", user.ID).Delete(&models.Parent{}).Error; err != nil {
+				return fmt.Errorf("failed to delete parent record: %w", err)
+			}
+
+			// Find children associated with this parent
+			var children []models.Children
+			if err := tx.Where("parent_id = ?", user.ID).Find(&children).Error; err != nil {
+				return fmt.Errorf("failed to find children records: %w", err)
+			}
+
+			// Delete each child's related records and then the child itself
+			for _, child := range children {
+				// Delete course subscriptions for the child
+				if err := tx.Where("children_id = ?", child.ID).Delete(&models.CourseSubscription{}).Error; err != nil {
+					return fmt.Errorf("failed to delete child's course subscriptions: %w", err)
+				}
+
+				// Delete the child record
+				if err := tx.Delete(&child).Error; err != nil {
+					return fmt.Errorf("failed to delete child record: %w", err)
+				}
+			}
+
+		case models.RoleTutor:
+			// Delete tutor specialties
+			if err := tx.Where("tutor_id = ?", user.ID).Delete(&models.TutorSpecialty{}).Error; err != nil {
+				return fmt.Errorf("failed to delete tutor specialties: %w", err)
+			}
+
+			// Delete availability records
+			var availability models.Availability
+			if err := tx.Where("tutor_id = ?", user.ID).First(&availability).Error; err == nil {
+				// Delete day availability records
+				if err := tx.Where("availability_id = ?", availability.ID).Delete(&models.DayAvailability{}).Error; err != nil {
+					return fmt.Errorf("failed to delete day availability records: %w", err)
+				}
+
+				// Delete availability record
+				if err := tx.Delete(&availability).Error; err != nil {
+					return fmt.Errorf("failed to delete availability record: %w", err)
+				}
+			}
+
+			// Delete tutor record
+			if err := tx.Where("id = ?", user.ID).Delete(&models.Tutor{}).Error; err != nil {
+				return fmt.Errorf("failed to delete tutor record: %w", err)
+			}
+		}
+
+		// Finally, delete the user record itself
+		if err := tx.Delete(&user).Error; err != nil {
+			return fmt.Errorf("failed to delete user record: %w", err)
+		}
+
+		return nil
+	})
+}
+
+func AssignRole(username string, newRole string, db *gorm.DB) error {
+	// Find user
+	var user models.User
+	if username == "" {
+		return errors.New("username cannot be empty")
+	}
+
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return fmt.Errorf("error finding user: %w", result.Error)
+	}
+
+	// Validate role
+	newRoleEnum := models.UserRole(newRole)
+	validRoles := map[models.UserRole]bool{
+		models.RoleParent: true,
+		models.RoleTutor:  true,
+		models.RoleKid:    true,
+		models.RoleAdmin:  true,
+	}
+
+	if !validRoles[newRoleEnum] {
+		return errors.New("invalid role value")
+	}
+
+	// If the user already has the role, just return
+	if user.Role == newRoleEnum {
+		return nil
+	}
+
+	// Start a transaction to ensure all related records are updated correctly
+	return db.Transaction(func(tx *gorm.DB) error {
+		// Handle deleting current role-specific records
+		switch user.Role {
+		case models.RoleParent:
+			// Get the parent record
+			var parent models.Parent
+			if err := tx.Where("id = ?", user.ID).First(&parent).Error; err == nil {
+				// Get the children of this parent
+				var children []models.Children
+				if err := tx.Where("parent_id = ?", user.ID).Find(&children).Error; err == nil && len(children) > 0 {
+					return errors.New("cannot change role: user has associated children records")
+				}
+
+				// Delete parent record
+				if err := tx.Delete(&parent).Error; err != nil {
+					return fmt.Errorf("failed to delete parent record: %w", err)
+				}
+			}
+		case models.RoleTutor:
+			// Get the tutor record
+			var tutor models.Tutor
+			if err := tx.Where("id = ?", user.ID).First(&tutor).Error; err == nil {
+				// Check if tutor has courses
+				var courseCount int64
+				if err := tx.Model(&models.Course{}).Where("tutor_id = ?", user.ID).Count(&courseCount).Error; err == nil && courseCount > 0 {
+					return errors.New("cannot change role: user has associated course records")
+				}
+
+				// Delete tutor specialties
+				if err := tx.Where("tutor_id = ?", user.ID).Delete(&models.TutorSpecialty{}).Error; err != nil {
+					return fmt.Errorf("failed to delete tutor specialties: %w", err)
+				}
+
+				// Delete availability records
+				var availability models.Availability
+				if err := tx.Where("tutor_id = ?", user.ID).First(&availability).Error; err == nil {
+					// Delete day availability records
+					if err := tx.Where("availability_id = ?", availability.ID).Delete(&models.DayAvailability{}).Error; err != nil {
+						return fmt.Errorf("failed to delete day availability records: %w", err)
+					}
+
+					// Delete availability record
+					if err := tx.Delete(&availability).Error; err != nil {
+						return fmt.Errorf("failed to delete availability record: %w", err)
+					}
+				}
+
+				// Delete tutor record
+				if err := tx.Delete(&tutor).Error; err != nil {
+					return fmt.Errorf("failed to delete tutor record: %w", err)
+				}
+			}
+		}
+
+		// Create new role-specific records
+		switch newRoleEnum {
+		case models.RoleParent:
+			parent := models.Parent{
+				ID:                   user.ID,
+				PreferredLanguage:    "English", // Default language
+				NotificationsEnabled: true,      // Default to enabled
+			}
+
+			if err := tx.Create(&parent).Error; err != nil {
+				return fmt.Errorf("failed to create parent record: %w", err)
+			}
+		case models.RoleTutor:
+			tutor := models.Tutor{
+				ID:             user.ID,
+				Bio:            "",    // Empty bio initially
+				Qualifications: "",    // Empty qualifications initially
+				TeachingStyle:  "",    // Empty teaching style initially
+				IsAvailable:    false, // Not available by default
+				DemoVideoURL:   "",    // No demo video initially
+				Image:          "",    // No image initially
+			}
+
+			if err := tx.Create(&tutor).Error; err != nil {
+				return fmt.Errorf("failed to create tutor record: %w", err)
+			}
+
+			// Create default availability for the tutor
+			availability := models.Availability{
+				TutorID: user.ID,
+				TimeGap: 10, // Default 10-minute gap between sessions
+			}
+
+			if err := tx.Create(&availability).Error; err != nil {
+				return fmt.Errorf("failed to create tutor availability: %w", err)
+			}
+		}
+
+		// Update user's role
+		if err := tx.Model(&user).Update("role", newRoleEnum).Error; err != nil {
+			return fmt.Errorf("failed to update user role: %w", err)
+		}
+
+		return nil
+	})
+}

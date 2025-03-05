@@ -296,3 +296,64 @@ func VerifyUserHandler(db *gorm.DB) fiber.Handler {
 		})
 	}
 }
+
+func AdminDeleteUserHandler(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		username := c.Query("username")
+		if username == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Username is required",
+			})
+		}
+
+		// Call the service to permanently delete the user
+		if err := services.HardDeleteUser(username, db); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"message": "User has been permanently deleted",
+		})
+	}
+}
+
+func AdminAssignRoleHandler(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		username := c.Query("username")
+		if username == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Username is required",
+			})
+		}
+
+		// Parse the request body
+		var req struct {
+			Role string `json:"role"`
+		}
+
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid request body",
+			})
+		}
+
+		if req.Role == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Role is required",
+			})
+		}
+
+		// Call the service to assign the role
+		if err := services.AssignRole(username, req.Role, db); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"message": "User role has been updated successfully",
+		})
+	}
+}

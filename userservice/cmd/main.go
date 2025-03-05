@@ -62,8 +62,10 @@ func main() {
 	user.Patch("/update/status", handlers.UpdateUserStatus(repository.DB))
 	user.Delete("/delete", handlers.DeleteUserHandler(repository.DB))
 	user.Post("/delete/cancel", handlers.CancelDeleteUserHandler(repository.DB))
-	user.Put("/users/:username", handlers.AdminUpdateUserHandler(repository.DB))
+	user.Put("/admin/update", handlers.AdminUpdateUserHandler(repository.DB))
 	user.Put("/verify", handlers.VerifyUserHandler(repository.DB))
+	user.Delete("/admin/delete", handlers.AdminDeleteUserHandler(repository.DB))
+	user.Post("/admin/role", handlers.AdminAssignRoleHandler(repository.DB))
 
 	port := os.Getenv("PORT")
 	if port == "" {

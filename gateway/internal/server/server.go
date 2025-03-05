@@ -89,7 +89,11 @@ func (g *Gateway) setupRoutes() {
 	admin_api := api.Group("/admin")
 	admin_api.Use(middleware.RequireRole("Admin"))
 	admin_api.Get("/users", g.user.HandleAllGetUser())
-	admin_api.Put("/users/:username", g.admin.HandleAdminUpdateUser())
+	admin_api.Put("/user/update", g.admin.HandleAdminUpdateUser())
+	admin_api.Get("/user", g.admin.HandleAdminGetUSerDetail())
+	admin_api.Patch("/users/:username/status", g.admin.HandleUpdateUserStatus())
+	admin_api.Delete("/users/:username", g.admin.HandleDeleteUser())
+	admin_api.Post("/users/:username/roles", g.admin.HandleAssignRole())
 	//// Specific role-based routes
 	//api.Get("/sensitive-data", middleware.RequireRole("admin", "data_analyst"), g.auth.HandleSensitiveData())
 }

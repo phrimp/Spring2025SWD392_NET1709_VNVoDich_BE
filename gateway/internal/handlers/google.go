@@ -145,7 +145,12 @@ func (h *GoogleHandler) HandleCreateMeetLink() fiber.Handler {
 		resp := fasthttp.AcquireResponse()
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
-		query_url := fmt.Sprintf("?title=%s", c.Query("title"))
+		claims, ok := c.Locals("user").(*middleware.Claims)
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "cannot find user in token claim"})
+		}
+
+		query_url := fmt.Sprintf("?title=%s&email=%s", c.Query("title"), claims.Email)
 		return routes.CreateMeetLink(req, resp, c, h.googleServiceURL+"/api/meet/create"+query_url)
 	}
 }
