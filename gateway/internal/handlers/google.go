@@ -91,7 +91,7 @@ type OTP struct {
 	expired_time int64
 }
 
-var verification_code map[string]*OTP
+var verification_code map[string]*OTP = make(map[string]*OTP)
 
 func (h *GoogleHandler) HandleSendVerificationEmail() fiber.Handler {
 	return func(c *fiber.Ctx) error {

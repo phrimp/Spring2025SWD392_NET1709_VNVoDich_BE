@@ -13,6 +13,7 @@ var API_KEY string
 
 func init() {
 	utils.SetupTimeZone()
+	API_KEY = utils.API_KEY
 }
 
 func main() {

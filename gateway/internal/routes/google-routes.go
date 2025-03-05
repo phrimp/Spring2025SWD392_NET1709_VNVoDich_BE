@@ -14,7 +14,7 @@ func SendVerificationEmail(req *fasthttp.Request, resp *fasthttp.Response, c *fi
 }
 
 func VerifyEmail(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
-	return ForwardRequest(req, resp, c, url, "POST", c.Body())
+	return ForwardRequest(req, resp, c, url, "PUT", c.Body())
 }
 
 func CreateMeetLink(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
