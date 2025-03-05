@@ -12,7 +12,7 @@ const router = Router();
 
 router.get("/", tutorAuth, getChildren);
 router.get("/:id", tutorAuth, getChild);
-router.post("/", createChild);
+router.post("/", tutorAuth, createChild);
 router.put("/:id", updateChild);
 router.delete("/:id", deleteChild);
 
