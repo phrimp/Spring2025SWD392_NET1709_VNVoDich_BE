@@ -13,6 +13,10 @@ func SendVerificationEmail(req *fasthttp.Request, resp *fasthttp.Response, c *fi
 	return ForwardRequest(req, resp, c, url, "POST", c.Body())
 }
 
+func VerifyEmail(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
+	return ForwardRequest(req, resp, c, url, "POST", c.Body())
+}
+
 func CreateMeetLink(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
 	return ForwardRequest(req, resp, c, url, "POST", c.Body())
 }

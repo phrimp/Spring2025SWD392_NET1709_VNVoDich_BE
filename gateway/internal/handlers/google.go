@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"gateway/internal/config"
 	"gateway/internal/middleware"
 	"gateway/internal/routes"
 	"time"
@@ -14,11 +15,13 @@ import (
 
 type GoogleHandler struct {
 	googleServiceURL string
+	userServiceURL   string
 }
 
-func NewGoogleHandler(googleServiceURL string) *GoogleHandler {
+func NewGoogleHandler(config *config.Config) *GoogleHandler {
 	return &GoogleHandler{
-		googleServiceURL: googleServiceURL,
+		googleServiceURL: config.GoogleServiceURL,
+		userServiceURL:   config.UserServiceURL,
 	}
 }
 
@@ -88,7 +91,7 @@ type OTP struct {
 	expired_time int64
 }
 
-var verification_code map[string]OTP
+var verification_code map[string]*OTP
 
 func (h *GoogleHandler) HandleSendVerificationEmail() fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -103,19 +106,36 @@ func (h *GoogleHandler) HandleSendVerificationEmail() fiber.Handler {
 		current_email := claims.Email
 		code := generateRandomOTP()
 		code = code[:len(code)-4]
-		otp := OTP{}
-		if cur_OTP, ok := verification_code[current_email]; !ok {
-			otp = OTP{code: code, expired_time: time.Now().Unix()}
-		} else {
-			if cur_OTP.expired_time < time.Now().Unix() {
-				otp = OTP{code: code, expired_time: time.Now().Unix()}
-			} else {
-				otp = cur_OTP
-			}
-		}
+		expired_time := time.Now().Add(10 * time.Minute).Unix()
+		otp := &OTP{code: code, expired_time: expired_time}
+
+		verification_code[current_email] = otp
+		fmt.Println("VERIFICATION CODE DEBUG:", verification_code[current_email])
 
 		query_url := fmt.Sprintf("?to=%s&body=%s", current_email, otp.code)
 		return routes.SendVerificationEmail(req, resp, c, h.googleServiceURL+"/api/email/send/verify/email"+query_url)
+	}
+}
+
+func (h *GoogleHandler) HandleVerifyEmail() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		req := fasthttp.AcquireRequest()
+		resp := fasthttp.AcquireResponse()
+		defer fasthttp.ReleaseRequest(req)
+		defer fasthttp.ReleaseResponse(resp)
+		code := c.Query("code")
+		claims, ok := c.Locals("user").(*middleware.Claims)
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "cannot find username in token claim"})
+		}
+		current_email := claims.Email
+		if verification_code[current_email].code != code {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "wrong otp code"})
+		}
+		delete(verification_code, current_email)
+
+		query := fmt.Sprintf("?username=%s", claims.Username)
+		return routes.VerifyEmail(req, resp, c, h.userServiceURL+"/user/verify"+query)
 	}
 }
 

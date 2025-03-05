@@ -63,6 +63,7 @@ func main() {
 	user.Delete("/delete", handlers.DeleteUserHandler(repository.DB))
 	user.Post("/delete/cancel", handlers.CancelDeleteUserHandler(repository.DB))
 	user.Put("/users/:username", handlers.AdminUpdateUserHandler(repository.DB))
+	user.Put("/verify", handlers.VerifyUserHandler(repository.DB))
 
 	port := os.Getenv("PORT")
 	if port == "" {

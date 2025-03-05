@@ -248,7 +248,7 @@ func CancelDeleteUserHandler(db *gorm.DB) fiber.Handler {
 
 func AdminUpdateUserHandler(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		username := c.Params("username")
+		username := c.Query("username")
 		if username == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Username is required",
@@ -272,6 +272,27 @@ func AdminUpdateUserHandler(db *gorm.DB) fiber.Handler {
 		return c.JSON(fiber.Map{
 			"message": "User updated successfully",
 			"user":    updatedUser,
+		})
+	}
+}
+
+func VerifyUserHandler(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		username := c.Query("username")
+		if username == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Username is required",
+			})
+		}
+		err := services.VerifyUser(username, db)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"message": "User verification status updated successfully",
 		})
 	}
 }

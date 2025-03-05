@@ -42,7 +42,7 @@ func NewGateway(config *config.Config) *Gateway {
 		config:  config,
 		app:     app,
 		auth:    handlers.NewAuthHandler(config.AuthServiceURL),
-		google:  handlers.NewGoogleHandler(config.GoogleServiceURL),
+		google:  handlers.NewGoogleHandler(config),
 		user:    handlers.NewUserService(config.UserServiceURL),
 		node:    handlers.NewNodeServiceHandler(config.NodeServiceURL),
 		admin:   handlers.NewAdminService(config),
@@ -79,6 +79,7 @@ func (g *Gateway) setupRoutes() {
 	api.Delete("/delete/me", g.user.HandleDeleteMe())
 	api.Post("/delete/me/cancel", g.user.HandleCancelDeleteMe())
 	api.Post("verify-email/send", g.google.HandleSendVerificationEmail())
+	api.Post("verify-email/verify", g.google.HandleVerifyEmail())
 	api.Post("/payment/create", g.payment.HandleCreatePayment())
 
 	// Tutor routes

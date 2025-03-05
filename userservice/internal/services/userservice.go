@@ -604,3 +604,17 @@ func CancelDeleteUser(username string, db *gorm.DB) error {
 
 	return nil
 }
+
+func VerifyUser(username string, db *gorm.DB) error {
+	var user models.User
+	if err := db.Where("username = ?", username).First(&user).Error; err != nil {
+		return err
+	}
+
+	// Update verification status
+	if err := db.Model(&user).Update("is_verified", true).Error; err != nil {
+		fmt.Printf("Error updating user verification status: %v\n", err)
+		return err
+	}
+	return nil
+}

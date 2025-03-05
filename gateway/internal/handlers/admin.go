@@ -38,14 +38,8 @@ func (a *AdminServiceHandler) HandleAdminUpdateUser() fiber.Handler {
 		resp := fasthttp.AcquireResponse()
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
+		query := fmt.Sprintf("?username=%s", c.Query("username"))
 
-		username := c.Params("username")
-		if username == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Username is required",
-			})
-		}
-
-		return routes.AdminUpdateUser(req, resp, c, a.userServiceURL+"/admin/users/"+username)
+		return routes.AdminUpdateUser(req, resp, c, a.userServiceURL+"/admin/users/"+query)
 	}
 }
