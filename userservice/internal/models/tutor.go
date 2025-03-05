@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 
-	"gorm.io/gorm"
 )
 
 type Tutor struct {
@@ -30,7 +29,6 @@ func (Tutor) TableName() string {
 }
 
 type TutorSpecialty struct {
-	gorm.Model
 	ID              uint   `gorm:"primaryKey;autoIncrement"`
 	Subject         string `gorm:"type:varchar(100)"`
 	Level           string `gorm:"type:varchar(50)"`
@@ -46,7 +44,6 @@ func (TutorSpecialty) TableName() string {
 }
 
 type TutorReview struct {
-	gorm.Model
 	ID            uint `gorm:"primaryKey;autoIncrement"`
 	Rating        int
 	ReviewContent string `gorm:"type:text;null"`

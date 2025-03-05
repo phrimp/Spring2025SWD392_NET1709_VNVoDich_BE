@@ -2,26 +2,26 @@
   {
     "id": 2,
     "preferred_language": "English",
-    "notifications_enable": true
+    "notifications_enabled": true
   },
   {
     "id": 4,
     "preferred_language": "Spanish",
-    "notifications_enable": false
+    "notifications_enabled": false
   },
   {
     "id": 6,
     "preferred_language": "French",
-    "notifications_enable": true
+    "notifications_enabled": true
   },
   {
     "id": 8,
     "preferred_language": "German",
-    "notifications_enable": false
+    "notifications_enabled": false
   },
   {
     "id": 10,
     "preferred_language": "Chinese",
-    "notifications_enable": true
+    "notifications_enabled": true
   }
 ]

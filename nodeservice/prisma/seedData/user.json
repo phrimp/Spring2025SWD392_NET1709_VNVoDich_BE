@@ -16,7 +16,7 @@
   {
     "id": 2,
     "username": "parent",
-    "password": "$2a$12$9dK3c2yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewYVXDgd.pLfFF..",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
     "email": "sarah.smith@example.com",
     "role": "Parent",
     "phone": "+1-555-0124",

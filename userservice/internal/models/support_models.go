@@ -3,11 +3,9 @@ package models
 import (
 	"time"
 
-	"gorm.io/gorm"
 )
 
 type Course struct {
-	gorm.Model
 	ID           uint   `gorm:"primaryKey;autoIncrement"`
 	Title        string `gorm:"type:varchar(255)"`
 	Description  string `gorm:"type:text;null"`
@@ -27,7 +25,6 @@ func (Course) TableName() string {
 }
 
 type CourseReview struct {
-	gorm.Model
 	ID            uint `gorm:"primaryKey;autoIncrement"`
 	Rating        int
 	ReviewContent string `gorm:"type:text;null"`
@@ -44,7 +41,6 @@ func (CourseReview) TableName() string {
 }
 
 type Availability struct {
-	gorm.Model
 	ID      uint  `gorm:"primaryKey;autoIncrement"`
 	TutorID uint  `gorm:"uniqueIndex"`
 	Tutor   Tutor `gorm:"foreignKey:TutorID"`
@@ -59,7 +55,6 @@ func (Availability) TableName() string {
 }
 
 type CourseSubscription struct {
-	gorm.Model
 	ID                uint   `gorm:"primaryKey;autoIncrement"`
 	Status            string `gorm:"type:varchar(20)"`
 	SessionsRemaining int    `gorm:"null"`
@@ -76,7 +71,6 @@ func (CourseSubscription) TableName() string {
 }
 
 type DayAvailability struct {
-	gorm.Model
 	ID             uint `gorm:"primaryKey;autoIncrement"`
 	AvailabilityID uint
 	Day            string `gorm:"type:varchar(20)"`

@@ -74,9 +74,9 @@ model Tutor {
 }
 
 model Parent {
-  id                   Int     @id
-  preferred_language   String
-  notifications_enable Boolean @default(false)
+  id                    Int     @id
+  preferred_language    String
+  notifications_enabled Boolean @default(false)
 
   profile User @relation(fields: [id], references: [id])
 
