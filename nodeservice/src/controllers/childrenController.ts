@@ -68,13 +68,7 @@ export const createChild = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { parentId } = req.params;
-    if (!parentId) {
-      res.status(400).json({ message: "Parent ID is required" });
-      return;
-    }
-
-    const { full_name, age, grade_level, learning_goals, password, parent_id } =
+    const { full_name, age, grade_level, learning_goals, password, userId } =
       req.body;
 
     if (
@@ -83,7 +77,7 @@ export const createChild = async (
       !grade_level ||
       !learning_goals ||
       !password ||
-      !parent_id
+      !userId
     ) {
       res.status(400).json({ message: "All fields are required" });
       return;
@@ -100,7 +94,9 @@ export const createChild = async (
         grade_level,
         learning_goals,
         password: hashedPassword,
-        parent_id: Number(parent_id),
+
+        parent_id: Number(userId),
+
       },
     });
 

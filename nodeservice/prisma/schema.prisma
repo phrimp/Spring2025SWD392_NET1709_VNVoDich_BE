@@ -39,17 +39,18 @@ model User {
   role      UserRole @default(Parent)
   phone     String?  @db.VarChar(20)
   full_name String?  @db.VarChar(255)
-  picture   String?  
-  google_token String? 
 
-  is_verified              Boolean    @default(false)
-  status                   UserStatus @default(Active)
+  picture   String?
+
+
+  is_verified Boolean    @default(false)
+  status      UserStatus @default(Active)
 
   last_login_at       BigInt?
   account_locked      Boolean @default(false)
   password_changed_at BigInt?
 
-  Tutor Tutor[]
+  Tutor  Tutor[]
   Parent Parent[]
 
   @@index([status])
@@ -75,8 +76,8 @@ model Tutor {
 }
 
 model Parent {
-  id                   Int     @id
-  preferred_language   String
+  id                    Int     @id
+  preferred_language    String
   notifications_enabled Boolean @default(false)
 
   profile User @relation(fields: [id], references: [id])
@@ -223,7 +224,6 @@ model CourseSubscriptionSchedule {
   subscription_id Int
   subscription    CourseSubscription @relation(fields: [subscription_id], references: [id])
 
-  day       Day
   startTime DateTime
   endTime   DateTime
 }

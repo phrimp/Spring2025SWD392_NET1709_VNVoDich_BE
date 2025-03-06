@@ -14,7 +14,6 @@ import teachingSessionRoutes from "./routes/teachingSessionRoutes";
 import searchRoutes from "./routes/searchMenuRoutes";
 import reviewTutorRoutes from "./routes/reviewTutorRoutes";
 import reviewCourseRoutes from "./routes/reviewCourseRoutes";
-import transactionRoutes from "./routes/transactionRoutes";
 import parentRoutes from "./routes/parentRoutes";
 
 // CONFIGURATIONS
@@ -42,7 +41,6 @@ app.use("/teaching-sessions", teachingSessionRoutes);
 app.use("/search", searchRoutes);
 app.use("/reviewsTutor", reviewTutorRoutes);
 app.use("/reviewsCourse", reviewCourseRoutes);
-app.use("/transactions", transactionRoutes);
 app.use("/parent", parentRoutes);
 
 // SERVER

@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import internal from "stream";
 
 const prisma = new PrismaClient();
 
@@ -28,10 +27,10 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
       filters.teaching_style = { contains: teachingStyle as string };
     if (isAvailable !== undefined)
       filters.is_available = isAvailable === "true";
-    if (email) filters.user = { email: { contains: email as string } }; 
+    if (email) filters.user = { email: { contains: email as string } };
     if (fullName)
-      filters.user = { full_name: { contains: fullName as string } }; 
-    if (phone) filters.user = { phone: { contains: phone as string } }; 
+      filters.user = { full_name: { contains: fullName as string } };
+    if (phone) filters.user = { phone: { contains: phone as string } };
 
     const skip = (pageNum - 1) * pageSizeNum;
     const tutors = await prisma.tutor.findMany({
@@ -81,6 +80,7 @@ export const getTutor = async (req: Request, res: Response): Promise<void> => {
             email: true,
             full_name: true,
             phone: true,
+            username: true,
           },
         },
         tutorReviews: {
@@ -109,6 +109,43 @@ export const getTutor = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     console.error("Error retrieving tutor:", error);
     res.status(500).json({ message: "Error retrieving tutor", error });
+  }
+};
+
+export const updateTutorProfile = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+  const updateData = { ...req.body };
+
+  try {
+    const tutor = await prisma.tutor.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        bio: updateData.bio,
+        qualifications: updateData.qualifications,
+        teaching_style: updateData.teaching_style,
+        demo_video_url: updateData.demo_video_url,
+        profile: {
+          update: {
+            full_name: updateData.full_name,
+            phone: updateData.phone,
+          },
+        },
+      },
+    });
+
+    if (!tutor) {
+      res.status(404).json({ message: "Tutor not found" });
+      return;
+    }
+
+    res.json({ message: "Tutor updated successfully", data: tutor });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating tutor", error });
   }
 };
 

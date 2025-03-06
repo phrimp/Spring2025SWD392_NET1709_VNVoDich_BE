@@ -92,3 +92,38 @@ export const getParentById = async (
     res.status(500).json({ message: "Error retrieving parent", error });
   }
 };
+
+export const updateParentProfile = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+  const updateData = { ...req.body };
+
+  try {
+    const parent = await prisma.parent.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        preferred_language: updateData.preferred_language,
+        notifications_enabled: updateData.notifications_enabled,
+        profile: {
+          update: {
+            full_name: updateData.full_name,
+            phone: updateData.phone,
+          },
+        },
+      },
+    });
+
+    if (!parent) {
+      res.status(404).json({ message: "Parent  profile not found" });
+      return;
+    }
+
+    res.json({ message: "Parent profile updated successfully", data: parent });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating parent profile", error });
+  }
+};
