@@ -39,7 +39,9 @@ model User {
   role      UserRole @default(Parent)
   phone     String?  @db.VarChar(20)
   full_name String?  @db.VarChar(255)
+
   picture   String?
+
 
   is_verified Boolean    @default(false)
   status      UserStatus @default(Active)
@@ -127,6 +129,11 @@ model Course {
   lessons             Lesson[]
   courseSubscriptions CourseSubscription[]
   courseReviews       CourseReview[]
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  deleted_at DateTime?
+
 }
 
 model Lesson {
@@ -149,8 +156,9 @@ model Availability {
 
   timeGap Int // Minimum gap between bookings in minutes
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  deleted_at DateTime?
 }
 
 model DayAvailability {
@@ -161,6 +169,10 @@ model DayAvailability {
   endTime         DateTime
 
   availability Availability @relation(fields: [availability_id], references: [id], onDelete: Cascade)
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  deleted_at DateTime?
 }
 
 model CourseSubscription {
@@ -176,6 +188,11 @@ model CourseSubscription {
 
   courseSubscriptionSchedules CourseSubscriptionSchedule[]
   teachingSessions            TeachingSession[]
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  deleted_at DateTime?
+
 }
 
 model TeachingSession {
@@ -233,6 +250,11 @@ model CourseReview {
   course    Course @relation(fields: [course_id], references: [id])
   parent_id Int
   parent    Parent @relation(fields: [parent_id], references: [id])
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  deleted_at DateTime?
+
 }
 
 enum CourseStatus {

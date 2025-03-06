@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
@@ -44,7 +45,7 @@ func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*mode
 	return &user, nil
 }
 
-func RegisterUserWithRole(params models.UserCreationParams, db *gorm.DB) error {
+func RegisterUserWithRole(params models.UserCreationParams, google_access_token string, db *gorm.DB) error {
 	// Start a database transaction
 	return db.Transaction(func(tx *gorm.DB) error {
 		user := models.User{
@@ -61,6 +62,9 @@ func RegisterUserWithRole(params models.UserCreationParams, db *gorm.DB) error {
 		}
 		if params.Phone != "" {
 			user.Phone = &params.Phone
+		}
+		if google_access_token != "" {
+			user.GoogleToken = google_access_token
 		}
 
 		// Validate user data
@@ -87,17 +91,31 @@ func RegisterUserWithRole(params models.UserCreationParams, db *gorm.DB) error {
 	})
 }
 
-func AddUser(params models.UserCreationParams, had_admin bool, db *gorm.DB) error {
+func AddUser(params models.UserCreationParams, had_admin bool, google_access_token string, db *gorm.DB) error {
 	// Check for existing username
 	fmt.Printf("Adding user with username: %s\n", params.Username)
 
 	var existingUser models.User
 	if err := db.Where("username = ?", params.Username).First(&existingUser).Error; err == nil {
+		if google_access_token != "" {
+			err := UpdateGoogleToken(params.Username, google_access_token, db)
+			if err != nil {
+				return fmt.Errorf("update google token failed: %s", err.Error())
+			}
+			return fmt.Errorf("user is already exists, update google token")
+		}
 		return fmt.Errorf("username already exists")
 	}
 
 	// Check for existing email
 	if err := db.Where("email = ?", params.Email).First(&existingUser).Error; err == nil {
+		if google_access_token != "" {
+			err := UpdateGoogleToken(existingUser.Username, google_access_token, db)
+			if err != nil {
+				return fmt.Errorf("update google token failed: %s", err.Error())
+			}
+			return fmt.Errorf("user email is already exist, update google token")
+		}
 		return fmt.Errorf("email already exists")
 	}
 
@@ -120,10 +138,10 @@ func AddUser(params models.UserCreationParams, had_admin bool, db *gorm.DB) erro
 		return nil
 	}
 
-	return RegisterUserWithRole(params, db)
+	return RegisterUserWithRole(params, google_access_token, db)
 }
 
-func FindUserWithUsername(username string, db *gorm.DB) (*models.User, error) {
+func FindUserWithUsername(username string, db *gorm.DB) (*map[string]interface{}, error) {
 	if username == "" {
 		return nil, errors.New("username cannot be empty")
 	}
@@ -139,9 +157,117 @@ func FindUserWithUsername(username string, db *gorm.DB) (*models.User, error) {
 		}
 		return nil, fmt.Errorf("error finding user: %w", result.Error)
 	}
+
+	// Remove sensitive data
 	user.Password = ""
 
-	return &user, nil
+	response := make(map[string]interface{})
+
+	userData, err := json.Marshal(user)
+	if err != nil {
+		return nil, fmt.Errorf("error serializing user data: %w", err)
+	}
+
+	if err := json.Unmarshal(userData, &response); err != nil {
+		return nil, fmt.Errorf("error building response: %w", err)
+	}
+
+	switch user.Role {
+	case models.RoleTutor:
+		var tutor models.Tutor
+		if err := db.Where("id = ?", user.ID).First(&tutor).Error; err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil, fmt.Errorf("error fetching tutor data: %w", err)
+			}
+			// If no tutor record is found, continue without it
+		} else {
+			tutorData, err := json.Marshal(tutor)
+			if err != nil {
+				return nil, fmt.Errorf("error serializing tutor data: %w", err)
+			}
+
+			var tutorMap map[string]interface{}
+			if err := json.Unmarshal(tutorData, &tutorMap); err != nil {
+				return nil, fmt.Errorf("error building tutor response: %w", err)
+			}
+
+			response["tutor"] = tutorMap
+
+			// Fetch tutor specialties
+			var specialties []models.TutorSpecialty
+			if err := db.Where("tutor_id = ?", user.ID).Find(&specialties).Error; err != nil {
+				// Just log the error but continue
+				fmt.Printf("Error fetching tutor specialties: %v\n", err)
+			} else if len(specialties) > 0 {
+				specialtiesData, _ := json.Marshal(specialties)
+				var specialtiesMap []map[string]interface{}
+				json.Unmarshal(specialtiesData, &specialtiesMap)
+
+				response["tutor"].(map[string]interface{})["specialties"] = specialtiesMap
+			}
+
+			// Fetch availability
+			var availability models.Availability
+			if err := db.Where("tutor_id = ?", user.ID).First(&availability).Error; err != nil {
+				fmt.Printf("Error fetching tutor availability: %v\n", err)
+			} else {
+				// Fetch days of availability
+				var days []models.DayAvailability
+				if err := db.Where("availability_id = ?", availability.ID).Find(&days).Error; err == nil && len(days) > 0 {
+					daysData, _ := json.Marshal(days)
+					var daysMap []map[string]interface{}
+					json.Unmarshal(daysData, &daysMap)
+
+					availabilityData, _ := json.Marshal(availability)
+					var availabilityMap map[string]interface{}
+					json.Unmarshal(availabilityData, &availabilityMap)
+
+					availabilityMap["days"] = daysMap
+					response["tutor"].(map[string]interface{})["availability"] = availabilityMap
+				}
+			}
+		}
+
+	case models.RoleParent:
+		var parent models.Parent
+		if err := db.Where("id = ?", user.ID).First(&parent).Error; err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil, fmt.Errorf("error fetching parent data: %w", err)
+			}
+			// If no parent record is found, continue without it
+		} else {
+			parentData, err := json.Marshal(parent)
+			if err != nil {
+				return nil, fmt.Errorf("error serializing parent data: %w", err)
+			}
+
+			var parentMap map[string]interface{}
+			if err := json.Unmarshal(parentData, &parentMap); err != nil {
+				return nil, fmt.Errorf("error building parent response: %w", err)
+			}
+
+			response["parent"] = parentMap
+
+			// Fetch children
+			var children []models.Children
+			if err := db.Where("parent_id = ?", user.ID).Find(&children).Error; err != nil {
+				fmt.Printf("Error fetching children: %v\n", err)
+			} else if len(children) > 0 {
+				childrenData, _ := json.Marshal(children)
+				var childrenMap []map[string]interface{}
+				json.Unmarshal(childrenData, &childrenMap)
+
+				// Remove sensitive data like passwords
+				for i := range childrenMap {
+					delete(childrenMap[i], "password")
+				}
+
+				response["parent"].(map[string]interface{})["children"] = childrenMap
+			}
+		}
+	}
+
+	return &response, nil
 }
 
 func GetAllUser(db *gorm.DB, page, limit int, filters map[string]interface{}) (*models.PaginatedResponse, error) {
@@ -240,33 +366,6 @@ func GetAllUser(db *gorm.DB, page, limit int, filters map[string]interface{}) (*
 	return response, nil
 }
 
-func DeleteUser(db *gorm.DB, username string) error {
-	// Find user
-	var user models.User
-	if username == "" {
-		return errors.New("username cannot be empty")
-	}
-
-	result := db.Model(&models.User{}).
-		Where("username = ?", username).
-		First(&user)
-
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return errors.New("user not found")
-		}
-		return fmt.Errorf("error finding user: %w", result.Error)
-	}
-
-	// Perform soft delete
-	if result := db.Delete(&user); result.Error != nil {
-		return fmt.Errorf("failed to delete user: %s", result.Error)
-	}
-
-	fmt.Println("User successfully deleted")
-	return nil
-}
-
 func createParentRecord(tx *gorm.DB, userID uint) error {
 	parent := models.Parent{
 		ID:                   userID,
@@ -310,7 +409,6 @@ func createTutorRecord(tx *gorm.DB, userID uint) error {
 }
 
 func UpdateUser(username string, params models.UserUpdateParams, db *gorm.DB) (*models.User, error) {
-	// Find user
 	var user models.User
 	if username == "" {
 		return nil, errors.New("username cannot be empty")
@@ -359,10 +457,10 @@ func UpdateUser(username string, params models.UserUpdateParams, db *gorm.DB) (*
 		updates["picture"] = params.Picture
 	}
 
-	if params.Status != "" {
+	if params.Status != "" && user.Role == models.RoleAdmin {
 		// Validate status
 		switch models.UserStatus(params.Status) {
-		case models.StatusActive, models.StatusBanned:
+		case models.StatusActive, models.StatusBanned, models.StatusDeleted:
 			updates["status"] = params.Status
 		default:
 			return nil, fmt.Errorf("invalid status value")
@@ -418,4 +516,325 @@ func UpdateUserStatus(username string, status string, db *gorm.DB) (*models.User
 	user.Password = ""
 
 	return &user, nil
+}
+
+func UpdateGoogleToken(username string, googleToken string, db *gorm.DB) error {
+	if username == "" {
+		return errors.New("username cannot be empty")
+	}
+
+	if googleToken == "" {
+		return errors.New("google token cannot be empty")
+	}
+
+	// Find the user
+	var user models.User
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return fmt.Errorf("error finding user: %w", result.Error)
+	}
+
+	// Update Google token
+	if err := db.Model(&user).Update("google_token", googleToken).Error; err != nil {
+		return fmt.Errorf("failed to update google token: %w", err)
+	}
+
+	return nil
+}
+
+func SoftDeleteUser(username string, db *gorm.DB) error {
+	// Find user
+	var user models.User
+	if username == "" {
+		return errors.New("username cannot be empty")
+	}
+
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return fmt.Errorf("error finding user: %w", result.Error)
+	}
+
+	// Update user status to "Deleted" instead of actually deleting
+	if err := db.Model(&user).Update("status", models.StatusDeleted).Error; err != nil {
+		return fmt.Errorf("failed to update user status: %w", err)
+	}
+
+	return nil
+}
+
+func CancelDeleteUser(username string, db *gorm.DB) error {
+	// Find user
+	var user models.User
+	if username == "" {
+		return errors.New("username cannot be empty")
+	}
+
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return fmt.Errorf("error finding user: %w", result.Error)
+	}
+
+	// Check if the user status is actually "Deleted"
+	if user.Status != models.StatusDeleted {
+		return errors.New("user is not in deleted status")
+	}
+
+	// Update user status back to "Active"
+	if err := db.Model(&user).Update("status", models.StatusActive).Error; err != nil {
+		return fmt.Errorf("failed to update user status: %w", err)
+	}
+
+	return nil
+}
+
+func VerifyUser(username string, db *gorm.DB) error {
+	var user models.User
+	if err := db.Where("username = ?", username).First(&user).Error; err != nil {
+		return err
+	}
+
+	// Update verification status
+	if err := db.Model(&user).Update("is_verified", true).Error; err != nil {
+		fmt.Printf("Error updating user verification status: %v\n", err)
+		return err
+	}
+	return nil
+}
+
+func HardDeleteUser(username string, db *gorm.DB) error {
+	// Find user
+	var user models.User
+	if username == "" {
+		return errors.New("username cannot be empty")
+	}
+
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return fmt.Errorf("error finding user: %w", result.Error)
+	}
+
+	// Start a transaction to ensure all related records are deleted correctly
+	return db.Transaction(func(tx *gorm.DB) error {
+		// Delete related records based on user role
+		switch user.Role {
+		case models.RoleParent:
+			// Delete parent record
+			if err := tx.Where("id = ?", user.ID).Delete(&models.Parent{}).Error; err != nil {
+				return fmt.Errorf("failed to delete parent record: %w", err)
+			}
+
+			// Find children associated with this parent
+			var children []models.Children
+			if err := tx.Where("parent_id = ?", user.ID).Find(&children).Error; err != nil {
+				return fmt.Errorf("failed to find children records: %w", err)
+			}
+
+			// Delete each child's related records and then the child itself
+			for _, child := range children {
+				// Delete course subscriptions for the child
+				if err := tx.Where("children_id = ?", child.ID).Delete(&models.CourseSubscription{}).Error; err != nil {
+					return fmt.Errorf("failed to delete child's course subscriptions: %w", err)
+				}
+
+				// Delete the child record
+				if err := tx.Delete(&child).Error; err != nil {
+					return fmt.Errorf("failed to delete child record: %w", err)
+				}
+			}
+
+		case models.RoleTutor:
+			// Delete tutor specialties
+			if err := tx.Where("tutor_id = ?", user.ID).Delete(&models.TutorSpecialty{}).Error; err != nil {
+				return fmt.Errorf("failed to delete tutor specialties: %w", err)
+			}
+
+			// Delete availability records
+			var availability models.Availability
+			if err := tx.Where("tutor_id = ?", user.ID).First(&availability).Error; err == nil {
+				// Delete day availability records
+				if err := tx.Where("availability_id = ?", availability.ID).Delete(&models.DayAvailability{}).Error; err != nil {
+					return fmt.Errorf("failed to delete day availability records: %w", err)
+				}
+
+				// Delete availability record
+				if err := tx.Delete(&availability).Error; err != nil {
+					return fmt.Errorf("failed to delete availability record: %w", err)
+				}
+			}
+
+			// Delete tutor record
+			if err := tx.Where("id = ?", user.ID).Delete(&models.Tutor{}).Error; err != nil {
+				return fmt.Errorf("failed to delete tutor record: %w", err)
+			}
+		}
+
+		// Finally, delete the user record itself
+		if err := tx.Delete(&user).Error; err != nil {
+			return fmt.Errorf("failed to delete user record: %w", err)
+		}
+
+		return nil
+	})
+}
+
+func AssignRole(username string, newRole string, db *gorm.DB) error {
+	// Find user
+	var user models.User
+	if username == "" {
+		return errors.New("username cannot be empty")
+	}
+
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return fmt.Errorf("error finding user: %w", result.Error)
+	}
+
+	// Validate role
+	newRoleEnum := models.UserRole(newRole)
+	validRoles := map[models.UserRole]bool{
+		models.RoleParent: true,
+		models.RoleTutor:  true,
+		models.RoleKid:    true,
+		models.RoleAdmin:  true,
+	}
+
+	if !validRoles[newRoleEnum] {
+		return errors.New("invalid role value")
+	}
+
+	// If the user already has the role, just return
+	if user.Role == newRoleEnum {
+		return nil
+	}
+
+	// Start a transaction to ensure all related records are updated correctly
+	return db.Transaction(func(tx *gorm.DB) error {
+		// Handle deleting current role-specific records
+		switch user.Role {
+		case models.RoleParent:
+			// Get the parent record
+			var parent models.Parent
+			if err := tx.Where("id = ?", user.ID).First(&parent).Error; err == nil {
+				// Get the children of this parent
+				var children []models.Children
+				if err := tx.Where("parent_id = ?", user.ID).Find(&children).Error; err == nil && len(children) > 0 {
+					return errors.New("cannot change role: user has associated children records")
+				}
+
+				// Delete parent record
+				if err := tx.Delete(&parent).Error; err != nil {
+					return fmt.Errorf("failed to delete parent record: %w", err)
+				}
+			}
+		case models.RoleTutor:
+			// Get the tutor record
+			var tutor models.Tutor
+			if err := tx.Where("id = ?", user.ID).First(&tutor).Error; err == nil {
+				// Check if tutor has courses
+				var courseCount int64
+				if err := tx.Model(&models.Course{}).Where("tutor_id = ?", user.ID).Count(&courseCount).Error; err == nil && courseCount > 0 {
+					return errors.New("cannot change role: user has associated course records")
+				}
+
+				// Delete tutor specialties
+				if err := tx.Where("tutor_id = ?", user.ID).Delete(&models.TutorSpecialty{}).Error; err != nil {
+					return fmt.Errorf("failed to delete tutor specialties: %w", err)
+				}
+
+				// Delete availability records
+				var availability models.Availability
+				if err := tx.Where("tutor_id = ?", user.ID).First(&availability).Error; err == nil {
+					// Delete day availability records
+					if err := tx.Where("availability_id = ?", availability.ID).Delete(&models.DayAvailability{}).Error; err != nil {
+						return fmt.Errorf("failed to delete day availability records: %w", err)
+					}
+
+					// Delete availability record
+					if err := tx.Delete(&availability).Error; err != nil {
+						return fmt.Errorf("failed to delete availability record: %w", err)
+					}
+				}
+
+				// Delete tutor record
+				if err := tx.Delete(&tutor).Error; err != nil {
+					return fmt.Errorf("failed to delete tutor record: %w", err)
+				}
+			}
+		}
+
+		// Create new role-specific records
+		switch newRoleEnum {
+		case models.RoleParent:
+			parent := models.Parent{
+				ID:                   user.ID,
+				PreferredLanguage:    "English", // Default language
+				NotificationsEnabled: true,      // Default to enabled
+			}
+
+			if err := tx.Create(&parent).Error; err != nil {
+				return fmt.Errorf("failed to create parent record: %w", err)
+			}
+		case models.RoleTutor:
+			tutor := models.Tutor{
+				ID:             user.ID,
+				Bio:            "",    // Empty bio initially
+				Qualifications: "",    // Empty qualifications initially
+				TeachingStyle:  "",    // Empty teaching style initially
+				IsAvailable:    false, // Not available by default
+				DemoVideoURL:   "",    // No demo video initially
+				Image:          "",    // No image initially
+			}
+
+			if err := tx.Create(&tutor).Error; err != nil {
+				return fmt.Errorf("failed to create tutor record: %w", err)
+			}
+
+			// Create default availability for the tutor
+			availability := models.Availability{
+				TutorID: user.ID,
+				TimeGap: 10, // Default 10-minute gap between sessions
+			}
+
+			if err := tx.Create(&availability).Error; err != nil {
+				return fmt.Errorf("failed to create tutor availability: %w", err)
+			}
+		}
+
+		// Update user's role
+		if err := tx.Model(&user).Update("role", newRoleEnum).Error; err != nil {
+			return fmt.Errorf("failed to update user role: %w", err)
+		}
+
+		return nil
+	})
 }

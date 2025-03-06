@@ -7,6 +7,7 @@ import (
 	"user-service/internal/models"
 	"user-service/internal/repository"
 	"user-service/internal/services"
+	"user-service/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,13 +19,15 @@ var (
 
 func init() {
 	API_KEY = os.Getenv("API_KEY")
-	err := services.AddUser(models.UserCreationParams{Username: "admin", Password: "admin", Role: "Admin", Email: "thaiphienn@gmail.com"}, had_admin, repository.DB)
+	err := services.AddUser(models.UserCreationParams{Username: "admin", Password: "admin", Role: "Admin", Email: "thaiphienn@gmail.com"}, had_admin, "", repository.DB)
 	if err != nil {
 		fmt.Println("Init admin account failed:", err)
 		had_admin = false
 		return
 	}
 	had_admin = false
+
+	utils.SetupTimeZone()
 }
 
 func main() {
@@ -57,6 +60,12 @@ func main() {
 	user.Get("", handlers.GetUserwithUsername(repository.DB))
 	user.Put("/update", handlers.UpdateUser(repository.DB))
 	user.Patch("/update/status", handlers.UpdateUserStatus(repository.DB))
+	user.Delete("/delete", handlers.DeleteUserHandler(repository.DB))
+	user.Post("/delete/cancel", handlers.CancelDeleteUserHandler(repository.DB))
+	user.Put("/admin/update", handlers.AdminUpdateUserHandler(repository.DB))
+	user.Put("/verify", handlers.VerifyUserHandler(repository.DB))
+	user.Delete("/admin/delete", handlers.AdminDeleteUserHandler(repository.DB))
+	user.Post("/admin/role", handlers.AdminAssignRoleHandler(repository.DB))
 
 	port := os.Getenv("PORT")
 	if port == "" {

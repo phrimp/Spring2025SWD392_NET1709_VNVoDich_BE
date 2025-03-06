@@ -38,7 +38,7 @@ public class PayPalController {
           description,
           orderId);
 
-      // Save initial payment record
+      // Temp Save Payment
       Payment paymentRecord = new Payment();
       paymentRecord.setOrderId(orderId);
       paymentRecord.setAmount(amount);
