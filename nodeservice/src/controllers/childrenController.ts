@@ -99,7 +99,7 @@ export const createChild = async (
         age: Number(age),
         grade_level,
         learning_goals,
-        password: hashedPassword, 
+        password: hashedPassword,
         parent_id: Number(parent_id),
       },
     });
@@ -146,8 +146,8 @@ export const deleteChild = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { parentId } = req.params;
-    if (!parentId) {
+    const { userId } = req.params;
+    if (!userId) {
       res.status(400).json({ message: "Parent ID is required" });
       return;
     }

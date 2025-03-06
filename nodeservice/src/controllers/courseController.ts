@@ -48,6 +48,7 @@ export const getCourses = async (
             },
           },
         },
+
         // lessons: true,
       },
     });
@@ -92,6 +93,20 @@ export const getCourse = async (req: Request, res: Response): Promise<void> => {
           },
         },
         lessons: true,
+        courseReviews: {
+          include: {
+            parent: {
+              select: {
+                profile: {
+                  select: {
+                    full_name: true,
+                    picture: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
     if (!course) {

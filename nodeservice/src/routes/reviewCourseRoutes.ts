@@ -1,8 +1,8 @@
 import express from "express";
-import { getCourseReviewsForParent } from "../controllers/reviewCourseController";
+import { addReviewCourse } from "../controllers/reviewCourseController";
 
 const router = express.Router();
 
-router.get("/:course_id", getCourseReviewsForParent);
+router.post("/:course_id/review", addReviewCourse);
 
 export default router;
