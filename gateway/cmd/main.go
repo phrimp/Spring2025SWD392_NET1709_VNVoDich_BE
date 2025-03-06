@@ -4,7 +4,12 @@ import (
 	"fmt"
 	"gateway/internal/config"
 	"gateway/internal/server"
+	"gateway/utils"
 )
+
+func init() {
+	utils.SetupTimeZone()
+}
 
 func main() {
 	cfg := config.New()

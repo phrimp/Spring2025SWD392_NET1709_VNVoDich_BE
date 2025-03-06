@@ -13,8 +13,8 @@ func GetUserwithUsername(req *fasthttp.Request, resp *fasthttp.Response, c *fibe
 	return ForwardRequest(req, resp, c, url, "GET", []byte(body))
 }
 
-func GetMe(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
-	return ForwardRequest(req, resp, c, url, "GET", c.Body())
+func GetMe(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string, dataTransformer func(originalData interface{}) (interface{}, error)) error {
+	return CustomForwardRequest(req, resp, c, url, "GET", c.Body(), dataTransformer)
 }
 
 func DeleteMe(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {

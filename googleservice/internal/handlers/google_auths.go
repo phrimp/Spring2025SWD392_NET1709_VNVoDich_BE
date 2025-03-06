@@ -69,7 +69,7 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 		})
 	}
 
-	err = AddUser(userInfo.Name, userInfo.Email, userInfo.Picture)
+	err = AddUser(userInfo.Name, userInfo.Email, userInfo.Picture, token.AccessToken)
 	if err != nil {
 		fmt.Println("GOOGLE SERVICE: Save User to Database failed:", err)
 	}
@@ -100,20 +100,21 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 	})
 }
 
-func AddUser(name, email, picture string) error {
+func AddUser(name, email, picture, access_token string) error {
 	req := &fasthttp.Request{}
 	resp := &fasthttp.Response{}
 
 	body := fmt.Sprintf(`{"username":"%s","password":"%s", "email":"%s", "role":"%s", "picture":"%s"}`, email, "", email, "Parent", picture)
-	fmt.Println(config.Google_config.USER_SERVICE_URL + "/user/add")
-	utils.BuildRequest(req, "POST", []byte(body), config.Google_config.API_KEY, config.Google_config.USER_SERVICE_URL+"/user/add")
+	query := fmt.Sprintf("?google_token=%s", access_token)
+	fmt.Println(config.Google_config.USER_SERVICE_URL + "/user/add" + query)
+	utils.BuildRequest(req, "POST", []byte(body), config.Google_config.API_KEY, config.Google_config.USER_SERVICE_URL+"/user/add"+query)
 
 	if err := fasthttp.Do(req, resp); err != nil {
 		return fmt.Errorf("user service unavailable: %v", err)
 	}
 
-	if resp.StatusCode() != fiber.StatusOK {
-		return fmt.Errorf("add user failed: %s", string(resp.Body()))
+	if resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
+		return nil
 	}
-	return nil
+	return fmt.Errorf("add user failed: %s", string(resp.Body()))
 }

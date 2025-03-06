@@ -31,20 +31,21 @@ const (
 
 type User struct {
 	gorm.Model
-	Username string   `gorm:"uniqueIndex;not null" json:"username" validate:"required,min=3,max=50,alphanum"`
-	Password string   `gorm:"not null" json:"-" validate:"required,min=8"`
-	Email    string   `gorm:"uniqueIndex;not null" json:"email" validate:"required,email"`
-	Role     UserRole `gorm:"type:varchar(50);not null;default:'user'" json:"role"`
-	Phone    *string  `gorm:"type:varchar(20)" json:"phone" validate:"omitempty,e164"`
-	FullName *string  `gorm:"type:varchar(255)" json:"full_name" validate:"omitempty,min=2,max=100"`
-	Picture  string   `gorm:"type:varchar(255)" json:"picture"`
+	Username    string   `gorm:"uniqueIndex;not null" json:"username" validate:"required,min=3,max=50,alphanum"`
+	Password    string   `gorm:"not null" json:"-" validate:"required,min=8"`
+	Email       string   `gorm:"uniqueIndex;not null" json:"email" validate:"required,email"`
+	Role        UserRole `gorm:"type:varchar(50);not null;default:'user'" json:"role"`
+	Phone       *string  `gorm:"type:varchar(20)" json:"phone" validate:"omitempty,e164"`
+	FullName    *string  `gorm:"type:varchar(255)" json:"full_name" validate:"omitempty,min=2,max=100"`
+	Picture     string   `gorm:"type:varchar(255)" json:"picture"`
+	GoogleToken string   `gorm:"type:varchar(255)" json:"google_token"`
 
 	IsVerified bool       `gorm:"default:false" json:"is_verified"`
 	Status     UserStatus `gorm:"type:varchar(20);default:'Active'" json:"status"`
 
 	LastLoginAt       *int64 `json:"last_login_at,omitempty"`
 	AccountLocked     bool   `gorm:"default:false" json:"account_locked"`
-	PasswordChangedAt *int64 `json:"-"`
+	PasswordChangedAt *int64 `json:"password_changed_at"`
 }
 
 func (User) TableName() string {

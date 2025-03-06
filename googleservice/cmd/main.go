@@ -4,6 +4,7 @@ import (
 	"google-service/internal/config"
 	"google-service/internal/handlers"
 	"google-service/internal/middleware"
+	"google-service/utils"
 	"log"
 	"os"
 
@@ -11,6 +12,10 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
+
+func init() {
+	utils.SetupTimeZone()
+}
 
 func main() {
 	cfg := config.Google_config

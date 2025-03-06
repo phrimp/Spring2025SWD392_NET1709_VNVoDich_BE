@@ -18,6 +18,7 @@ services:
       - USER_SERVICE_URL=${USER_SERVICE_URL}
       - SERVER_READ_TIMEOUT=${SERVER_READ_TIMEOUT}
       - SERVER_WRITE_TIMEOUT=${SERVER_WRITE_TIMEOUT}
+      - TZ=${TZ}
     networks:
       - app-network
     restart: unless-stopped
@@ -39,6 +40,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - API_KEY=${API_KEY}
       - USER_SERVICE_PORT=${USER_SERVICE_PORT}
+      - TZ=${TZ}
     networks:
       - app-network
     restart: unless-stopped
@@ -70,6 +72,7 @@ services:
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - GOOGLE_SERVICE_ACCOUNT_CREDENTIALS=${GOOGLE_SERVICE_ACCOUNT_CREDENTIALS}
       - USER_SERVICE_URL=${USER_SERVICE_URL}
+      - TZ=${TZ}
     ports:
       - "${GOOGLE_SERVICE_PORT}:${GOOGLE_SERVICE_PORT}"
     networks:
@@ -119,6 +122,7 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
+      - TZ=${TZ}
     depends_on:
       mysql:
         condition: service_healthy
@@ -149,6 +153,7 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
+      - TZ=${TZ}
     networks:
       - app-network
     restart: unless-stopped
@@ -180,6 +185,7 @@ services:
       - PAYPAL_MODE=${PAYPAL_MODE}
       - PAYPAL_SUCCESS_URL=${PAYPAL_SUCCESS_URL}
       - PAYPAL_CANCEL_URL=${PAYPAL_CANCEL_URL}
+      - TZ=${TZ}
     networks:
       - app-network
     volumes:

@@ -6,6 +6,7 @@ import (
 	"adminservice/internal/handlers"
 	"adminservice/internal/middleware"
 	"adminservice/internal/repository"
+	"adminservice/utils"
 	"fmt"
 	"log"
 	"os"
@@ -13,6 +14,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
+
+func init() {
+	utils.SetupTimeZone()
+}
 
 func main() {
 	cfg := config.New()

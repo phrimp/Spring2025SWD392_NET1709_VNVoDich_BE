@@ -3,86 +3,70 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const getCourseReviewsForParent = async (
+export const addReviewCourse = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { course_id } = req.params;
-    const { parent_id } = req.query;
+    const { userId, role, rating, review_content } = req.body;
 
     const courseId = Number(course_id);
-    const parentId = parent_id ? Number(parent_id) : null;
+    const parentId = Number(userId);
 
-    if (isNaN(courseId)) {
-      res.status(400).json({ message: "Invalid Course ID" });
+    if (isNaN(courseId) || isNaN(parentId)) {
+      res.status(400).json({ message: "Invalid Course ID or User ID" });
       return;
     }
 
-    // Lấy thông tin khóa học và tutor dạy khóa học đó
-    const course = await prisma.course.findUnique({
-      where: { id: courseId },
-      include: {
-        tutor: {
-          include: {
-            profile: {
-              select: { full_name: true },
-            },
-          },
-        },
-      },
+    // Kiểm tra role của user, chỉ cho phép parent đánh giá
+    if (role !== "Parent") {
+      res.status(403).json({ message: "Only parents can add course reviews" });
+      return;
+    }
+
+    // Kiểm tra xem user có ít nhất một children đã đăng ký khóa học không
+    const children = await prisma.children.findMany({
+      where: { parent_id: parentId },
     });
-
-    if (!course) {
-      res.status(404).json({ message: "Course not found" });
+    if (children.length === 0) {
+      res.status(403).json({ message: "User has no registered children" });
       return;
     }
 
-    // Lấy danh sách đánh giá của khóa học (có thể lọc theo parent_id nếu có)
-    const reviews = await prisma.courseReview.findMany({
+    // Kiểm tra xem có bất kỳ children nào đã đăng ký khóa học này không
+    const childrenIds = children.map((child) => child.id);
+    const subscription = await prisma.courseSubscription.findFirst({
       where: {
         course_id: courseId,
-        ...(parentId !== null && { parent_id: parentId }),
+        children_id: { in: childrenIds },
+        status: "Active",
       },
-      include: {
-        parent: {
-          select: {
-            id: true,
-            profile: {
-              select: { full_name: true },
-            },
-          },
-        },
-      },
-      orderBy: { createAt: "desc" },
     });
 
-    // Tính điểm trung bình
-    const averageRating =
-      reviews.length > 0
-        ? reviews.reduce((sum, review) => sum + review.rating, 0) /
-          reviews.length
-        : 0;
+    if (!subscription) {
+      res
+        .status(403)
+        .json({ message: "No active subscription found for user's children" });
+      return;
+    }
 
-    // Trả về kết quả JSON
-    res.json({
-      course_id: courseId,
-      course_title: course.title || "Unknown Course",
-      tutor: {
-        tutor_id: course.tutor?.id || null,
-        tutor_name: course.tutor?.profile?.full_name || "Unknown Tutor",
+    // Thêm đánh giá khóa học
+    const newReview = await prisma.courseReview.create({
+      data: {
+        course_id: courseId,
+        parent_id: parentId,
+        rating,
+        review_content,
+        createAt: new Date(),
       },
-      average_rating: Number(averageRating.toFixed(1)),
-      reviews: reviews.map((review) => ({
-        parent_id: review.parent?.id || null,
-        parent_name: review.parent?.profile?.full_name || "Anonymous",
-        rating: review.rating,
-        review_content: review.review_content,
-        createAt: review.createAt,
-      })),
     });
+
+    res
+      .status(201)
+      .json({ message: "Review added successfully", review: newReview });
   } catch (error) {
-    console.error("Error fetching course reviews:", error);
-    res.status(500).json({ message: "Error fetching reviews", error });
+    console.error("Error adding course review:", error);
+    res.status(500).json({ message: "Error adding review", error });
   }
 };
