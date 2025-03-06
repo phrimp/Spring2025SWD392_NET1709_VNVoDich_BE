@@ -252,11 +252,11 @@ function generateAvailableTimeSlots({
   // If the date is today, start from the next available slot after the current time
   const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
 
-  if (format(now, "yyyy-MM-dd") === dateStr) {
-    currentTime = isBefore(currentTime, now)
-      ? addMinutes(now, timeGap)
-      : currentTime;
-  }
+  // if (format(now, "yyyy-MM-dd") === dateStr) {
+  //   currentTime = isBefore(currentTime, now)
+  //     ? addMinutes(now, timeGap)
+  //     : currentTime;
+  // }
 
   while (currentTime < slotEndTime) {
     const slotEnd = new Date(

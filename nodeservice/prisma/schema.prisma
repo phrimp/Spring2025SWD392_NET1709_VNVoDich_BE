@@ -58,9 +58,9 @@ model User {
 
 model Tutor {
   id             Int     @id
-  bio            String
-  qualifications String
-  teaching_style String
+  bio            String?
+  qualifications String?
+  teaching_style String?
   is_available   Boolean @default(false)
   demo_video_url String?
   image          String?
