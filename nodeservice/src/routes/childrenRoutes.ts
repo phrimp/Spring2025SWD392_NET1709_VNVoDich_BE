@@ -12,8 +12,8 @@ const router = Router();
 
 router.get("/", tutorAuth, getChildren);
 router.get("/:id", tutorAuth, getChild);
-router.post("/", createChild);
-router.put("/:id", updateChild);
-router.delete("/:id", deleteChild);
+router.post("/", tutorAuth, createChild);
+router.put("/:id", tutorAuth, updateChild);
+router.delete("/:id", tutorAuth, deleteChild);
 
 export default router;
