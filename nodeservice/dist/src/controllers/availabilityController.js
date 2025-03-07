@@ -150,6 +150,7 @@ const getCourseAvailability = (req, res) => __awaiter(void 0, void 0, void 0, fu
     var _a, _b;
     try {
         const { courseId } = req.params;
+        const { type } = req.query;
         const course = yield prisma.course.findUnique({
             where: {
                 id: Number(courseId),
@@ -196,6 +197,7 @@ const getCourseAvailability = (req, res) => __awaiter(void 0, void 0, void 0, fu
                     sessions,
                     dateStr,
                     timeGap: (_b = course.tutor.availability) === null || _b === void 0 ? void 0 : _b.timeGap,
+                    type: type,
                 });
                 availableDates.push({
                     date: dateStr,
@@ -214,16 +216,18 @@ const getCourseAvailability = (req, res) => __awaiter(void 0, void 0, void 0, fu
 });
 exports.getCourseAvailability = getCourseAvailability;
 function generateAvailableTimeSlots({ startTime, endTime, sessions, dateStr, timeGap = 10, duration = 50, // Default slot duration in minutes
- }) {
+type = "Week", }) {
     const slots = [];
     let currentTime = (0, date_fns_1.parseISO)(`${dateStr}T${startTime.toISOString().slice(11, 16)}:00.000Z`);
     const slotEndTime = (0, date_fns_1.parseISO)(`${dateStr}T${endTime.toISOString().slice(11, 16)}:00.000Z`);
     // If the date is today, start from the next available slot after the current time
-    const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
-    if ((0, date_fns_1.format)(now, "yyyy-MM-dd") === dateStr) {
-        currentTime = (0, date_fns_1.isBefore)(currentTime, now)
-            ? (0, date_fns_1.addMinutes)(now, timeGap)
-            : currentTime;
+    if (type === "Day") {
+        const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
+        if ((0, date_fns_1.format)(now, "yyyy-MM-dd") === dateStr) {
+            currentTime = (0, date_fns_1.isBefore)(currentTime, now)
+                ? (0, date_fns_1.addMinutes)(now, timeGap)
+                : currentTime;
+        }
     }
     while (currentTime < slotEndTime) {
         const slotEnd = new Date(currentTime.getTime() + duration * 60000 + timeGap * 60000);
