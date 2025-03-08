@@ -25,6 +25,7 @@ func (p *PaymentHandler) HandleCreatePayment() fiber.Handler {
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
 		query := fmt.Sprintf("?amount=%s&description=%s&orderId=%s", c.Query("amount"), c.Query("description"), c.Query("orderId"))
+		fmt.Println(p.paymentServiceURL + "/api/payment/paypal/create" + query)
 		return routes.CreatePayment(req, resp, c, p.paymentServiceURL+"/api/payment/paypal/create"+query)
 	}
 }

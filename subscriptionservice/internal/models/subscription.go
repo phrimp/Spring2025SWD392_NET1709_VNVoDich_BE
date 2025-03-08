@@ -57,7 +57,6 @@ type SubscriptionResponse struct {
 	MaxCourses         int                `json:"max_courses"`
 	CommissionRate     float64            `json:"commission_rate"`
 	PaymentOrderID     string             `json:"payment_order_id,omitempty"`
-	PaymentURL         string             `json:"payment_url,omitempty"` // URL to redirect for payment
 }
 
 // SubscriptionStatusUpdateRequest is used to update the status of a subscription

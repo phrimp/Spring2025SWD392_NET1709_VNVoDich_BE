@@ -32,9 +32,11 @@ public class PayPalController {
   public ResponseEntity<?> createPayment(
       @RequestParam("amount") Double amount,
       @RequestParam("description") String description,
-      @RequestParam("orderId") String orderId) {
+      @RequestParam("orderId") String orderId,
+      @RequestHeader("API_KEY") String api_key) {
 
     try {
+      System.out.println("DEBUGGGGGGG" + api_key);
       com.paypal.api.payments.Payment payment = payPalService.createPayment(
           amount,
           "USD",
@@ -43,6 +45,8 @@ public class PayPalController {
           description,
           orderId);
 
+      System.out.println("DEBUGGGGGGG22222");
+      System.out.println(payment);
       // Temp Save Payment
       Payment paymentRecord = new Payment();
       paymentRecord.setOrderId(orderId);

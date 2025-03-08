@@ -53,8 +53,10 @@ func (s *paymentService) CreatePayment(tutorID uint, planID uint, amount float64
 		fmt.Sprintf("Subscription payment - %s plan (%s)", getPlanName(planID), billingCycle),
 		orderID)
 
+	url := fmt.Sprintf("%s/api/payment/paypal/create%s", s.paymentServiceURL, query)
+	fmt.Println(url)
 	// Send request to payment service
-	utils.BuildRequest(req, "POST", nil, s.apiKey, fmt.Sprintf("%s/api/payment/paypal/create%s", s.paymentServiceURL, query))
+	utils.BuildRequest(req, "POST", nil, s.apiKey, url)
 
 	if err := fasthttp.Do(req, resp); err != nil {
 		return "", "", fmt.Errorf("payment service unavailable: %w", err)

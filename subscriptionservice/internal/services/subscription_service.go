@@ -72,15 +72,7 @@ func (s *subscriptionService) InitiateSubscription(req models.SubscriptionReques
 	}
 
 	// Create payment order
-	orderID, paymentURL, err := s.paymentService.CreatePayment(
-		req.TutorID,
-		req.PlanID,
-		amount,
-		string(req.BillingCycle),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create payment: %w", err)
-	}
+	orderID := fmt.Sprintf("SUB-%d-%d-%d", req.TutorID, req.PlanID, time.Now().Unix())
 
 	// Create subscription in pending state
 	subscription := &models.TutorSubscription{
@@ -125,7 +117,6 @@ func (s *subscriptionService) InitiateSubscription(req models.SubscriptionReques
 		MaxCourses:         plan.MaxCourses,
 		CommissionRate:     plan.CommissionRate,
 		PaymentOrderID:     orderID,
-		PaymentURL:         paymentURL,
 	}
 
 	return response, nil
@@ -416,15 +407,7 @@ func (s *subscriptionService) ChangePlan(id uint, req models.ChangePlanRequest) 
 	fmt.Println(newEndDate)
 
 	// Create a new payment for the plan change
-	orderID, paymentURL, err := s.paymentService.CreatePayment(
-		subscription.TutorID,
-		req.NewPlanID,
-		amount,
-		string(req.BillingCycle),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create payment for plan change: %w", err)
-	}
+	orderID := fmt.Sprintf("SUB-%d-%d-%d", subscription.TutorID, req.NewPlanID, time.Now().Unix())
 
 	// Store the old plan ID for event logging
 	oldPlanID := subscription.PlanID
@@ -467,7 +450,6 @@ func (s *subscriptionService) ChangePlan(id uint, req models.ChangePlanRequest) 
 		MaxCourses:         subscription.Plan.MaxCourses,
 		CommissionRate:     subscription.Plan.CommissionRate,
 		PaymentOrderID:     orderID,
-		PaymentURL:         paymentURL,
 	}
 
 	return response, nil
