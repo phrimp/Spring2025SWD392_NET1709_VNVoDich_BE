@@ -313,6 +313,22 @@ func (h *UserServiceHandler) HandleUpdateMe() fiber.Handler {
 	}
 }
 
+func (h *UserServiceHandler) HandleUpdateMePassword() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		req := fasthttp.AcquireRequest()
+		resp := fasthttp.AcquireResponse()
+		defer fasthttp.ReleaseRequest(req)
+		defer fasthttp.ReleaseResponse(resp)
+		claims, ok := c.Locals("user").(*middleware.Claims)
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "cannot find username in token claim"})
+		}
+		current_username := claims.Username
+		query_url := fmt.Sprintf("?username=%s&new_password=%s&cur_password=%s", current_username, c.Query("new_password"), c.Query("cur_password"))
+		return routes.UpdateMePassword(req, resp, c, h.userServiceURL+"/user/update/password"+query_url)
+	}
+}
+
 func calculateAverageRating(reviews []interface{}) float64 {
 	var totalRating float64
 	var count int

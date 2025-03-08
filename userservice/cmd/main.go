@@ -59,6 +59,7 @@ func main() {
 	user.Get("/get-all-user", handlers.GetAllUser(repository.DB))
 	user.Get("", handlers.GetUserwithUsername(repository.DB))
 	user.Put("/update", handlers.UpdateUser(repository.DB))
+	user.Patch("/update/password", handlers.UpdatePassword(repository.DB))
 	user.Patch("/update/status", handlers.UpdateUserStatus(repository.DB))
 	user.Delete("/delete", handlers.DeleteUserHandler(repository.DB))
 	user.Post("/delete/cancel", handlers.CancelDeleteUserHandler(repository.DB))

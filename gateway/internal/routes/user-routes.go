@@ -28,3 +28,7 @@ func CancelDeleteMe(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx
 func UpdateMe(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
 	return ForwardRequest(req, resp, c, url, "PUT", c.Body())
 }
+
+func UpdateMePassword(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
+	return ForwardRequest(req, resp, c, url, "PATCH", c.Body())
+}

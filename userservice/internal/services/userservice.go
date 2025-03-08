@@ -863,3 +863,27 @@ func AssignRole(username string, newRole string, db *gorm.DB) error {
 		return nil
 	})
 }
+
+func UpdatePassword(new_password, cur_password, username string, db *gorm.DB) error {
+	var user models.User
+	if username == "" {
+		return errors.New("username cannot be empty")
+	}
+
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return fmt.Errorf("error finding user: %w", result.Error)
+	}
+	err := user.CheckPassword(cur_password)
+	if err != nil {
+		return fmt.Errorf("check current password failed: %s", err)
+	}
+
+	return db.Update("password", new_password).Error
+}

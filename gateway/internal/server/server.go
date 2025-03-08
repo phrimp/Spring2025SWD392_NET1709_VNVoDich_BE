@@ -82,6 +82,7 @@ func (g *Gateway) setupRoutes() {
 	api.Use(middleware.JWTMiddleware(g.config.JWTSecret))
 	api.Get("/get/me", g.user.HandleGetMe())
 	api.Put("/update/me", g.user.HandleUpdateMe())
+	api.Patch("/update/me/password", g.user.HandleUpdateMePassword())
 	api.Delete("/delete/me", g.user.HandleDeleteMe())
 	api.Post("/delete/me/cancel", g.user.HandleCancelDeleteMe())
 	api.Post("verify-email/send", g.google.HandleSendVerificationEmail())

@@ -350,3 +350,37 @@ func AdminAssignRoleHandler(db *gorm.DB) fiber.Handler {
 		})
 	}
 }
+
+func UpdatePassword(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		new_password := c.Query("new_password")
+		if new_password == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "new password is required",
+			})
+		}
+
+		cur_password := c.Query("cur_password")
+		if cur_password == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "current password is required",
+			})
+		}
+
+		username := c.Query("username")
+		if username == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "username is required",
+			})
+		}
+
+		if err := services.UpdatePassword(new_password, cur_password, username, db); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"message": "User Password has been updated successfully",
+		})
+	}
+}
