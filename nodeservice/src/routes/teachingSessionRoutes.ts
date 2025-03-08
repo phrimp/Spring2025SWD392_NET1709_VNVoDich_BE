@@ -1,9 +1,9 @@
 // bookingRoutes.ts
 import express from "express";
-import { getChildrenTeachingSessions } from "../controllers/teachingSessionController";
+import { getTeachingSessions } from "../controllers/teachingSessionController";
 
 const router = express.Router();
 
-router.get("/child/:children_id", getChildrenTeachingSessions);
+router.get("/", getTeachingSessions);
 
 export default router;

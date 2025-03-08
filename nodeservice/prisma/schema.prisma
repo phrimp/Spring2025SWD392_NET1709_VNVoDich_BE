@@ -194,11 +194,11 @@ model CourseSubscription {
 }
 
 model TeachingSession {
-  id                Int      @id @default(autoincrement())
+  id                Int           @id @default(autoincrement())
   google_meet_id    String?
   startTime         DateTime
   endTime           DateTime
-  status            String
+  status            SessionStatus @default(NotYet)
   topics_covered    String?
   homework_assigned String?
 
@@ -267,4 +267,10 @@ enum Day {
   FRIDAY
   SATURDAY
   SUNDAY
+}
+
+enum SessionStatus {
+  NotYet
+  Attended
+  Absent
 }

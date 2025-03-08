@@ -161,7 +161,6 @@ export const createTrialBooking = async (
           teachingSessionsData.push({
             startTime: startDate,
             endTime: endDate,
-            status: "Scheduled",
             subscription_id: newBooking.id,
             google_meet_id: meetLink,
             topics_covered: currentLesson?.title || null,

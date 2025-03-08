@@ -3,27 +3,44 @@ import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
 
-export const getChildrenTeachingSessions = async (
+export const getTeachingSessions = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const { children_id } = req.params;
+    const { userId } = req.query;
 
-    const teachingSessions = await prisma.teachingSession.findMany({
-      where: {
-        subscription: {
-          children_id: Number(children_id),
-        },
-      },
-      include: {
-        subscription: {
-          select: {
-            course: true,
+    const teachingSessions = userId
+      ? await prisma.teachingSession.findMany({
+          include: {
+            subscription: {
+              select: {
+                course: true,
+              },
+            },
           },
-        },
-      },
-    });
+        })
+      : await prisma.teachingSession.findMany({
+          where: {
+            subscription: {
+              OR: [
+                { children_id: Number(userId) },
+                {
+                  course: {
+                    tutor_id: Number(userId),
+                  },
+                },
+              ],
+            },
+          },
+          include: {
+            subscription: {
+              select: {
+                course: true,
+              },
+            },
+          },
+        });
 
     res.json({
       message: "Teaching sessions retrieved successfully",

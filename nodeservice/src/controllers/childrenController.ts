@@ -17,8 +17,23 @@ export const getChildren = async (
       return;
     }
 
+    console.log(userId);
+
     const children = await prisma.children.findMany({
-      where: { parent_id: Number(userId) },
+      where: {
+        OR: [
+          { parent_id: Number(userId) },
+          {
+            courseSubscriptions: {
+              some: {
+                course: {
+                  tutor_id: Number(userId),
+                },
+              },
+            },
+          },
+        ],
+      },
       include: {
         profile: {
           select: {
