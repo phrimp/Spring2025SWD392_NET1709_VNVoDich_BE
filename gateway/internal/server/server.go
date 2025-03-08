@@ -11,14 +11,15 @@ import (
 )
 
 type Gateway struct {
-	config  *config.Config
-	app     *fiber.App
-	auth    *handlers.AuthHandler
-	google  *handlers.GoogleHandler
-	user    *handlers.UserServiceHandler
-	node    *handlers.NodeServiceHandler
-	admin   *handlers.AdminServiceHandler
-	payment *handlers.PaymentHandler
+	config       *config.Config
+	app          *fiber.App
+	auth         *handlers.AuthHandler
+	google       *handlers.GoogleHandler
+	user         *handlers.UserServiceHandler
+	node         *handlers.NodeServiceHandler
+	admin        *handlers.AdminServiceHandler
+	payment      *handlers.PaymentHandler
+	subscription *handlers.SubscriptionHandler
 }
 
 func NewGateway(config *config.Config) *Gateway {
@@ -39,14 +40,15 @@ func NewGateway(config *config.Config) *Gateway {
 	}))
 
 	gateway := &Gateway{
-		config:  config,
-		app:     app,
-		auth:    handlers.NewAuthHandler(config.AuthServiceURL),
-		google:  handlers.NewGoogleHandler(config),
-		user:    handlers.NewUserService(config.UserServiceURL),
-		node:    handlers.NewNodeServiceHandler(config.NodeServiceURL),
-		admin:   handlers.NewAdminService(config),
-		payment: handlers.NewPaymentHandler(config.PaymentServiceURL),
+		config:       config,
+		app:          app,
+		auth:         handlers.NewAuthHandler(config.AuthServiceURL),
+		google:       handlers.NewGoogleHandler(config),
+		user:         handlers.NewUserService(config.UserServiceURL),
+		node:         handlers.NewNodeServiceHandler(config.NodeServiceURL),
+		admin:        handlers.NewAdminService(config),
+		payment:      handlers.NewPaymentHandler(config.PaymentServiceURL),
+		subscription: handlers.NewSubscriptionHandler(config.SubscriptionURL),
 	}
 
 	gateway.setupRoutes()
@@ -71,6 +73,10 @@ func (g *Gateway) setupRoutes() {
 	g.app.Get("/public/course/:id", g.node.HandleGetACourse())
 	g.app.Get("/payment/success", g.payment.HandleCompletePayPalPayment())
 	g.app.Get("/payment/cancel", g.payment.HandleCancelPayPalPayment())
+
+	g.app.Get("/subscription/plans", g.subscription.HandleGetPlans())
+	g.app.Get("/subscription/plans/:id", g.subscription.HandleGetPlan())
+
 	// Protected routes
 	api := g.app.Group("/api")
 	api.Use(middleware.JWTMiddleware(g.config.JWTSecret))
@@ -81,6 +87,12 @@ func (g *Gateway) setupRoutes() {
 	api.Post("verify-email/send", g.google.HandleSendVerificationEmail())
 	api.Post("verify-email/verify", g.google.HandleVerifyEmail())
 	api.Post("/payment/create", g.payment.HandleCreatePayment())
+
+	api.Get("/subscription/tutor/:tutorId", g.subscription.HandleGetTutorSubscription())
+	api.Post("/subscription", g.subscription.HandleCreateSubscription())
+	api.Post("/subscription/confirm", g.subscription.HandleConfirmSubscription())
+	api.Put("/subscription/:id/cancel", g.subscription.HandleCancelSubscription())
+	api.Put("/subscription/:id/change-plan", g.subscription.HandleChangePlan())
 
 	// Tutor routes
 	tutor_api := api.Group("/tutor").Use(middleware.RequireRole("Tutor"))
@@ -94,6 +106,12 @@ func (g *Gateway) setupRoutes() {
 	admin_api.Patch("/users/:username/status", g.admin.HandleUpdateUserStatus())
 	admin_api.Delete("/users/:username", g.admin.HandleDeleteUser())
 	admin_api.Post("/users/:username/roles", g.admin.HandleAssignRole())
+
+	admin_api.Get("/subscriptions", g.subscription.HandleGetAllSubscriptions())
+	admin_api.Put("/subscription/:id/status", g.subscription.HandleUpdateSubscriptionStatus())
+	admin_api.Post("/subscription/plans", g.subscription.HandleAdminCreatePlan())
+	admin_api.Put("/subscription/plans/:id", g.subscription.HandleAdminUpdatePlan())
+	admin_api.Delete("/subscription/plans/:id", g.subscription.HandleAdminDeletePlan())
 	//// Specific role-based routes
 	//api.Get("/sensitive-data", middleware.RequireRole("admin", "data_analyst"), g.auth.HandleSensitiveData())
 }

@@ -1,7 +1,9 @@
+// com/example/payment_service/controller/PayPalController.java
 package com.example.payment_service.controller;
 
 import com.example.payment_service.entity.Payment;
 import com.example.payment_service.repository.PaymentRepo;
+import com.example.payment_service.service.WebhookService;
 import com.example.payment_service.service.payment.PayPalService;
 import com.paypal.api.payments.Links;
 import com.paypal.base.rest.PayPalRESTException;
@@ -22,6 +24,9 @@ public class PayPalController {
 
   @Autowired
   private PaymentRepo paymentRepo;
+
+  @Autowired
+  private WebhookService webhookService;
 
   @PostMapping("/create")
   public ResponseEntity<?> createPayment(
@@ -85,6 +90,9 @@ public class PayPalController {
         paymentRecord.setUpdatedAt(LocalDateTime.now());
         paymentRepo.save(paymentRecord);
 
+        // Send webhook notification
+        webhookService.sendPaymentEvent("payment.completed", orderId, "COMPLETED");
+
         // Return success response
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");
@@ -97,6 +105,8 @@ public class PayPalController {
       return ResponseEntity.badRequest().body("Payment not approved");
 
     } catch (PayPalRESTException e) {
+      // Send webhook notification about failure
+      webhookService.sendPaymentEvent("payment.failed", orderId, "FAILED");
       return ResponseEntity.badRequest().body(e.getMessage());
     }
   }
@@ -110,6 +120,9 @@ public class PayPalController {
     paymentRecord.setStatus("CANCELLED");
     paymentRecord.setUpdatedAt(LocalDateTime.now());
     paymentRepo.save(paymentRecord);
+
+    // Send webhook notification
+    webhookService.sendPaymentEvent("payment.canceled", orderId, "CANCELLED");
 
     Map<String, String> response = new HashMap<>();
     response.put("status", "cancelled");

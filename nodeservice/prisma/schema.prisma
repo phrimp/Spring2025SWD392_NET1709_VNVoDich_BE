@@ -39,6 +39,7 @@ model User {
   role      UserRole @default(Parent)
   phone     String?  @db.VarChar(20)
   full_name String?  @db.VarChar(255)
+  googleToken    String?   @db.Text @map("google_token") 
 
   picture   String?
 
@@ -70,6 +71,7 @@ model Tutor {
   profile User @relation(fields: [id], references: [id])
 
   tutorSpecialty TutorSpecialty[]
+  subscriptions  TutorSubscriptions[]
   courses        Course[]
   tutorReviews   TutorReview[]
   availability   Availability?
@@ -271,3 +273,76 @@ enum Day {
   SATURDAY
   SUNDAY
 }
+
+enum PlanType {
+  BASIC
+  PREMIUM
+  PROFESSIONAL
+}
+
+enum BillingCycle {
+  MONTHLY
+  ANNUALLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+  INCOMPLETE
+}
+
+model SubscriptionPlan {
+  id               Int               @id @default(autoincrement())
+  name             String
+  description      String?
+  price_monthly    Float
+  price_annually   Float
+  max_courses      Int
+  commission_rate  Float
+  features         String            @db.Text // Stored as JSON string
+  is_active        Boolean           @default(true)
+  created_at       DateTime          @default(now())
+  updated_at       DateTime          @default(now()) @updatedAt
+  deleted_at       DateTime?
+  // Relations
+  subscriptions    TutorSubscriptions[]
+}
+
+model TutorSubscriptions {
+  id                     Int               @id @default(autoincrement())
+  tutor_id               Int
+  plan_id                Int
+  status                 SubscriptionStatus
+  current_period_start   DateTime
+  current_period_end     DateTime
+  cancel_at_period_end   Boolean           @default(false)
+  billing_cycle          BillingCycle
+  payment_order_id       String?
+  created_at             DateTime          @default(now())
+  updated_at             DateTime          @default(now()) @updatedAt
+  deleted_at             DateTime?
+  // Relations
+  tutor                  Tutor             @relation(fields: [tutor_id], references: [id])
+  plan                   SubscriptionPlan  @relation(fields: [plan_id], references: [id])
+  events                 SubscriptionEvent[]
+  @@index([tutor_id])
+  @@index([plan_id])
+}
+
+model SubscriptionEvent {
+  id                  Int               @id @default(autoincrement())
+  subscription_id     Int
+  event_type          String            // created, renewed, canceled, plan_changed, etc.
+  previous_status     SubscriptionStatus?
+  current_status      SubscriptionStatus
+  notes               String?           @db.Text
+  created_at          DateTime          @default(now())
+  updated_at          DateTime          @default(now()) @updatedAt
+  deleted_at          DateTime?
+  // Relations
+  subscription        TutorSubscriptions @relation(fields: [subscription_id], references: [id])
+  @@index([subscription_id])
+}
+

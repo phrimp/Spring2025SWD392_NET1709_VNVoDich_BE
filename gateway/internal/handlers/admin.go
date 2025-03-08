@@ -3,7 +3,9 @@ package handlers
 import (
 	"fmt"
 	"gateway/internal/config"
+	"gateway/internal/middleware"
 	"gateway/internal/routes"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/valyala/fasthttp"
@@ -27,7 +29,45 @@ func (a *AdminServiceHandler) HandleAllGetUser() fiber.Handler {
 		resp := fasthttp.AcquireResponse()
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
-		query_url := fmt.Sprintf("?page=%s&limit=%s", c.Query("page"), c.Query("limit"))
+
+		page, _ := strconv.Atoi(c.Query("page", "1"))
+		limit, _ := strconv.Atoi(c.Query("limit", "10"))
+		role := c.Query("role")
+		status := c.Query("status")
+		search := c.Query("search")
+		sort := c.Query("sort", "created_at")
+		sortDir := c.Query("sort_dir", "DESC")
+		dateFrom := c.Query("created_from")
+		dateTo := c.Query("created_to")
+		var isVerified *bool
+		if verified := c.Query("is_verified"); verified != "" {
+			verifiedBool, err := strconv.ParseBool(verified)
+			if err == nil {
+				isVerified = &verifiedBool
+			}
+		}
+
+		query_url := fmt.Sprintf("?page=%d&limit=%d", page, limit)
+
+		if role != "" {
+			query_url += fmt.Sprintf("&role=%s", role)
+		}
+		if status != "" {
+			query_url += fmt.Sprintf("&status=%s", status)
+		}
+		if search != "" {
+			query_url += fmt.Sprintf("&search=%s", search)
+		}
+		query_url += fmt.Sprintf("&sort=%s&sort_dir=%s", sort, sortDir)
+		if dateFrom != "" {
+			query_url += fmt.Sprintf("&created_from=%s", dateFrom)
+		}
+		if dateTo != "" {
+			query_url += fmt.Sprintf("&created_to=%s", dateTo)
+		}
+		if isVerified != nil {
+			query_url += fmt.Sprintf("&is_verified=%t", *isVerified)
+		}
 		return routes.GetAllUser(req, resp, c, a.adminServiceURL+"/api/users"+query_url)
 	}
 }
@@ -90,11 +130,23 @@ func (a *AdminServiceHandler) HandleDeleteUser() fiber.Handler {
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
 
+		claims, ok := c.Locals("user").(*middleware.Claims)
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "cannot find username in token claim"})
+		}
+		current_username := claims.Username
+
 		username := c.Params("username")
 
 		if username == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Username is required",
+			})
+		}
+
+		if username == current_username {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Can not delete yourself using this route",
 			})
 		}
 
@@ -118,24 +170,15 @@ func (a *AdminServiceHandler) HandleAssignRole() fiber.Handler {
 			})
 		}
 
-		// Get role from request body
-		var requestBody struct {
-			Role string `json:"role"`
-		}
+		role := c.Query("role")
 
-		if err := c.BodyParser(&requestBody); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid request body",
-			})
-		}
-
-		if requestBody.Role == "" {
+		if role == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Role is required",
 			})
 		}
 
 		// Forward the request to the user service
-		return routes.AdminAssignRole(req, resp, c, a.userServiceURL+"/user/admin/role?username="+username, requestBody.Role)
+		return routes.AdminAssignRole(req, resp, c, a.userServiceURL+"/user/admin/role?username="+username, role)
 	}
 }

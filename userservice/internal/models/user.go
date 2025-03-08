@@ -38,7 +38,7 @@ type User struct {
 	Phone       *string  `gorm:"type:varchar(20)" json:"phone" validate:"omitempty,e164"`
 	FullName    *string  `gorm:"type:varchar(255)" json:"full_name" validate:"omitempty,min=2,max=100"`
 	Picture     string   `gorm:"type:varchar(255)" json:"picture"`
-	GoogleToken string   `gorm:"type:varchar(255)" json:"google_token"`
+	GoogleToken string   `gorm:"type:text" json:"google_token"`
 
 	IsVerified bool       `gorm:"default:false" json:"is_verified"`
 	Status     UserStatus `gorm:"type:varchar(20);default:'Active'" json:"status"`

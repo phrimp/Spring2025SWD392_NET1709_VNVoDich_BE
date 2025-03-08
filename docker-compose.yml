@@ -15,6 +15,7 @@ services:
       - PAYMENT_SERVICE_URL=${PAYMENT_SERVICE_URL}
       - ADMIN_SERVICE_URL=${ADMIN_SERVICE_URL}
       - GOOGLE_SERVICE_URL=${GOOGLE_SERVICE_URL}
+      - SUBSCRIPTION_SERVICE_URL=${SUBSCRIPTION_SERVICE_URL}
       - USER_SERVICE_URL=${USER_SERVICE_URL}
       - SERVER_READ_TIMEOUT=${SERVER_READ_TIMEOUT}
       - SERVER_WRITE_TIMEOUT=${SERVER_WRITE_TIMEOUT}
@@ -164,6 +165,33 @@ services:
       retries: 3
       start_period: 10s
 
+  subscription-service:
+    build:
+      context: ./subscriptionservice
+      dockerfile: Dockerfile
+    ports:
+      - "${SUBSCRIPTION_SERVICE_PORT}:${SUBSCRIPTION_SERVICE_PORT}"
+    environment:
+      - PORT=${SUBSCRIPTION_SERVICE_PORT}
+      - SERVER_READ_TIMEOUT=${SERVER_READ_TIMEOUT}
+      - SERVER_WRITE_TIMEOUT=${SERVER_WRITE_TIMEOUT}
+      - API_KEY=${API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - PAYMENT_SERVICE_URL=${PAYMENT_SERVICE_URL}
+      - USER_SERVICE_URL=${USER_SERVICE_URL}
+      - TZ=${TZ}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+
   payment-service:
     build:
       context: ./paymentservice
@@ -185,6 +213,7 @@ services:
       - PAYPAL_MODE=${PAYPAL_MODE}
       - PAYPAL_SUCCESS_URL=${PAYPAL_SUCCESS_URL}
       - PAYPAL_CANCEL_URL=${PAYPAL_CANCEL_URL}
+      - API_KEY=${API_KEY}
       - TZ=${TZ}
     networks:
       - app-network
