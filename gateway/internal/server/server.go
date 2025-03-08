@@ -104,7 +104,7 @@ func (g *Gateway) setupRoutes() {
 	admin_api.Put("/user/update", g.admin.HandleAdminUpdateUser())
 	admin_api.Get("/user", g.admin.HandleAdminGetUSerDetail())
 	admin_api.Patch("/users/:username/status", g.admin.HandleUpdateUserStatus())
-	admin_api.Delete("/users/:username", g.admin.HandleDeleteUser())
+	admin_api.Delete("/users/:id", g.admin.HandleDeleteUser())
 	admin_api.Post("/users/:username/roles", g.admin.HandleAssignRole())
 
 	admin_api.Get("/subscriptions", g.subscription.HandleGetAllSubscriptions())

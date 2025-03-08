@@ -78,7 +78,7 @@ func (a *AdminServiceHandler) HandleAdminUpdateUser() fiber.Handler {
 		resp := fasthttp.AcquireResponse()
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
-		query := fmt.Sprintf("?username=%s", c.Query("username"))
+		query := fmt.Sprintf("?id=%s&username=%s", c.Query("id"), c.Query("username"))
 
 		return routes.AdminUpdateUser(req, resp, c, a.userServiceURL+"/user/admin/update"+query)
 	}
@@ -134,23 +134,23 @@ func (a *AdminServiceHandler) HandleDeleteUser() fiber.Handler {
 		if !ok {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "cannot find username in token claim"})
 		}
-		current_username := claims.Username
+		current_userid := claims.UserID
 
-		username := c.Params("username")
+		userid := c.Params("id")
 
-		if username == "" {
+		if userid == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Username is required",
+				"error": "User ID is required",
 			})
 		}
 
-		if username == current_username {
+		if userid == strconv.Itoa(int(current_userid)) {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Can not delete yourself using this route",
 			})
 		}
 
-		query := fmt.Sprintf("?username=%s", username)
+		query := fmt.Sprintf("?id=%s", userid)
 		return routes.AdminDeleteUser(req, resp, c, a.userServiceURL+"/user/admin/delete"+query)
 	}
 }

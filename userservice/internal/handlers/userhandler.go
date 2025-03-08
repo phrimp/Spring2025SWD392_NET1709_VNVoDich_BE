@@ -167,6 +167,7 @@ func GetUserwithUsername(db *gorm.DB) fiber.Handler {
 func UpdateUser(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		username := c.Query("username")
+		userid := c.Query("id")
 
 		var updateReq models.UserUpdateParams
 		if err := c.BodyParser(&updateReq); err != nil {
@@ -175,7 +176,7 @@ func UpdateUser(db *gorm.DB) fiber.Handler {
 			})
 		}
 
-		updatedUser, err := services.UpdateUser(username, updateReq, db)
+		updatedUser, err := services.UpdateUser(username, userid, updateReq, db)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),
@@ -248,12 +249,8 @@ func CancelDeleteUserHandler(db *gorm.DB) fiber.Handler {
 
 func AdminUpdateUserHandler(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		username := c.Query("username")
-		if username == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Username is required",
-			})
-		}
+		userid := c.Query("id")
+		username := c.Query("name")
 
 		var updateReq models.UserUpdateParams
 		if err := c.BodyParser(&updateReq); err != nil {
@@ -262,7 +259,7 @@ func AdminUpdateUserHandler(db *gorm.DB) fiber.Handler {
 			})
 		}
 
-		updatedUser, err := services.UpdateUser(username, updateReq, db)
+		updatedUser, err := services.UpdateUser(username, userid, updateReq, db)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),
@@ -300,14 +297,10 @@ func VerifyUserHandler(db *gorm.DB) fiber.Handler {
 func AdminDeleteUserHandler(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		username := c.Query("username")
-		if username == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Username is required",
-			})
-		}
+		userid := c.Query("id")
 
 		// Call the service to permanently delete the user
-		if err := services.HardDeleteUser(username, db); err != nil {
+		if err := services.HardDeleteUser(userid, username, db); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),
 			})
