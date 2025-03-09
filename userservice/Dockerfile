@@ -21,11 +21,12 @@ FROM alpine:3.18
 
 WORKDIR /app
 
+#Update TZ data
+RUN apk add --no-cache tzdata
 # Add CA certificates and create non-root user
 RUN apk --no-cache add ca-certificates && \
     addgroup -g 1001 appgroup && \
     adduser -D -u 1001 -G appgroup appuser
-
 # Copy the binary from builder
 COPY --from=builder /app/main .
 

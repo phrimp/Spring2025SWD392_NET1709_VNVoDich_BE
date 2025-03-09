@@ -108,7 +108,7 @@ func (h *GoogleHandler) HandleCallback() fiber.Handler {
 		}
 
 		c.Cookie(&fiber.Cookie{
-			Name:     "auth_token",
+			Name:     "authToken",
 			Value:    token,
 			Path:     "/",
 			Expires:  time.Now().Add(24 * time.Hour), // 24 hour expiration
