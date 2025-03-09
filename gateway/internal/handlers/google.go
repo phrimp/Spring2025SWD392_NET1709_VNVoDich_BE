@@ -8,6 +8,7 @@ import (
 	"gateway/internal/config"
 	"gateway/internal/middleware"
 	"gateway/internal/routes"
+	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -119,16 +120,16 @@ func (h *GoogleHandler) HandleCallback() fiber.Handler {
 
 		userDataJSON, _ := json.Marshal(userData)
 		c.Cookie(&fiber.Cookie{
-			Name:     "user_info",
+			Name:     "user",
 			Value:    string(userDataJSON),
 			Path:     "/",
 			Expires:  time.Now().Add(24 * time.Hour),
-			HTTPOnly: false, // Not HTTP-only so JavaScript can read it
+			HTTPOnly: false,
 			Secure:   true,
 			SameSite: "Lax",
 		})
 
-		return c.Redirect("http://localhost:3000", fiber.StatusTemporaryRedirect)
+		return c.Redirect(os.Getenv("REDIRECT_URL"), fiber.StatusTemporaryRedirect)
 	}
 }
 

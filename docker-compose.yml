@@ -19,6 +19,7 @@ services:
       - USER_SERVICE_URL=${USER_SERVICE_URL}
       - SERVER_READ_TIMEOUT=${SERVER_READ_TIMEOUT}
       - SERVER_WRITE_TIMEOUT=${SERVER_WRITE_TIMEOUT}
+      - REDIRECT_URL=${REDIRECT_URL}
       - TZ=${TZ}
     networks:
       - app-network

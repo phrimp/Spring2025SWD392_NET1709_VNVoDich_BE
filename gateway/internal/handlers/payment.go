@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"gateway/internal/routes"
 	"net/url"
+	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/valyala/fasthttp"
@@ -51,7 +54,42 @@ func (h *PaymentHandler) HandleCompletePayPalPayment() fiber.Handler {
 		params.Add("orderId", c.Query("orderId"))
 
 		endpoint := fmt.Sprintf("%s/api/payment/paypal/success?%s", h.paymentServiceURL, params.Encode())
-		return routes.CompletePayment(req, resp, c, endpoint)
+		err := routes.CompletePayment(req, resp, c, endpoint)
+		if err != nil {
+			fmt.Println("PAYMENT COMPLETEMENT FAILED:", err)
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "payment is success but failed to complete payment in final steps",
+			})
+		}
+
+		var responseData map[string]interface{}
+		if err := json.Unmarshal(resp.Body(), &responseData); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to parse payment complete response",
+			})
+		}
+
+		c.Cookie(&fiber.Cookie{
+			Name:     "status",
+			Value:    responseData["status"].(string),
+			Path:     "/",
+			Expires:  time.Now().Add(24 * time.Hour),
+			HTTPOnly: false,
+			Secure:   true,
+			SameSite: "Lax",
+		})
+
+		c.Cookie(&fiber.Cookie{
+			Name:     "paymentID",
+			Value:    responseData["paymentId"].(string),
+			Path:     "/",
+			Expires:  time.Now().Add(24 * time.Hour),
+			HTTPOnly: false,
+			Secure:   true,
+			SameSite: "Lax",
+		})
+
+		return c.Redirect(os.Getenv("REDIRECT_URL"), fiber.StatusTemporaryRedirect)
 	}
 }
 
