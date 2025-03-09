@@ -113,6 +113,8 @@ func (g *Gateway) setupRoutes() {
 	admin_api.Post("/subscription/plans", g.subscription.HandleAdminCreatePlan())
 	admin_api.Put("/subscription/plans/:id", g.subscription.HandleAdminUpdatePlan())
 	admin_api.Delete("/subscription/plans/:id", g.subscription.HandleAdminDeletePlan())
+	admin_api.Post("/jwt/block", g.admin.HandleAdminBlockJWT())
+	admin_api.Post("/jwt/unblock", g.admin.HandleAdminUnBlockJWT())
 	//// Specific role-based routes
 	//api.Get("/sensitive-data", middleware.RequireRole("admin", "data_analyst"), g.auth.HandleSensitiveData())
 }

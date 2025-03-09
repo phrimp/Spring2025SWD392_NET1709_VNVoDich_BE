@@ -887,3 +887,27 @@ func UpdatePassword(new_password, cur_password, username string, db *gorm.DB) er
 
 	return db.Update("password", new_password).Error
 }
+
+func IsUserActive(username string, db *gorm.DB) (bool, error) {
+	var user models.User
+	if err := db.Where("username = ?", username).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, fmt.Errorf("user not found")
+		}
+		return false, fmt.Errorf("database error: %v", err)
+	}
+
+	return user.Status == models.StatusActive, nil
+}
+
+func IsUserActiveByID(userID uint, db *gorm.DB) (bool, error) {
+	var user models.User
+	if err := db.First(&user, userID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, fmt.Errorf("user not found")
+		}
+		return false, fmt.Errorf("database error: %v", err)
+	}
+
+	return user.Status == models.StatusActive, nil
+}

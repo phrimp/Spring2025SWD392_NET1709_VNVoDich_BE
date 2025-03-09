@@ -283,6 +283,7 @@ func (s *subscriptionService) GetTutorSubscription(tutorID uint) (*models.Subscr
 		Features:           subscription.Plan.FeaturesJSON,
 		MaxCourses:         subscription.Plan.MaxCourses,
 		CommissionRate:     subscription.Plan.CommissionRate,
+		PaymentOrderID:     subscription.PaymentOrderID,
 	}, nil
 }
 

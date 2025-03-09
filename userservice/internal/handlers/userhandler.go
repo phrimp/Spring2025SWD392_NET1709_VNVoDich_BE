@@ -384,3 +384,43 @@ func UpdatePassword(db *gorm.DB) fiber.Handler {
 		})
 	}
 }
+
+func CheckUserStatusHandler(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		username := c.Query("username")
+		userID := c.Query("user_id")
+
+		if username == "" && userID == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Either username or user_id must be provided",
+			})
+		}
+
+		var isActive bool
+		var err error
+
+		if username != "" {
+			isActive, err = services.IsUserActive(username, db)
+		} else {
+			id, parseErr := strconv.ParseUint(userID, 10, 32)
+			if parseErr != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"error": "Invalid user_id format",
+				})
+			}
+			isActive, err = services.IsUserActiveByID(uint(id), db)
+		}
+
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		return c.JSON(fiber.Map{
+			"username":  username,
+			"user_id":   userID,
+			"is_active": isActive,
+		})
+	}
+}

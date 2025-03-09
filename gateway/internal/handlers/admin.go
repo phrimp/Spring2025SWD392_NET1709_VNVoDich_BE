@@ -14,12 +14,14 @@ import (
 type AdminServiceHandler struct {
 	adminServiceURL string
 	userServiceURL  string
+	authServiceURL  string
 }
 
 func NewAdminService(config *config.Config) *AdminServiceHandler {
 	return &AdminServiceHandler{
 		adminServiceURL: config.AdminServiceURL,
 		userServiceURL:  config.UserServiceURL,
+		authServiceURL:  config.AuthServiceURL,
 	}
 }
 
@@ -180,5 +182,29 @@ func (a *AdminServiceHandler) HandleAssignRole() fiber.Handler {
 
 		// Forward the request to the user service
 		return routes.AdminAssignRole(req, resp, c, a.userServiceURL+"/user/admin/role?username="+username, role)
+	}
+}
+
+func (a *AdminServiceHandler) HandleAdminBlockJWT() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		req := fasthttp.AcquireRequest()
+		resp := fasthttp.AcquireResponse()
+		defer fasthttp.ReleaseRequest(req)
+		defer fasthttp.ReleaseResponse(resp)
+		query := fmt.Sprintf("?username=%s&time=%s", c.Query("username"), c.Query("time"))
+
+		return routes.AdminBlockJWT(req, resp, c, a.authServiceURL+"/block"+query)
+	}
+}
+
+func (a *AdminServiceHandler) HandleAdminUnBlockJWT() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		req := fasthttp.AcquireRequest()
+		resp := fasthttp.AcquireResponse()
+		defer fasthttp.ReleaseRequest(req)
+		defer fasthttp.ReleaseResponse(resp)
+		query := fmt.Sprintf("?username=%s", c.Query("username"))
+
+		return routes.AdminBlockJWT(req, resp, c, a.authServiceURL+"/unblock"+query)
 	}
 }
