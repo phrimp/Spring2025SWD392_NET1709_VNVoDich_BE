@@ -78,6 +78,7 @@ func main() {
 	subscriptions.Get("/tutor/:tutorId", subscriptionHandler.HandleGetTutorSubscription)
 	subscriptions.Put("/:id/cancel", subscriptionHandler.HandleCancelSubscription)
 	subscriptions.Put("/:id/change-plan", subscriptionHandler.HandleChangePlan)
+	subscriptions.Post("/confirm", subscriptionHandler.HandleConfirmSubscription)
 
 	subscriptionAdmin := api.Group("/admin/subscriptions")
 	subscriptionAdmin.Get("/", subscriptionHandler.HandleGetAllSubscriptions)

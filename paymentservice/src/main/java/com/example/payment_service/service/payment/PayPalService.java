@@ -38,7 +38,7 @@ public class PayPalService implements IPayPalPayment {
 
     Amount amount = new Amount();
     amount.setCurrency("USD");
-    amount.setTotal(usdAmount.toString());
+    amount.setTotal(Double.toString(total));
 
     Transaction transaction = new Transaction();
     transaction.setDescription(description);

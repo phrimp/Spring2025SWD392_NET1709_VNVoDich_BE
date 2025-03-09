@@ -3,6 +3,8 @@ package services
 import (
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 	"subscription/internal/models"
 	"subscription/internal/repository"
 	"time"
@@ -125,22 +127,28 @@ func (s *subscriptionService) InitiateSubscription(req models.SubscriptionReques
 // ConfirmSubscription finalizes a subscription after successful payment
 func (s *subscriptionService) ConfirmSubscription(req models.PaymentConfirmationRequest) (*models.SubscriptionResponse, error) {
 	// Find subscription by payment order ID
-	var subscriptions []models.TutorSubscription
-	var count int64
-	filters := map[string]interface{}{
-		"payment_order_id": req.OrderID,
-	}
+	//var subscriptions []models.TutorSubscription
+	//var count int64
+	//filters := map[string]interface{}{
+	//	"payment_order_id": req.OrderID,
+	//}
 
-	subscriptions, count, err := s.subscriptionRepo.GetAll(1, 1, filters)
-	if err != nil {
-		return nil, err
-	}
+	//subscriptions, count, err := s.subscriptionRepo.GetAll(1, 1, filters)
+	//if err != nil {
+	//	return nil, err
+	//}
 
-	if count == 0 || len(subscriptions) == 0 {
-		return nil, errors.New("subscription not found for this payment order ID")
-	}
+	//if count == 0 || len(subscriptions) == 0 {
+	//	return nil, errors.New("subscription not found for this payment order ID")
+	//}
 
-	subscription := subscriptions[0]
+	order_id_split := strings.Split(req.OrderID, "-")
+	tutor_id_str := order_id_split[1]
+	tutor_id, _ := strconv.Atoi(tutor_id_str)
+	fmt.Println(tutor_id, "DEBUG SubscriptionFOUND")
+
+	subscription, _ := s.subscriptionRepo.GetByTutorID(uint(tutor_id))
+	fmt.Println(subscription.PaymentOrderID, "DEBUG SubscriptionFOUND")
 
 	// Make sure it's not already active
 	if subscription.Status == models.SubscriptionActive {
@@ -176,7 +184,7 @@ func (s *subscriptionService) ConfirmSubscription(req models.PaymentConfirmation
 	oldStatus := subscription.Status
 	subscription.Status = models.SubscriptionActive
 
-	if err := s.subscriptionRepo.Update(&subscription); err != nil {
+	if err := s.subscriptionRepo.Update(subscription); err != nil {
 		return nil, fmt.Errorf("failed to update subscription: %w", err)
 	}
 
@@ -491,6 +499,7 @@ func (s *subscriptionService) ProcessPaymentWebhook(payload models.PaymentWebhoo
 	switch payload.Event {
 	case "payment.completed", "payment.success":
 		// When payment completes, activate the subscription
+		fmt.Println(payload, "DEBUG PAYMENT WEBHOOK =========================")
 		_, err := s.ConfirmSubscription(models.PaymentConfirmationRequest{
 			OrderID: payload.OrderID,
 		})

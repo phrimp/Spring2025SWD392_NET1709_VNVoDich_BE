@@ -22,8 +22,9 @@ type Claims struct {
 }
 
 var (
-	tokens  map[string]*jwt.Token = make(map[string]*jwt.Token)
-	blocked map[string]bool       = make(map[string]bool)
+	tokens  map[string]*jwt.Token  = make(map[string]*jwt.Token)
+	blocked map[string]bool        = make(map[string]bool)
+	claims  map[*jwt.Token]*Claims = make(map[*jwt.Token]*Claims)
 )
 
 func BlockUser(username string) {
@@ -81,7 +82,7 @@ func HandleUnblockToken() fiber.Handler {
 }
 
 func generateNewToken(user *repository.User) *jwt.Token {
-	claims := Claims{
+	claim := Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -92,7 +93,9 @@ func generateNewToken(user *repository.User) *jwt.Token {
 		Email:    user.Email,
 		Role:     user.Role,
 	}
-	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+	claims[token] = &claim
+	return token
 }
 
 func HandleLogin() fiber.Handler {
@@ -131,8 +134,8 @@ func HandleLogin() fiber.Handler {
 
 		var token *jwt.Token
 		if existingToken, ok := tokens[user.Username]; ok {
-			claims, claimsOk := existingToken.Claims.(*Claims)
-			if !claimsOk || time.Now().After(claims.ExpiresAt.Time) {
+			claim, ok := claims[existingToken]
+			if !ok || time.Now().After(claim.ExpiresAt.Time) {
 				fmt.Println("token is expired, generate a new one")
 				token = generateNewToken(user)
 				tokens[user.Username] = token

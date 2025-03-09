@@ -15,11 +15,11 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
-
+#Update TZ data
+RUN apk add --no-cache tzdata
 # Create non-root user
 RUN addgroup -g 1001 -S javauser && \
     adduser -S javauser -G javauser -u 1001
-
 # Copy the jar from build stage
 COPY --from=build /app/target/*.jar app.jar
 
