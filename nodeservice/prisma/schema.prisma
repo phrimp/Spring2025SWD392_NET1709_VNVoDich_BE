@@ -41,8 +41,7 @@ model User {
   full_name   String?  @db.VarChar(255)
   googleToken String?  @map("google_token") @db.Text
 
-  picture      String?
-  google_token String?
+  picture String?
 
   is_verified Boolean    @default(false)
   status      UserStatus @default(Active)
