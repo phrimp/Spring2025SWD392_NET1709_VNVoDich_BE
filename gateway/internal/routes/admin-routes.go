@@ -32,3 +32,7 @@ func AdminAssignRole(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ct
 	body := []byte(fmt.Sprintf(`{"role":"%s"}`, role))
 	return ForwardRequest(req, resp, c, url, "POST", body)
 }
+
+func AdminBlockJWT(req *fasthttp.Request, resp *fasthttp.Response, c *fiber.Ctx, url string) error {
+	return ForwardRequest(req, resp, c, url, "POST", c.Body())
+}

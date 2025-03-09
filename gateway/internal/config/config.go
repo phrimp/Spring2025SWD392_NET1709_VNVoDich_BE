@@ -14,6 +14,7 @@ type Config struct {
 	UserServiceURL    string
 	AdminServiceURL   string
 	PaymentServiceURL string
+	SubscriptionURL   string
 	JWTSecret         string
 	ServerCfg         ServerConfig
 }
@@ -26,6 +27,7 @@ func New() *Config {
 		UserServiceURL:    os.Getenv("USER_SERVICE_URL"),
 		AdminServiceURL:   os.Getenv("ADMIN_SERVICE_URL"),
 		PaymentServiceURL: os.Getenv("PAYMENT_SERVICE_URL"),
+		SubscriptionURL:   os.Getenv("SUBSCRIPTION_SERVICE_URL"),
 		JWTSecret:         os.Getenv("JWT_SECRET"),
 		ServerCfg:         loadServerConfig(),
 	}

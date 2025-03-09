@@ -408,22 +408,34 @@ func createTutorRecord(tx *gorm.DB, userID uint) error {
 	return nil
 }
 
-func UpdateUser(username string, params models.UserUpdateParams, db *gorm.DB) (*models.User, error) {
+func UpdateUser(username string, userId string, params models.UserUpdateParams, db *gorm.DB) (*models.User, error) {
 	var user models.User
-	if username == "" {
-		return nil, errors.New("username cannot be empty")
-	}
+	if username != "" {
+		result := db.Model(&models.User{}).
+			Where("username = ?", username).
+			First(&user)
 
-	result := db.Model(&models.User{}).
-		Where("username = ?", username).
-		First(&user)
-
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, errors.New("user not found")
+		if result.Error != nil {
+			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+				return nil, errors.New("user not found")
+			}
+			return nil, fmt.Errorf("error finding user: %w", result.Error)
 		}
-		return nil, fmt.Errorf("error finding user: %w", result.Error)
 	}
+	if userId != "" {
+		result := db.Model(&models.User{}).
+			Where("id = ?", userId).
+			First(&user)
+
+		if result.Error != nil {
+			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+				return nil, errors.New("user not found")
+			}
+			return nil, fmt.Errorf("error finding user: %w", result.Error)
+		}
+
+	}
+
 	// Update fields if provided
 	updates := make(map[string]interface{})
 
@@ -619,22 +631,35 @@ func VerifyUser(username string, db *gorm.DB) error {
 	return nil
 }
 
-func HardDeleteUser(username string, db *gorm.DB) error {
+func HardDeleteUser(userid, username string, db *gorm.DB) error {
 	// Find user
 	var user models.User
-	if username == "" {
-		return errors.New("username cannot be empty")
+	if userid == "" && username == "" {
+		return fmt.Errorf("username and userid is empty")
 	}
+	if username != "" {
+		result := db.Model(&models.User{}).
+			Where("username = ?", username).
+			First(&user)
 
-	result := db.Model(&models.User{}).
-		Where("username = ?", username).
-		First(&user)
-
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return errors.New("user not found")
+		if result.Error != nil {
+			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+				return errors.New("user not found")
+			}
+			return fmt.Errorf("error finding user: %w", result.Error)
 		}
-		return fmt.Errorf("error finding user: %w", result.Error)
+	}
+	if userid != "" {
+		result := db.Model(&models.User{}).
+			Where("id = ?", userid).
+			First(&user)
+
+		if result.Error != nil {
+			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+				return errors.New("user not found")
+			}
+			return fmt.Errorf("error finding user: %w", result.Error)
+		}
 	}
 
 	// Start a transaction to ensure all related records are deleted correctly
@@ -837,4 +862,52 @@ func AssignRole(username string, newRole string, db *gorm.DB) error {
 
 		return nil
 	})
+}
+
+func UpdatePassword(new_password, cur_password, username string, db *gorm.DB) error {
+	var user models.User
+	if username == "" {
+		return errors.New("username cannot be empty")
+	}
+
+	result := db.Model(&models.User{}).
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return fmt.Errorf("error finding user: %w", result.Error)
+	}
+	err := user.CheckPassword(cur_password)
+	if err != nil {
+		return fmt.Errorf("check current password failed: %s", err)
+	}
+
+	return db.Update("password", new_password).Error
+}
+
+func IsUserActive(username string, db *gorm.DB) (bool, error) {
+	var user models.User
+	if err := db.Where("username = ?", username).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, fmt.Errorf("user not found")
+		}
+		return false, fmt.Errorf("database error: %v", err)
+	}
+
+	return user.Status == models.StatusActive, nil
+}
+
+func IsUserActiveByID(userID uint, db *gorm.DB) (bool, error) {
+	var user models.User
+	if err := db.First(&user, userID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, fmt.Errorf("user not found")
+		}
+		return false, fmt.Errorf("database error: %v", err)
+	}
+
+	return user.Status == models.StatusActive, nil
 }

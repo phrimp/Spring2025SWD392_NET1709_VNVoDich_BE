@@ -41,6 +41,8 @@ func main() {
 	// Routes
 	auth.Post("/login", handlers.HandleLogin())
 	auth.Post("/register", handlers.HandleRegister())
+	auth.Post("/block", handlers.HandleBlockToken())
+	auth.Post("/unblock", handlers.HandleUnblockToken())
 
 	port := os.Getenv("AUTH_SERVICE_PORT")
 	if port == "" {

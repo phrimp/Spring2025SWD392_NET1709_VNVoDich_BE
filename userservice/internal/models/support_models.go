@@ -2,7 +2,6 @@ package models
 
 import (
 	"time"
-
 )
 
 type Course struct {
@@ -45,7 +44,7 @@ type Availability struct {
 	TutorID uint  `gorm:"uniqueIndex"`
 	Tutor   Tutor `gorm:"foreignKey:TutorID"`
 
-	TimeGap int // Minimum gap between bookings in minutes
+	TimeGap int `gorm:"column:timeGap"`
 
 	Days []DayAvailability `gorm:"foreignKey:AvailabilityID"`
 }

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class PayPalService implements IPayment {
+public class PayPalService implements IPayPalPayment {
 
   @Autowired
   private APIContext apiContext;

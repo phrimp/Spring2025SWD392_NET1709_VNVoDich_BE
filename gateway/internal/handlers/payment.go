@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"gateway/internal/routes"
+	"net/url"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/valyala/fasthttp"
@@ -24,8 +25,16 @@ func (p *PaymentHandler) HandleCreatePayment() fiber.Handler {
 		resp := fasthttp.AcquireResponse()
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
-		query := fmt.Sprintf("?amount=%s&description=%s&orderId=%s", c.Query("amount"), c.Query("description"), c.Query("orderId"))
-		return routes.CreatePayment(req, resp, c, p.paymentServiceURL+"/api/payment/paypal/create"+query)
+
+		params := url.Values{}
+		params.Add("amount", c.Query("amount"))
+		params.Add("description", c.Query("description"))
+		params.Add("orderId", c.Query("orderId"))
+
+		endpoint := fmt.Sprintf("%s/api/payment/paypal/create?%s", p.paymentServiceURL, params.Encode())
+		fmt.Println(endpoint)
+
+		return routes.CreatePayment(req, resp, c, endpoint)
 	}
 }
 
@@ -35,8 +44,14 @@ func (h *PaymentHandler) HandleCompletePayPalPayment() fiber.Handler {
 		resp := fasthttp.AcquireResponse()
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
-		query := fmt.Sprintf("?paymentId=%s&PayerID=%s&orderId=%s", c.Query("paymentId"), c.Query("PayerID"), c.Query("orderId"))
-		return routes.CompletePayment(req, resp, c, h.paymentServiceURL+"/api/payment/paypal/success"+query)
+
+		params := url.Values{}
+		params.Add("paymentId", c.Query("paymentId"))
+		params.Add("PayerID", c.Query("PayerID"))
+		params.Add("orderId", c.Query("orderId"))
+
+		endpoint := fmt.Sprintf("%s/api/payment/paypal/success?%s", h.paymentServiceURL, params.Encode())
+		return routes.CompletePayment(req, resp, c, endpoint)
 	}
 }
 
@@ -46,7 +61,11 @@ func (h *PaymentHandler) HandleCancelPayPalPayment() fiber.Handler {
 		resp := fasthttp.AcquireResponse()
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
-		query := fmt.Sprintf("?orderId=%s", c.Query("orderId"))
-		return routes.CompletePayment(req, resp, c, h.paymentServiceURL+"/api/payment/paypal/success"+query)
+
+		params := url.Values{}
+		params.Add("orderId", c.Query("orderId"))
+
+		endpoint := fmt.Sprintf("%s/api/payment/paypal/cancel?%s", h.paymentServiceURL, params.Encode())
+		return routes.CancelPayment(req, resp, c, endpoint)
 	}
 }

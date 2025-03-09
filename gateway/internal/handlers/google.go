@@ -3,6 +3,7 @@ package handlers
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"gateway/internal/config"
 	"gateway/internal/middleware"
@@ -82,7 +83,52 @@ func (h *GoogleHandler) HandleCallback() fiber.Handler {
 		resp := fasthttp.AcquireResponse()
 		defer fasthttp.ReleaseRequest(req)
 		defer fasthttp.ReleaseResponse(resp)
-		return routes.GoogleLoginRoute(req, resp, c, h.googleServiceURL+"/api/auth/google/callback?"+query)
+		err := routes.GoogleLoginRoute(req, resp, c, h.googleServiceURL+"/api/auth/google/callback?"+query)
+		if err != nil {
+			fmt.Println("GOOGLE SERVICE CALL BACK FAILED:", err)
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to get user information",
+			})
+		}
+
+		var responseData map[string]interface{}
+		if err := json.Unmarshal(resp.Body(), &responseData); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to parse authentication response",
+			})
+		}
+
+		token, hasToken := responseData["token"].(string)
+		userData, hasUserData := responseData["user"].(map[string]interface{})
+
+		if !hasToken || !hasUserData {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Invalid authentication response format",
+			})
+		}
+
+		c.Cookie(&fiber.Cookie{
+			Name:     "auth_token",
+			Value:    token,
+			Path:     "/",
+			Expires:  time.Now().Add(24 * time.Hour), // 24 hour expiration
+			HTTPOnly: true,
+			Secure:   true,
+			SameSite: "Lax",
+		})
+
+		userDataJSON, _ := json.Marshal(userData)
+		c.Cookie(&fiber.Cookie{
+			Name:     "user_info",
+			Value:    string(userDataJSON),
+			Path:     "/",
+			Expires:  time.Now().Add(24 * time.Hour),
+			HTTPOnly: false, // Not HTTP-only so JavaScript can read it
+			Secure:   true,
+			SameSite: "Lax",
+		})
+
+		return c.Redirect("http://localhost:3000", fiber.StatusTemporaryRedirect)
 	}
 }
 
