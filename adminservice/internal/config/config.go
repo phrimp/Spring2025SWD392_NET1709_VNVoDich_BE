@@ -28,8 +28,9 @@ type DatabaseConfig struct {
 }
 
 type ExternalServices struct {
-	UserService string
-	NodeService string
+	UserService   string
+	NodeService   string
+	GoogleService string
 }
 
 // New creates a new Config instance with values from environment variables
@@ -51,10 +52,15 @@ func loadExternalServiceConfig() ExternalServices {
 	if user_service == "" {
 		user_service = "node-service:8000"
 	}
+	google_service := os.Getenv("GOOGLE_SERVICE_URL")
+	if google_service == "" {
+		google_service = "http://google-service:8084"
+	}
 
 	return ExternalServices{
-		UserService: user_service,
-		NodeService: node_service,
+		UserService:   user_service,
+		NodeService:   node_service,
+		GoogleService: google_service,
 	}
 }
 
