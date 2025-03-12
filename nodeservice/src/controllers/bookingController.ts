@@ -75,6 +75,7 @@ export const createTrialBooking = async (
       where: {
         id: Number(courseId),
       },
+
       select: {
         id: true,
         total_lessons: true,
@@ -207,7 +208,7 @@ export const createTrialBooking = async (
 
 const generateMeetLink = async () => {
   const token =
-    "ya29.a0AeXRPp7fiBp2G0yiXQYBnnY_5VAMmF11xsNX_U_BUnbmAZkTeqHh1WkZFs6k4mRlGfTwONG-sFx4EZQLWNFN2YizMjxpKlcSv3STUeDA3NChjqWijVOZ-6deqhRn-p6aeTrpsFjKGt3NG9t0gkCBpK6pgWPPAG66jQCyvT0GnwaCgYKAecSARISFQHGX2MinropG5zEBmCXubsFoW-uXQ0177";
+    "ya29.a0AeXRPp6Fyr-2rZZCqTHKVyl_Ph4T4Z4p99iOL7EnmWLYUL5VFT969sVek4TeiIynGKNeCFb66f-BnM67FefYGBYH98FxAN73AwuEEb6MrwiOe_0C-swqSoG6fQzE0NZSAWVB6S4YggLMXoAYkLcUMlQu1DZjdboE6QsLDKYREAaCgYKAckSARISFQHGX2Mi9ethTgoYUf0VB8uB5_0QxQ0177";
 
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -247,4 +248,48 @@ const generateMeetLink = async () => {
   const meetLink = meetResponse.data.hangoutLink;
 
   return meetLink;
+};
+
+export const getParentBookings = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      res.status(400).json({ message: "UserId is required" });
+      return;
+    }
+
+    const bookings = await prisma.courseSubscription.findMany({
+      where: {
+        children: {
+          parent_id: Number(userId),
+        },
+      },
+      include: {
+        course: true,
+        children: {
+          include: {
+            profile: {
+              select: {
+                full_name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    res.json({
+      message: "Parent's bookings retrieved successfully",
+      data: bookings,
+    });
+  } catch (error) {
+    console.error("Error retrieving booking:", error);
+    res.status(500).json({
+      message: "Error retrieving parent booking",
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 };

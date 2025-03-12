@@ -195,27 +195,20 @@ model CourseSubscription {
 }
 
 model TeachingSession {
-  id                Int           @id @default(autoincrement())
-  google_meet_id    String?
-  startTime         DateTime
-  endTime           DateTime
-  status            SessionStatus @default(NotYet)
-  topics_covered    String?
+  id             Int           @id @default(autoincrement())
+  google_meet_id String?
+  startTime      DateTime
+  endTime        DateTime
+  status         SessionStatus @default(NotYet)
+  topics_covered String?
+
   homework_assigned String?
+  rating            Int?
+  comment           String?
+  teaching_quality  SessionQuality?
 
   subscription_id Int
   subscription    CourseSubscription @relation(fields: [subscription_id], references: [id])
-  sessionFeedback SessionFeedback[]
-}
-
-model SessionFeedback {
-  id               Int     @id @default(autoincrement())
-  rating           Int
-  comment          String?
-  teaching_quality String?
-
-  session_id Int
-  session    TeachingSession @relation(fields: [session_id], references: [id])
 }
 
 model CourseSubscriptionSchedule {
@@ -287,6 +280,13 @@ enum SubscriptionStatus {
   PAST_DUE
   TRIALING
   INCOMPLETE
+}
+
+enum SessionQuality {
+  POOR
+  FAIR
+  GOOD
+  EXCELLENT
 }
 
 model SubscriptionPlan {

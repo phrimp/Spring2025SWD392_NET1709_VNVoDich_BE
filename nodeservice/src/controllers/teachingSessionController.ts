@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, SessionStatus, TeachingSession } from "@prisma/client";
 import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
@@ -57,13 +57,21 @@ export const getTeachingSessions = async (
   }
 };
 
-export const rescheduleTeachingSession = async (
+export const updateTeachingSession = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const { startTime, endTime } = req.body;
+    const {
+      startTime,
+      endTime,
+      status,
+      homework_assigned,
+      rating,
+      teaching_quality,
+      comment,
+    } = req.body;
 
     const teachingSession = await prisma.teachingSession.findUnique({
       where: { id: Number(id) },
@@ -84,11 +92,16 @@ export const rescheduleTeachingSession = async (
       data: {
         startTime,
         endTime,
+        status: status as SessionStatus,
+        rating: Number(rating),
+        homework_assigned,
+        teaching_quality,
+        comment,
       },
     });
 
     res.json({
-      message: "Teaching sessions rescheduled successfully",
+      message: "Teaching sessions updating successfully",
       data: teachingSession,
     });
   } catch (error) {
