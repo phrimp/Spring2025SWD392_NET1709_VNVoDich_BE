@@ -99,6 +99,7 @@ func (g *Gateway) setupRoutes() {
 
 	api.Post("/refunds", g.refund.HandleCreateRefundRequest())
 	api.Get("/refunds/:id", g.refund.HandleGetRefundRequest())
+	api.Get("/p-refunds", g.refund.HandleGetAllRefundRequests())
 
 	// Tutor routes
 	tutor_api := api.Group("/tutor").Use(middleware.RequireRole("Tutor"))

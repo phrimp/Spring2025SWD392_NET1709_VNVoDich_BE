@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var LoginAttempt map[string]int
+var LoginAttempt = make(map[string]int)
 
 // Login
 func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*models.User, error) {

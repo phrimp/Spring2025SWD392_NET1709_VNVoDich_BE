@@ -6,6 +6,7 @@ import (
 	"adminservice/utils"
 	"fmt"
 	"math"
+	"net/url"
 
 	"github.com/valyala/fasthttp"
 )
@@ -141,11 +142,12 @@ func (s *refundService) sendRefundNotification(refund *models.RefundRequest) err
 	// Build the request to the email service
 	url := fmt.Sprintf("%s/api/email/send?to=%s&title=%s&body=%s",
 		s.googleServiceURL,
-		refund.Email,
-		emailTitle,
-		emailBody,
+		url.QueryEscape(refund.Email),
+		url.QueryEscape(emailTitle),
+		url.QueryEscape(emailBody),
 	)
 
+	fmt.Println(url)
 	utils.BuildRequest(req, "POST", nil, s.apiKey, url)
 
 	if err := fasthttp.Do(req, resp); err != nil {

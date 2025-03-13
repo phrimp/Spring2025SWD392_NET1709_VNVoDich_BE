@@ -10,9 +10,9 @@ import (
 type RefundStatus string
 
 const (
-	RefundStatusPending  RefundStatus = "pending"
-	RefundStatusApproved RefundStatus = "approved"
-	RefundStatusRejected RefundStatus = "rejected"
+	RefundStatusPending  RefundStatus = "PENDING"
+	RefundStatusApproved RefundStatus = "APPROVED"
+	RefundStatusRejected RefundStatus = "REJECTED"
 )
 
 // RefundRequest represents a user's request for a refund
