@@ -17,8 +17,30 @@ export const getChildren = async (
       return;
     }
 
+    console.log(userId);
+
     const children = await prisma.children.findMany({
-      where: { parent_id: Number(userId) },
+      where: {
+        OR: [
+          { parent_id: Number(userId) },
+          {
+            courseSubscriptions: {
+              some: {
+                course: {
+                  tutor_id: Number(userId),
+                },
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        profile: {
+          select: {
+            full_name: true,
+          },
+        },
+      },
     });
 
     res.json({
@@ -48,6 +70,13 @@ export const getChild = async (req: Request, res: Response): Promise<void> => {
 
     const child = await prisma.children.findUnique({
       where: { id: Number(id) },
+      include: {
+        profile: {
+          select: {
+            full_name: true,
+          },
+        },
+      },
     });
 
     if (!child) {
@@ -68,16 +97,22 @@ export const createChild = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { full_name, age, grade_level, learning_goals, password, userId } =
-      req.body;
+    const {
+      full_name,
+      username,
+      learning_goals,
+      password,
+      userId,
+      date_of_birth,
+    } = req.body;
 
     if (
       !full_name ||
-      !age ||
-      !grade_level ||
       !learning_goals ||
       !password ||
-      !userId
+      !userId ||
+      !username ||
+      !date_of_birth
     ) {
       res.status(400).json({ message: "All fields are required" });
       return;
@@ -87,16 +122,28 @@ export const createChild = async (
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const newChild = await prisma.children.create({
+    const newUser = await prisma.user.create({
       data: {
         full_name,
-        age: Number(age),
-        grade_level,
-        learning_goals,
+        username,
         password: hashedPassword,
+        role: "Children",
+      },
+    });
 
+    const newChild = await prisma.children.create({
+      data: {
+        id: newUser.id,
+        learning_goals,
+        date_of_birth,
         parent_id: Number(userId),
-
+      },
+      include: {
+        profile: {
+          select: {
+            full_name: true,
+          },
+        },
       },
     });
 
@@ -113,17 +160,38 @@ export const updateChild = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { parentId } = req.params;
-    if (!parentId) {
+    const { userId } = req.body;
+    if (!userId) {
       res.status(400).json({ message: "Parent ID is required" });
       return;
     }
     const { id } = req.params;
-    const { full_name, age, grade_level, learning_goals, password } = req.body;
+    const { full_name, learning_goals, password, date_of_birth } = req.body;
+
+    const saltRounds = 10;
+    const hashedPassword = password
+      ? await bcrypt.hash(password, saltRounds)
+      : password;
 
     const updatedChild = await prisma.children.update({
       where: { id: Number(id) },
-      data: { full_name, age, grade_level, learning_goals, password },
+      data: {
+        date_of_birth,
+        learning_goals,
+        profile: {
+          update: {
+            full_name,
+            password: hashedPassword,
+          },
+        },
+      },
+      include: {
+        profile: {
+          select: {
+            full_name: true,
+          },
+        },
+      },
     });
 
     res.json({
@@ -142,14 +210,14 @@ export const deleteChild = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.body;
     if (!userId) {
       res.status(400).json({ message: "Parent ID is required" });
       return;
     }
     const { id } = req.params;
 
-    await prisma.children.delete({ where: { id: Number(id) } });
+    await prisma.user.delete({ where: { id: Number(id) } });
     res.json({ message: "Child account deleted successfully" });
   } catch (error) {
     console.error("Error deleting child:", error);

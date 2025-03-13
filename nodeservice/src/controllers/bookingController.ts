@@ -4,6 +4,7 @@ import { google } from "googleapis";
 
 import dotenv from "dotenv";
 import Stripe from "stripe";
+import { isBefore } from "date-fns";
 
 const prisma = new PrismaClient();
 
@@ -74,6 +75,7 @@ export const createTrialBooking = async (
       where: {
         id: Number(courseId),
       },
+
       select: {
         id: true,
         total_lessons: true,
@@ -123,28 +125,43 @@ export const createTrialBooking = async (
       // Prepare teaching sessions in bulk instead of one-by-one
       const teachingSessionsData = [];
       let lessonCount = 0;
+      const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
+
+      // Tính toán thời gian bắt đầu đã điều chỉnh cho mỗi schedule
+      const adjustedSchedules = schedules.map((schedule) => {
+        let adjustedStartTime = new Date(schedule.startTime);
+        while (isBefore(adjustedStartTime, now)) {
+          adjustedStartTime.setDate(adjustedStartTime.getDate() + 7);
+        }
+        let adjustedEndTime = new Date(schedule.endTime);
+        while (isBefore(adjustedEndTime, now)) {
+          adjustedEndTime.setDate(adjustedEndTime.getDate() + 7);
+        }
+        return { schedule, adjustedStartTime, adjustedEndTime };
+      });
 
       for (
         let week = 0;
         week < weeksNeeded && lessonCount < totalLessons;
         week++
       ) {
-        for (const schedule of schedules) {
+        for (const {
+          schedule,
+          adjustedStartTime,
+          adjustedEndTime,
+        } of adjustedSchedules) {
           if (lessonCount >= totalLessons) break;
 
           const currentLesson = course.lessons[lessonCount];
 
-          // Calculate dates efficiently
-          const startDate = new Date(schedule.startTime);
-          const endDate = new Date(schedule.endTime);
+          const startDate = new Date(adjustedStartTime);
+          const endDate = new Date(adjustedEndTime);
           startDate.setDate(startDate.getDate() + 7 * week);
           endDate.setDate(endDate.getDate() + 7 * week);
 
-          // Collect data for bulk insertion
           teachingSessionsData.push({
             startTime: startDate,
             endTime: endDate,
-            status: "Scheduled",
             subscription_id: newBooking.id,
             google_meet_id: meetLink,
             topics_covered: currentLesson?.title || null,
@@ -191,7 +208,7 @@ export const createTrialBooking = async (
 
 const generateMeetLink = async () => {
   const token =
-    "ya29.a0AeXRPp7FyyZ-BjhCe48KXTgwgb2Szj9D6U7D2SL90KFqzvFvHSQy7WovEzWL0dJCGoUp0YUhtNTcvvFTLQXU_A50yN9Mnr46KvQerTWrN-nfrXh47mA4XAGOohBXiBBH7ezPBJutMqswkYNh5hMGcFRdHKYxxhnKa_oPMxlbsgaCgYKAbcSARISFQHGX2MiiM75xeeOyZ_xldlADofoaQ0177";
+    "ya29.a0AeXRPp6Fyr-2rZZCqTHKVyl_Ph4T4Z4p99iOL7EnmWLYUL5VFT969sVek4TeiIynGKNeCFb66f-BnM67FefYGBYH98FxAN73AwuEEb6MrwiOe_0C-swqSoG6fQzE0NZSAWVB6S4YggLMXoAYkLcUMlQu1DZjdboE6QsLDKYREAaCgYKAckSARISFQHGX2Mi9ethTgoYUf0VB8uB5_0QxQ0177";
 
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -231,4 +248,48 @@ const generateMeetLink = async () => {
   const meetLink = meetResponse.data.hangoutLink;
 
   return meetLink;
+};
+
+export const getParentBookings = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      res.status(400).json({ message: "UserId is required" });
+      return;
+    }
+
+    const bookings = await prisma.courseSubscription.findMany({
+      where: {
+        children: {
+          parent_id: Number(userId),
+        },
+      },
+      include: {
+        course: true,
+        children: {
+          include: {
+            profile: {
+              select: {
+                full_name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    res.json({
+      message: "Parent's bookings retrieved successfully",
+      data: bookings,
+    });
+  } catch (error) {
+    console.error("Error retrieving booking:", error);
+    res.status(500).json({
+      message: "Error retrieving parent booking",
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 };

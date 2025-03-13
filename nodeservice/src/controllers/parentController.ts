@@ -18,11 +18,12 @@ export const getParents = async (
       take: pageSizeNum,
       include: {
         childrens: {
-          select: {
-            age: true,
-            grade_level: true,
-            learning_goals: true,
-            full_name: true,
+          include: {
+            profile: {
+              select: {
+                full_name: true,
+              },
+            },
           },
         },
         profile: {
@@ -64,11 +65,12 @@ export const getParentById = async (
       where: { id: Number(id) },
       include: {
         childrens: {
-          select: {
-            age: true,
-            grade_level: true,
-            learning_goals: true,
-            full_name: true,
+          include: {
+            profile: {
+              select: {
+                full_name: true,
+              },
+            },
           },
         },
         profile: {

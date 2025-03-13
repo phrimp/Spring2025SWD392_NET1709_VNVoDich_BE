@@ -2,11 +2,13 @@
   {
     "id": 1,
     "google_meet_id": "meet123",
-    "startTime": "2025-01-21T10:00:00Z",
-    "endTime": "2025-01-21T11:00:00Z",
-    "status": "Completed",
+    "startTime": "2025-03-10T10:00:00Z",
+    "endTime": "2025-03-10T11:00:00Z",
     "topics_covered": "Addition and subtraction techniques",
     "homework_assigned": "Worksheet on addition and subtraction",
+    "rating": 5,
+    "comment": "The student was very attentive and engaged throughout the session.",
+    "teaching_quality": "EXCELLENT",
     "subscription_id": 1
   },
   {
@@ -14,9 +16,11 @@
     "google_meet_id": "meet124",
     "startTime": "2025-01-21T11:30:00Z",
     "endTime": "2025-01-21T12:30:00Z",
-    "status": "Completed",
     "topics_covered": "Multiplication and division basics",
     "homework_assigned": "Multiplication table practice",
+    "rating": 4,
+    "comment": "The student grasped the concepts well but could use more practice with problem-solving.",
+    "teaching_quality": "GOOD",
     "subscription_id": 2
   },
   {
@@ -24,9 +28,11 @@
     "google_meet_id": "meet125",
     "startTime": "2025-01-21T13:00:00Z",
     "endTime": "2025-01-21T14:00:00Z",
-    "status": "Completed",
     "topics_covered": "Understanding nouns",
     "homework_assigned": "Identify nouns in sentences",
+    "rating": 3,
+    "comment": "The session was a bit challenging for the student, but we made progress.",
+    "teaching_quality": "FAIR",
     "subscription_id": 3
   },
   {
@@ -34,9 +40,11 @@
     "google_meet_id": "meet126",
     "startTime": "2025-01-21T14:30:00Z",
     "endTime": "2025-01-21T15:30:00Z",
-    "status": "Completed",
     "topics_covered": "Advanced sentence structures",
     "homework_assigned": "Write complex sentences",
+    "rating": 5,
+    "comment": "The student was very focused, and the session was productive.",
+    "teaching_quality": "EXCELLENT",
     "subscription_id": 4
   },
   {
@@ -44,9 +52,11 @@
     "google_meet_id": "meet127",
     "startTime": "2025-01-22T10:00:00Z",
     "endTime": "2025-01-22T11:00:00Z",
-    "status": "Completed",
     "topics_covered": "The Solar System",
     "homework_assigned": "Research a planet in the solar system",
+    "rating": 2,
+    "comment": "The student struggled with understanding some of the key concepts.",
+    "teaching_quality": "POOR",
     "subscription_id": 5
   },
   {
@@ -54,9 +64,11 @@
     "google_meet_id": "meet128",
     "startTime": "2025-01-22T11:30:00Z",
     "endTime": "2025-01-22T12:30:00Z",
-    "status": "Completed",
     "topics_covered": "Ancient Civilizations",
     "homework_assigned": "Write a report on an ancient civilization",
+    "rating": 4,
+    "comment": "Good session, but the student needs more time to fully grasp the material.",
+    "teaching_quality": "GOOD",
     "subscription_id": 6
   },
   {
@@ -64,9 +76,11 @@
     "google_meet_id": "meet129",
     "startTime": "2025-01-22T13:00:00Z",
     "endTime": "2025-01-22T14:00:00Z",
-    "status": "Completed",
     "topics_covered": "Creative Writing Techniques",
     "homework_assigned": "Write a short story",
+    "rating": 5,
+    "comment": "Excellent session! The student made significant improvements.",
+    "teaching_quality": "EXCELLENT",
     "subscription_id": 7
   },
   {
@@ -74,9 +88,11 @@
     "google_meet_id": "meet130",
     "startTime": "2025-01-22T14:30:00Z",
     "endTime": "2025-01-22T15:30:00Z",
-    "status": "Completed",
     "topics_covered": "Basic Music Notes",
     "homework_assigned": "Practice playing basic notes",
+    "rating": 3,
+    "comment": "The student seemed distracted at times, but overall, the session went well.",
+    "teaching_quality": "FAIR",
     "subscription_id": 8
   },
   {
@@ -84,9 +100,11 @@
     "google_meet_id": "meet131",
     "startTime": "2025-01-23T10:00:00Z",
     "endTime": "2025-01-23T11:00:00Z",
-    "status": "Completed",
     "topics_covered": "Introduction to Python",
     "homework_assigned": "Write a simple Python program",
+    "rating": 4,
+    "comment": "The student had a good understanding of the topic, but more review could help.",
+    "teaching_quality": "GOOD",
     "subscription_id": 9
   },
   {
@@ -94,9 +112,11 @@
     "google_meet_id": "meet132",
     "startTime": "2025-01-23T11:30:00Z",
     "endTime": "2025-01-23T12:30:00Z",
-    "status": "Completed",
     "topics_covered": "Control Structures in Python",
     "homework_assigned": "Solve problems using loops and conditionals",
+    "rating": 5,
+    "comment": "Great session! The student showed excellent understanding and was eager to learn.",
+    "teaching_quality": "EXCELLENT",
     "subscription_id": 10
   }
 ]

@@ -138,5 +138,85 @@
     "last_login_at": 1708410000000,
     "account_locked": false,
     "password_changed_at": 1708323600000
+  },
+  {
+    "id": 11,
+    "username": "emily_johnson",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
+    "email": "emily.johnson@example.com",
+    "full_name": "Emily Johnson",
+    "role": "Children"
+  },
+  {
+    "id": 12,
+    "username": "michael_smith",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
+    "email": "michael.smith@example.com",
+    "full_name": "Michael Smith",
+    "role": "Children"
+  },
+  {
+    "id": 13,
+    "username": "sophia_williams",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
+    "email": "sophia.williams@example.com",
+    "full_name": "Sophia Williams",
+    "role": "Children"
+  },
+  {
+    "id": 14,
+    "username": "ethan_brown",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
+    "email": "ethan.brown@example.com",
+    "full_name": "Ethan Brown",
+    "role": "Children"
+  },
+  {
+    "id": 15,
+    "username": "olivia_davis",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
+    "email": "olivia.davis@example.com",
+    "full_name": "Olivia Davis",
+    "role": "Children"
+  },
+  {
+    "id": 16,
+    "username": "noah_wilson",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
+    "email": "noah.wilson@example.com",
+    "full_name": "Noah Wilson",
+    "role": "Children"
+  },
+  {
+    "id": 17,
+    "username": "liam_martinez",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
+    "email": "liam.martinez@example.com",
+    "full_name": "Liam Martinez",
+    "role": "Children"
+  },
+  {
+    "id": 18,
+    "username": "charlotte_anderson",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
+    "email": "charlotte.anderson@example.com",
+    "full_name": "Charlotte Anderson",
+    "role": "Children"
+  },
+  {
+    "id": 19,
+    "username": "james_thompson",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
+    "email": "james.thompson@example.com",
+    "full_name": "James Thompson",
+    "role": "Children"
+  },
+  {
+    "id": 20,
+    "username": "isabella_white",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
+    "email": "isabella.white@example.com",
+    "full_name": "Isabella White",
+    "role": "Children"
   }
 ]

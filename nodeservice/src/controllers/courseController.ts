@@ -16,6 +16,7 @@ export const getCourses = async (
       grade,
       title,
       status,
+      userId,
     } = req.query;
 
     // Chuyển đổi page và pageSize sang số nguyên
@@ -29,6 +30,7 @@ export const getCourses = async (
     if (title) filters.title = { contains: title as string };
     if (grade && grade !== "all") filters.grade = parseInt(grade as string, 10);
     if (status) filters.status = status as string;
+    if (userId) filters.tutor_id = parseInt(userId as string, 10);
 
     // Tính toán skip và lấy dữ liệu
     const skip = (pageNum - 1) * pageSizeNum;

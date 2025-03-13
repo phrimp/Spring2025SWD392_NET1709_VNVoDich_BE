@@ -151,6 +151,7 @@ export const updateAvailability = async (req: Request, res: Response) => {
 export const getCourseAvailability = async (req: Request, res: Response) => {
   try {
     const { courseId } = req.params;
+    const { type } = req.query;
 
     const course = await prisma.course.findUnique({
       where: {
@@ -208,6 +209,7 @@ export const getCourseAvailability = async (req: Request, res: Response) => {
           sessions,
           dateStr,
           timeGap: course.tutor.availability?.timeGap,
+          type: type as "Day" | "Week",
         });
 
         availableDates.push({
@@ -233,6 +235,7 @@ function generateAvailableTimeSlots({
   dateStr,
   timeGap = 10,
   duration = 50, // Default slot duration in minutes
+  type = "Week",
 }: {
   startTime: Date;
   endTime: Date;
@@ -240,6 +243,7 @@ function generateAvailableTimeSlots({
   dateStr: string;
   timeGap?: number;
   duration?: number;
+  type?: "Day" | "Week";
 }) {
   const slots = [];
   let currentTime = parseISO(
@@ -250,12 +254,14 @@ function generateAvailableTimeSlots({
   );
 
   // If the date is today, start from the next available slot after the current time
-  const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
+  if (type === "Day") {
+    const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
 
-  if (format(now, "yyyy-MM-dd") === dateStr) {
-    currentTime = isBefore(currentTime, now)
-      ? addMinutes(now, timeGap)
-      : currentTime;
+    if (format(now, "yyyy-MM-dd") === dateStr) {
+      currentTime = isBefore(currentTime, now)
+        ? addMinutes(now, timeGap)
+        : currentTime;
+    }
   }
 
   while (currentTime < slotEndTime) {
