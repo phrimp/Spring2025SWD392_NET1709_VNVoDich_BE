@@ -344,3 +344,8 @@ model SubscriptionEvent {
   @@index([subscription_id])
 }
 
+enum SessionStatus {
+  NotYet
+  Attended
+  Absent
+}
