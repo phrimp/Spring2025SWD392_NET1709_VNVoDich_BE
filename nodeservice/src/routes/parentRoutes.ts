@@ -1,16 +1,16 @@
 import { Router } from "express";
 import {
-  getParents,
-  getParentById,
-  updateParentProfile,
+  handleGetParentById,
+  handleGetParents,
+  handleUpdateParentProfile,
 } from "../controllers/parentController";
 import multer from "multer";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-router.get("/", getParents);
-router.get("/:id", getParentById);
-router.put("/:id", upload.single("image"), updateParentProfile);
+router.get("/", handleGetParents);
+router.get("/:id", handleGetParentById);
+router.put("/:id", upload.single("image"), handleUpdateParentProfile);
 
 export default router;
