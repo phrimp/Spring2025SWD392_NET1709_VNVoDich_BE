@@ -20,6 +20,7 @@ type Gateway struct {
 	admin        *handlers.AdminServiceHandler
 	payment      *handlers.PaymentHandler
 	subscription *handlers.SubscriptionHandler
+	refund       *handlers.RefundHandler
 }
 
 func NewGateway(config *config.Config) *Gateway {
@@ -49,6 +50,7 @@ func NewGateway(config *config.Config) *Gateway {
 		admin:        handlers.NewAdminService(config),
 		payment:      handlers.NewPaymentHandler(config.PaymentServiceURL),
 		subscription: handlers.NewSubscriptionHandler(config.SubscriptionURL),
+		refund:       handlers.NewRefundHandler(config.AdminServiceURL),
 	}
 
 	gateway.setupRoutes()
@@ -95,6 +97,10 @@ func (g *Gateway) setupRoutes() {
 	api.Put("/subscription/:id/cancel", g.subscription.HandleCancelSubscription())
 	api.Put("/subscription/:id/change-plan", g.subscription.HandleChangePlan())
 
+	api.Post("/refunds", g.refund.HandleCreateRefundRequest())
+	api.Get("/refunds/:id", g.refund.HandleGetRefundRequest())
+	api.Get("/p-refunds", g.refund.HandleGetAllRefundRequests())
+
 	// Tutor routes
 	tutor_api := api.Group("/tutor").Use(middleware.RequireRole("Tutor"))
 	tutor_api.Get("/meet", g.google.HandleCreateMeetLink())
@@ -115,6 +121,12 @@ func (g *Gateway) setupRoutes() {
 	admin_api.Delete("/subscription/plans/:id", g.subscription.HandleAdminDeletePlan())
 	admin_api.Post("/jwt/block", g.admin.HandleAdminBlockJWT())
 	admin_api.Post("/jwt/unblock", g.admin.HandleAdminUnBlockJWT())
+
+	// Admin refund routes
+	admin_api.Get("/refunds", g.refund.HandleGetAllRefundRequests())
+	admin_api.Get("/refunds/statistics", g.refund.HandleGetRefundStatistics())
+	admin_api.Put("/refunds/:id/process", g.refund.HandleProcessRefundRequest())
+
 	//// Specific role-based routes
 	//api.Get("/sensitive-data", middleware.RequireRole("admin", "data_analyst"), g.auth.HandleSensitiveData())
 }

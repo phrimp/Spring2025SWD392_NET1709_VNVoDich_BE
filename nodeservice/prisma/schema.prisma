@@ -344,6 +344,49 @@ model SubscriptionEvent {
   @@index([subscription_id])
 }
 
+// Enum for refund request status
+enum RefundStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Refund request model
+model RefundRequests {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deleteAt  DateTime? @map("deleted_at")
+
+  // User information
+  userId   Int    @map("user_id")
+  username String
+  email    String
+
+  // Refund details
+  orderId    String  @map("order_id")
+  amount     Decimal @db.Decimal(10, 2)
+  cardNumber String  @map("card_number")
+  reason     String? @db.Text
+
+  // Status and processing information
+  status           RefundStatus @default(PENDING)
+  processedBy      Int?         @map("processed_by")
+  processedAt      DateTime?    @map("processed_at")
+  adminNote        String?      @map("admin_note") @db.Text
+  notificationSent Boolean      @default(false) @map("notification_sent")
+
+  // Relations (uncomment and adjust these as needed for your schema)
+  // user            User          @relation(fields: [userId], references: [id])
+  // admin           User?         @relation("ProcessedRefunds", fields: [processedBy], references: [id])
+  // order           Order         @relation(fields: [orderId], references: [id])
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
+  @@index([createdAt])
+}
+
 enum SessionStatus {
   NotYet
   Attended

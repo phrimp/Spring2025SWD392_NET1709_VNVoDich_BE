@@ -6,6 +6,7 @@ import (
 	"adminservice/internal/handlers"
 	"adminservice/internal/middleware"
 	"adminservice/internal/repository"
+	"adminservice/internal/services"
 	"adminservice/utils"
 	"fmt"
 	"log"
@@ -42,8 +43,14 @@ func main() {
 			})
 		},
 	})
+	// Initialize repositories
+	refundRepo := repository.NewRefundRepository(db)
 
+	refundService := services.NewRefundService(refundRepo, cfg.ExternalServices.GoogleService, cfg.APIKey)
+
+	// Initialize handlers
 	adminHandler := handlers.NewAdminHandler(cfg)
+	refundHandler := handlers.NewRefundHandler(refundService)
 
 	app.Use(cors.New())
 
@@ -59,6 +66,16 @@ func main() {
 	api := app.Group("/api", middleware.Middleware(cfg.APIKey))
 	api.Get("/", handlers.TestHandler(db))
 	api.Get("/users", adminHandler.GetAllUsersHandler())
+
+	refunds := api.Group("/refunds")
+	refunds.Post("/", refundHandler.HandleCreateRefundRequest())
+	refunds.Get("/:id", refundHandler.HandleGetRefundRequest())
+
+	// Admin-facing refund routes
+	adminRefunds := api.Group("/admin/refunds")
+	adminRefunds.Get("/", refundHandler.HandleGetAllRefundRequests())
+	adminRefunds.Get("/statistics", refundHandler.HandleGetRefundStatistics())
+	adminRefunds.Put("/:id/process", refundHandler.HandleProcessRefundRequest())
 
 	port := os.Getenv("PORT")
 	if port == "" {
