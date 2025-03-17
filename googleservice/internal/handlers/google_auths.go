@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"google-service/internal/config"
 	"google-service/internal/middleware"
@@ -74,15 +75,29 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 		fmt.Println("GOOGLE SERVICE: Save User to Database failed:", err)
 	}
 
+	id, err := GetUserID(userInfo.Email)
+	if err != nil {
+		fmt.Println("GOOGLE SERVICE: Get user id failed:", err)
+	}
+
 	claims := middleware.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Issuer:    "google-service",
 		},
+		UserID:   uint(id),
 		Username: userInfo.Email,
 		Email:    userInfo.Email,
 		Role:     "Parent",
+	}
+
+	type User struct {
+		Userid   uint   `json:"user_id"`
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		Role     string `json:"role"`
+		Status   string `json:"status"`
 	}
 
 	jwt_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -96,7 +111,13 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"token": jwt_tokenString,
-		"user":  userInfo,
+		"user": User{
+			Userid:   uint(id),
+			Username: userInfo.Email,
+			Email:    userInfo.Email,
+			Role:     "Parent",
+			Status:   "Active",
+		},
 	})
 }
 
@@ -117,4 +138,27 @@ func AddUser(name, email, picture, access_token string) error {
 		return nil
 	}
 	return fmt.Errorf("add user failed: %s", string(resp.Body()))
+}
+
+func GetUserID(email string) (int, error) {
+	req := &fasthttp.Request{}
+	resp := &fasthttp.Response{}
+
+	query := fmt.Sprintf("?email=%s", email)
+	utils.BuildRequest(req, "GET", nil, config.Google_config.API_KEY, config.Google_config.USER_SERVICE_URL+"/user/get/id"+query)
+
+	if err := fasthttp.Do(req, resp); err != nil {
+		return 0, fmt.Errorf("user service unavailable: %v", err)
+	}
+
+	if resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
+		var originalData map[string]interface{}
+		if err := json.Unmarshal(resp.Body(), &originalData); err != nil {
+			fmt.Printf("Error parsing JSON response: %v\n", err)
+			return 0, fmt.Errorf("error formatting response data: %s", err)
+		}
+
+		return originalData["user_id"].(int), nil
+	}
+	return 0, fmt.Errorf("get user id failed: %s", string(resp.Body()))
 }
