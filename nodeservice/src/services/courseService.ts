@@ -3,7 +3,11 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // Lấy danh sách khóa học với bộ lọc và phân trang
-export const getCoursesService = async (filters: any, skip: number, pageSizeNum: number) => {
+export const getCoursesService = async (
+  filters: any,
+  skip: number,
+  pageSizeNum: number
+) => {
   const courses = await prisma.course.findMany({
     where: filters,
     skip,
@@ -69,6 +73,18 @@ export const createCourseService = async (tutor_id: number) => {
 
 // Cập nhật khóa học
 export const updateCourseService = async (id: number, updateData: any) => {
+  if (updateData.price) {
+    const price = parseInt(updateData.price);
+
+    updateData.price = price;
+  }
+
+  if (updateData.grade) {
+    const grade = parseInt(updateData.grade);
+
+    updateData.grade = grade;
+  }
+
   return prisma.course.update({
     where: { id },
     data: updateData,
@@ -81,7 +97,10 @@ export const deleteCourseService = async (id: number) => {
 };
 
 // Thêm bài học vào khóa học
-export const addLessonToCourseService = async (courseId: number, lessonData: any) => {
+export const addLessonToCourseService = async (
+  courseId: number,
+  lessonData: any
+) => {
   return prisma.course.update({
     where: { id: courseId },
     data: {
@@ -92,7 +111,11 @@ export const addLessonToCourseService = async (courseId: number, lessonData: any
 };
 
 // Cập nhật bài học
-export const updateLessonService = async (courseId: number, lessonId: number, lessonData: any) => {
+export const updateLessonService = async (
+  courseId: number,
+  lessonId: number,
+  lessonData: any
+) => {
   return prisma.course.update({
     where: { id: courseId },
     data: {
@@ -104,7 +127,10 @@ export const updateLessonService = async (courseId: number, lessonId: number, le
 };
 
 // Xóa bài học khỏi khóa học
-export const deleteLessonService = async (courseId: number, lessonId: number) => {
+export const deleteLessonService = async (
+  courseId: number,
+  lessonId: number
+) => {
   return prisma.course.update({
     where: { id: courseId },
     data: {

@@ -68,6 +68,7 @@ func main() {
 	user.Delete("/admin/delete", handlers.AdminDeleteUserHandler(repository.DB))
 	user.Post("/admin/role", handlers.AdminAssignRoleHandler(repository.DB))
 	user.Get("/check-status", handlers.CheckUserStatusHandler(repository.DB))
+	user.Get("/get/id", handlers.GetUserIDWithEmail(repository.DB))
 
 	port := os.Getenv("PORT")
 	if port == "" {

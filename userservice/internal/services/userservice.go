@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var LoginAttempt map[string]int
+var LoginAttempt = make(map[string]int)
 
 // Login
 func FindUserWithUsernamePassword(username, password string, db *gorm.DB) (*models.User, error) {
@@ -910,4 +910,15 @@ func IsUserActiveByID(userID uint, db *gorm.DB) (bool, error) {
 	}
 
 	return user.Status == models.StatusActive, nil
+}
+
+func FindUserIDByEmail(email string, db *gorm.DB) (uint, error) {
+	var user models.User
+	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, fmt.Errorf("user not found")
+		}
+		return 0, fmt.Errorf("database error: %v", err)
+	}
+	return user.ID, nil
 }

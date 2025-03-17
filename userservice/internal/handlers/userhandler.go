@@ -424,3 +424,18 @@ func CheckUserStatusHandler(db *gorm.DB) fiber.Handler {
 		})
 	}
 }
+
+func GetUserIDWithEmail(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		email := c.Query("email")
+		id, err := services.FindUserIDByEmail(email, db)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+		return c.JSON(fiber.Map{
+			"user_id": id,
+		})
+	}
+}

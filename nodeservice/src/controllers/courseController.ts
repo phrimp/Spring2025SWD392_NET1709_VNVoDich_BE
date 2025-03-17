@@ -90,14 +90,13 @@ export const createCourse = async (
     res.status(500).json({ message: COURSE_MESSAGES.ERROR_CREATING, error });
   }
 };
-
 export const updateCourse = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const courseId = Number(req.params.id);
-    const updateData = req.body;
+    const updateData = { ...req.body };
 
     const updatedCourse = await updateCourseService(courseId, updateData);
     res.json({ message: COURSE_MESSAGES.COURSE_UPDATED, data: updatedCourse });

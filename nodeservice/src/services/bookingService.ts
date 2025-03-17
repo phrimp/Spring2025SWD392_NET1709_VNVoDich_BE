@@ -61,7 +61,7 @@ export const createTrialBookingService = async (
     throw new Error(BOOKINGMESSAGE.COURSE_NOT_FOUND);
   }
 
-  const meetLink = await generateMeetLink();
+  const meetLink = await generateMeetLink(children_id);
 
   return await prisma.$transaction(async (tx) => {
     const newBooking = await tx.courseSubscription.create({
@@ -175,8 +175,25 @@ export const getParentBookingsService = async (userId: number) => {
   });
 };
 
-const generateMeetLink = async () => {
-  const token = process.env.GOOGLE_ACCESS_TOKEN;
+const generateMeetLink = async (children_id: number) => {
+  const children = await prisma.children.findUnique({
+    where: { id: children_id },
+    select: {
+      parent: {
+        select: {
+          profile: {
+            select: {
+              googleToken: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const token = children?.parent.profile.googleToken
+    ? children?.parent.profile.googleToken
+    : process.env.GOOGLE_ACCESS_TOKEN;
 
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,

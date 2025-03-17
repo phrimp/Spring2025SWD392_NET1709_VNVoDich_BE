@@ -100,6 +100,7 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GOOGLE_REDIRECT_URL=${GOOGLE_REDIRECT_URL}
+      - GOOGLE_ACCESS_TOKEN=${GOOGLE_ACCESS_TOKEN}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
     depends_on:
       mysql:
@@ -120,7 +121,7 @@ services:
       - SERVER_WRITE_TIMEOUT=${SERVER_WRITE_TIMEOUT}
       - GOOGLE_SERVICE_URL=${GOOGLE_SERVICE_URL}
       - API_KEY=${API_KEY}
-      - DB_HOST=mysql
+      - DB_HOST=${DB_HOST}
       - DB_PORT=3306
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -151,7 +152,7 @@ services:
     environment:
       - PORT=${USER_SERVICE_PORT}
       - API_KEY=${API_KEY}
-      - DB_HOST=mysql
+      - DB_HOST=${DB_HOST}
       - DB_PORT=3306
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -179,7 +180,7 @@ services:
       - SERVER_WRITE_TIMEOUT=${SERVER_WRITE_TIMEOUT}
       - API_KEY=${API_KEY}
       - JWT_SECRET=${JWT_SECRET}
-      - DB_HOST=mysql
+      - DB_HOST=${DB_HOST}
       - DB_PORT=3306
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}

@@ -54,7 +54,7 @@ func loadExternalServiceConfig() ExternalServices {
 	}
 	google_service := os.Getenv("GOOGLE_SERVICE_URL")
 	if google_service == "" {
-		google_service = "http://google-service:8084"
+		google_service = "google-service:8084"
 	}
 
 	return ExternalServices{
