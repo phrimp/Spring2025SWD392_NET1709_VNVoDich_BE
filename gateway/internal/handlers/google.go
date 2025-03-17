@@ -115,7 +115,7 @@ func (h *GoogleHandler) HandleCallback() fiber.Handler {
 			Expires:  time.Now().Add(24 * time.Hour), // 24 hour expiration
 			HTTPOnly: true,
 			Secure:   true,
-			SameSite: "None",
+			SameSite: "Strict",
 		})
 
 		userDataJSON, _ := json.Marshal(userData)
@@ -126,7 +126,7 @@ func (h *GoogleHandler) HandleCallback() fiber.Handler {
 			Expires:  time.Now().Add(24 * time.Hour),
 			HTTPOnly: false,
 			Secure:   true,
-			SameSite: "None",
+			SameSite: "Strict",
 		})
 
 		return c.Redirect(os.Getenv("REDIRECT_URL"), fiber.StatusTemporaryRedirect)
