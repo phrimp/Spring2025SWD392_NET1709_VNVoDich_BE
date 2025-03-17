@@ -43,7 +43,6 @@ func (h *GoogleHandler) HandleLogin() fiber.Handler {
 			Name:     "oauth_state",
 			Value:    state,
 			Expires:  time.Now().Add(time.Minute * 5),
-			HTTPOnly: true,
 			Secure:   true,
 			SameSite: "None",
 			Path:     "/",
@@ -113,7 +112,6 @@ func (h *GoogleHandler) HandleCallback() fiber.Handler {
 			Value:    token,
 			Path:     "/",
 			Expires:  time.Now().Add(24 * time.Hour), // 24 hour expiration
-			HTTPOnly: true,
 			Secure:   true,
 			SameSite: "Strict",
 		})
@@ -124,7 +122,6 @@ func (h *GoogleHandler) HandleCallback() fiber.Handler {
 			Value:    string(userDataJSON),
 			Path:     "/",
 			Expires:  time.Now().Add(24 * time.Hour),
-			HTTPOnly: false,
 			Secure:   true,
 			SameSite: "Strict",
 		})
