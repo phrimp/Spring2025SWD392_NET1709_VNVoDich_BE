@@ -4,9 +4,9 @@ import (
 	"log"
 	"os"
 	"subscription/internal/config"
-	"subscription/internal/handlers"
 	"subscription/internal/middleware"
 	"subscription/internal/repository"
+	"subscription/internal/routes"
 	"subscription/internal/services"
 	"subscription/utils"
 
@@ -49,44 +49,15 @@ func main() {
 		},
 	})
 
-	// Setup handlers
-	planHandler := handlers.NewPlanHandler(planService)
-	subscriptionHandler := handlers.NewSubscriptionHandler(subscriptionService)
-
 	// Middleware
 	app.Use(cors.New())
 	app.Use(logger.New())
 
-	// Public routes
-
-	// Protected routes with API key
+	// Setup API router group with middleware
 	api := app.Group("/api", middleware.Middleware(cfg.APIKey))
 
-	// Plans routes
-	plans := api.Group("/plans")
-	plans.Get("/", planHandler.HandleGetAllPlans)
-	plans.Get("/:id", planHandler.HandleGetPlan)
-
-	// Admin routes for plan management
-	planAdmin := api.Group("/admin/plans")
-	planAdmin.Post("/", planHandler.HandleCreatePlan)
-	planAdmin.Put("/:id", planHandler.HandleUpdatePlan)
-	planAdmin.Delete("/:id", planHandler.HandleDeletePlan)
-
-	subscriptions := api.Group("/subscriptions")
-	subscriptions.Post("/", subscriptionHandler.HandleCreateSubscription)
-	subscriptions.Get("/tutor/:tutorId", subscriptionHandler.HandleGetTutorSubscription)
-	subscriptions.Put("/:id/cancel", subscriptionHandler.HandleCancelSubscription)
-	subscriptions.Put("/:id/change-plan", subscriptionHandler.HandleChangePlan)
-	subscriptions.Post("/confirm", subscriptionHandler.HandleConfirmSubscription)
-
-	subscriptionAdmin := api.Group("/admin/subscriptions")
-	subscriptionAdmin.Get("/", subscriptionHandler.HandleGetAllSubscriptions)
-	subscriptionAdmin.Put("/:id/status", subscriptionHandler.HandleUpdateSubscriptionStatus)
-
-	// Payment webhooks
-	webhooks := api.Group("/webhooks")
-	webhooks.Post("/payment", subscriptionHandler.HandlePaymentWebhook)
+	// Setup all routes
+	routes.SetupRoutes(api, planService, subscriptionService)
 
 	// Start the server
 	port := os.Getenv("PORT")
