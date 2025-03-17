@@ -911,3 +911,14 @@ func IsUserActiveByID(userID uint, db *gorm.DB) (bool, error) {
 
 	return user.Status == models.StatusActive, nil
 }
+
+func FindUserIDByEmail(email string, db *gorm.DB) (uint, error) {
+	var user models.User
+	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, fmt.Errorf("user not found")
+		}
+		return 0, fmt.Errorf("database error: %v", err)
+	}
+	return user.ID, nil
+}
