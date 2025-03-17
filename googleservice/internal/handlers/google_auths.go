@@ -98,6 +98,7 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 		Email    string `json:"email"`
 		Role     string `json:"role"`
 		Status   string `json:"status"`
+		Picture  string `json:"picture"`
 	}
 
 	jwt_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -117,6 +118,7 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 			Email:    userInfo.Email,
 			Role:     "Parent",
 			Status:   "Active",
+			Picture:  userInfo.Picture,
 		},
 	})
 }
@@ -157,8 +159,9 @@ func GetUserID(email string) (int, error) {
 			fmt.Printf("Error parsing JSON response: %v\n", err)
 			return 0, fmt.Errorf("error formatting response data: %s", err)
 		}
+		id := int(originalData["user_id"].(float64))
 
-		return originalData["user_id"].(int), nil
+		return id, nil
 	}
 	return 0, fmt.Errorf("get user id failed: %s", string(resp.Body()))
 }
