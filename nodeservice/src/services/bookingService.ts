@@ -9,7 +9,9 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is required but was not found in env variables");
+  throw new Error(
+    "STRIPE_SECRET_KEY is required but was not found in env variables"
+  );
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -29,8 +31,18 @@ export const createStripePaymentIntentService = async (amount: number) => {
   });
 };
 
-export const createTrialBookingService = async (courseId: number, children_id: number, dates: any[]) => {
-  if (!courseId || !children_id || !dates || !Array.isArray(dates) || dates.length === 0) {
+export const createTrialBookingService = async (
+  courseId: number,
+  children_id: number,
+  dates: any[]
+) => {
+  if (
+    !courseId ||
+    !children_id ||
+    !dates ||
+    !Array.isArray(dates) ||
+    dates.length === 0
+  ) {
     throw new Error(BOOKINGMESSAGE.INVALID_REQUEST_BODY);
   }
 
@@ -92,8 +104,16 @@ export const createTrialBookingService = async (courseId: number, children_id: n
       return { schedule, adjustedStartTime, adjustedEndTime };
     });
 
-    for (let week = 0; week < weeksNeeded && lessonCount < totalLessons; week++) {
-      for (const { schedule, adjustedStartTime, adjustedEndTime } of adjustedSchedules) {
+    for (
+      let week = 0;
+      week < weeksNeeded && lessonCount < totalLessons;
+      week++
+    ) {
+      for (const {
+        schedule,
+        adjustedStartTime,
+        adjustedEndTime,
+      } of adjustedSchedules) {
         if (lessonCount >= totalLessons) break;
 
         const currentLesson = course.lessons[lessonCount];
