@@ -9,7 +9,9 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is required but was not found in env variables");
+  throw new Error(
+    "STRIPE_SECRET_KEY is required but was not found in env variables"
+  );
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -29,8 +31,18 @@ export const createStripePaymentIntentService = async (amount: number) => {
   });
 };
 
-export const createTrialBookingService = async (courseId: number, children_id: number, dates: any[]) => {
-  if (!courseId || !children_id || !dates || !Array.isArray(dates) || dates.length === 0) {
+export const createTrialBookingService = async (
+  courseId: number,
+  children_id: number,
+  dates: any[]
+) => {
+  if (
+    !courseId ||
+    !children_id ||
+    !dates ||
+    !Array.isArray(dates) ||
+    dates.length === 0
+  ) {
     throw new Error(BOOKINGMESSAGE.INVALID_REQUEST_BODY);
   }
 
@@ -49,7 +61,7 @@ export const createTrialBookingService = async (courseId: number, children_id: n
     throw new Error(BOOKINGMESSAGE.COURSE_NOT_FOUND);
   }
 
-  const meetLink = await generateMeetLink();
+  const meetLink = await generateMeetLink(children_id);
 
   return await prisma.$transaction(async (tx) => {
     const newBooking = await tx.courseSubscription.create({
@@ -92,8 +104,16 @@ export const createTrialBookingService = async (courseId: number, children_id: n
       return { schedule, adjustedStartTime, adjustedEndTime };
     });
 
-    for (let week = 0; week < weeksNeeded && lessonCount < totalLessons; week++) {
-      for (const { schedule, adjustedStartTime, adjustedEndTime } of adjustedSchedules) {
+    for (
+      let week = 0;
+      week < weeksNeeded && lessonCount < totalLessons;
+      week++
+    ) {
+      for (const {
+        schedule,
+        adjustedStartTime,
+        adjustedEndTime,
+      } of adjustedSchedules) {
         if (lessonCount >= totalLessons) break;
 
         const currentLesson = course.lessons[lessonCount];
@@ -155,8 +175,25 @@ export const getParentBookingsService = async (userId: number) => {
   });
 };
 
-const generateMeetLink = async () => {
-  const token = process.env.GOOGLE_ACCESS_TOKEN;
+const generateMeetLink = async (children_id: number) => {
+  const children = await prisma.children.findUnique({
+    where: { id: children_id },
+    select: {
+      parent: {
+        select: {
+          profile: {
+            select: {
+              googleToken: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const token = children?.parent.profile.googleToken
+    ? children?.parent.profile.googleToken
+    : process.env.GOOGLE_ACCESS_TOKEN;
 
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
