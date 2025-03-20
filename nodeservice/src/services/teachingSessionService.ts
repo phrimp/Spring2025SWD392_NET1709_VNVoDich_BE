@@ -1,4 +1,5 @@
 import { PrismaClient, SessionStatus, SessionQuality } from "@prisma/client";
+import { TEACHING_SESSION_MESSAGES } from "../message/teachingSessionMessages";
 
 const prisma = new PrismaClient();
 
@@ -6,10 +7,7 @@ export const findTeachingSessions = async (userId?: number) => {
   const whereClause = userId
     ? {
         subscription: {
-          OR: [
-            { children_id: userId },
-            { course: { tutor_id: userId } },
-          ],
+          OR: [{ children_id: userId }, { course: { tutor_id: userId } }],
         },
       }
     : undefined;
@@ -56,14 +54,29 @@ export const updateTeachingSessionData = async (
     where: { id },
   });
 
-  if (!teachingSession) return null;
-  if (teachingSession.status !== "NotYet") return "ALREADY_STARTED";
+  if (!teachingSession) throw new Error(TEACHING_SESSION_MESSAGES.NOT_FOUND);
+  if (teachingSession.status !== "NotYet") {
+    throw new Error(TEACHING_SESSION_MESSAGES.ALREADY_STARTED);
+  }
 
-  return await prisma.teachingSession.update({
+  const updatedTeachingSession = await prisma.teachingSession.update({
     where: { id },
     data: {
       ...data,
       rating: data.rating ? Number(data.rating) : undefined,
     },
   });
+
+  if (updatedTeachingSession.status !== "NotYet") {
+    await prisma.courseSubscription.update({
+      where: { id: updatedTeachingSession.subscription_id },
+      data: {
+        sessions_remaining: {
+          decrement: 1,
+        },
+      },
+    });
+  }
+
+  return updatedTeachingSession;
 };

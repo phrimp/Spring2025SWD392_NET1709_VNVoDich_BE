@@ -5,7 +5,10 @@ import {
   updateTutorProfileService,
 } from "../services/tutorService";
 import { tutorMessages } from "../message/tutorMessage";
-import { connectTutorAccountToStripeService } from "../services/bookingService";
+import {
+  checkConnectionStatusService,
+  connectTutorAccountToStripeService,
+} from "../services/bookingService";
 
 // Lấy danh sách tutors
 export const getTutors = async (req: Request, res: Response): Promise<void> => {
@@ -123,5 +126,26 @@ export const connectTutorAccountToStripe = async (
   } catch (error) {
     console.error(tutorMessages.ERROR.CONNECTED_TUTOR_TO_STRIPE, error);
     res.status(500).json({ message: tutorMessages.ERROR.UPDATE_TUTOR, error });
+  }
+};
+
+export const checkConnection = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const result = await checkConnectionStatusService(Number(id));
+
+    res.json({
+      message: tutorMessages.SUCCESS.CHECKED_CONNECTION_STATUS,
+      data: {
+        isConnected: result.isConnected,
+        description: result.description,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: tutorMessages.ERROR.CHECK_CONNECTION_STATUS,
+      error: (error as Error).message,
+    });
   }
 };

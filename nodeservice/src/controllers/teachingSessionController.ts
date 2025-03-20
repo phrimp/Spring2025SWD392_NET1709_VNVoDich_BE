@@ -54,13 +54,6 @@ export const updateTeachingSession = async (req: Request, res: Response) => {
       return;
     }
 
-    if (updatedSession === "ALREADY_STARTED") {
-      res.status(400).json({
-        message: TEACHING_SESSION_MESSAGES.ALREADY_STARTED,
-      });
-      return;
-    }
-
     res.json({
       message: TEACHING_SESSION_MESSAGES.UPDATE_SUCCESS,
       data: updatedSession,

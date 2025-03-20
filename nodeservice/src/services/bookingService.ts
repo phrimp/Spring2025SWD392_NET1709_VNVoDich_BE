@@ -86,6 +86,7 @@ export const createTrialBookingService = async (
     select: {
       id: true,
       total_lessons: true,
+      price: true,
       lessons: {
         select: { id: true, title: true },
       },
@@ -104,8 +105,9 @@ export const createTrialBookingService = async (
         course_id: Number(courseId),
         children_id: Number(children_id),
         status: "Active",
+        price: course.price,
         sessions_remaining: course.total_lessons,
-        transaction: { transactionId },
+        transactionId,
         courseSubscriptionSchedules: {
           createMany: {
             data: dates.map((date) => ({
@@ -186,7 +188,7 @@ export const createTrialBookingService = async (
 };
 
 export const getParentBookingsService = async (userId: number) => {
-  if (userId) {
+  if (!userId) {
     throw new Error(BOOKINGMESSAGE.USER_ID_REQUIRED);
   }
 
@@ -290,4 +292,34 @@ export const connectTutorAccountToStripeService = async (userId: number) => {
   });
 
   return { destination, accountLink };
+};
+
+export const checkConnectionStatusService = async (userId: number) => {
+  console.log(userId);
+
+  if (!userId) {
+    throw new Error(BOOKINGMESSAGE.USER_ID_REQUIRED);
+  }
+
+  const tutor = await prisma.tutor.findUnique({
+    where: { id: userId },
+  });
+
+  if (!tutor) {
+    throw new Error(BOOKINGMESSAGE.USER_NOT_FOUND);
+  }
+
+  if (!tutor.stripe_account_id) {
+    return { isConnected: false, description: BOOKINGMESSAGE.NOT_CONNECTED };
+  }
+
+  const account = await stripe.accounts.retrieve(tutor.stripe_account_id);
+  const isFullyConnected = account.charges_enabled && account.payouts_enabled;
+
+  return {
+    isConnected: isFullyConnected,
+    description: isFullyConnected
+      ? BOOKINGMESSAGE.CONNECTED
+      : BOOKINGMESSAGE.NOT_COMPLETE_ONBOARDING,
+  };
 };

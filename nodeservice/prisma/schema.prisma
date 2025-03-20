@@ -178,10 +178,12 @@ model DayAvailability {
 }
 
 model CourseSubscription {
-  id                 Int    @id @default(autoincrement())
+  id                 Int     @id @default(autoincrement())
   status             String
   sessions_remaining Int?
-  transaction        Json?
+  price              Int     @default(0)
+  transactionId      String?
+  refundId           String?
 
   course_id Int
   course    Course @relation(fields: [course_id], references: [id])

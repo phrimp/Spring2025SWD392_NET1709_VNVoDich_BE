@@ -9,4 +9,7 @@ export const BOOKINGMESSAGE = {
   USER_NOT_FOUND: "User not found",
   PAYMENT_SUCCESS: "Payment intent created successfully",
   BOOKING_SUCCESS: "Booking created successfully",
+  NOT_CONNECTED: "User is not connected to Stripe",
+  CONNECTED: "User is connected to Stripe",
+  NOT_COMPLETE_ONBOARDING: "User has not completed onboarding",
 };

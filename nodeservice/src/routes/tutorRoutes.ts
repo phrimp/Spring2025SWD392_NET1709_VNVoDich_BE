@@ -4,6 +4,7 @@ import {
   getTutor,
   updateTutorProfile,
   connectTutorAccountToStripe,
+  checkConnection,
 } from "../controllers/tutorController";
 import multer from "multer";
 import tutorAuth from "../middleware/tutorAuth";
@@ -19,6 +20,7 @@ router.post(
   tutorAuth,
   connectTutorAccountToStripe
 );
+router.get("/:id/check-connection", checkConnection);
 // router.post("/", createTutor);
 // router.delete("/:id", deleteTutor);
 

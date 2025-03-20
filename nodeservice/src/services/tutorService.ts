@@ -2,7 +2,11 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const getTutorsService = async (filters: any, skip: number, pageSizeNum: number) => {
+export const getTutorsService = async (
+  filters: any,
+  skip: number,
+  pageSizeNum: number
+) => {
   const tutors = await prisma.tutor.findMany({
     where: filters,
     skip,
@@ -26,7 +30,9 @@ export const getTutorsService = async (filters: any, skip: number, pageSizeNum: 
 
 export const getTutorService = async (id: number) => {
   return await prisma.tutor.findUnique({
-    where: { id },
+    where: {
+      id,
+    },
     include: {
       profile: {
         select: {
@@ -54,7 +60,10 @@ export const getTutorService = async (id: number) => {
   });
 };
 
-export const updateTutorProfileService = async (id: number, updateData: any) => {
+export const updateTutorProfileService = async (
+  id: number,
+  updateData: any
+) => {
   return await prisma.tutor.update({
     where: { id },
     data: {
