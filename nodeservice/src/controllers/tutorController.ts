@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
-import { getTutorsService, getTutorService, updateTutorProfileService } from "../services/tutorService";
+import {
+  getTutorsService,
+  getTutorService,
+  updateTutorProfileService,
+} from "../services/tutorService";
 import { tutorMessages } from "../message/tutorMessage";
+import { connectTutorAccountToStripeService } from "../services/bookingService";
 
 // Lấy danh sách tutors
 export const getTutors = async (req: Request, res: Response): Promise<void> => {
@@ -20,15 +25,23 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
     const pageSizeNum = parseInt(pageSize as string, 10);
 
     const filters: any = {};
-    if (qualifications) filters.qualifications = { contains: qualifications as string };
-    if (teachingStyle) filters.teaching_style = { contains: teachingStyle as string };
-    if (isAvailable !== undefined) filters.is_available = isAvailable === "true";
+    if (qualifications)
+      filters.qualifications = { contains: qualifications as string };
+    if (teachingStyle)
+      filters.teaching_style = { contains: teachingStyle as string };
+    if (isAvailable !== undefined)
+      filters.is_available = isAvailable === "true";
     if (email) filters.user = { email: { contains: email as string } };
-    if (fullName) filters.user = { full_name: { contains: fullName as string } };
+    if (fullName)
+      filters.user = { full_name: { contains: fullName as string } };
     if (phone) filters.user = { phone: { contains: phone as string } };
 
     const skip = (pageNum - 1) * pageSizeNum;
-    const { tutors, totalTutors } = await getTutorsService(filters, skip, pageSizeNum);
+    const { tutors, totalTutors } = await getTutorsService(
+      filters,
+      skip,
+      pageSizeNum
+    );
 
     res.json({
       message: tutorMessages.SUCCESS.GET_TUTORS,
@@ -66,7 +79,10 @@ export const getTutor = async (req: Request, res: Response): Promise<void> => {
 };
 
 // Cập nhật thông tin tutor
-export const updateTutorProfile = async (req: Request, res: Response): Promise<void> => {
+export const updateTutorProfile = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { id } = req.params;
   const updateData = { ...req.body };
 
@@ -81,6 +97,31 @@ export const updateTutorProfile = async (req: Request, res: Response): Promise<v
     res.json({ message: tutorMessages.SUCCESS.UPDATE_TUTOR, data: tutor });
   } catch (error) {
     console.error(tutorMessages.ERROR.UPDATE_TUTOR, error);
+    res.status(500).json({ message: tutorMessages.ERROR.UPDATE_TUTOR, error });
+  }
+};
+
+export const connectTutorAccountToStripe = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      res.status(400).json({ message: tutorMessages.ERROR.USER_ID_REQUIRED });
+    }
+
+    const result = await connectTutorAccountToStripeService(Number(userId));
+
+    res.json({
+      message: tutorMessages.SUCCESS.CONNECTED_TUTOR_TO_STRIPE,
+      data: {
+        destination: result.destination,
+        onboardingUrl: result.accountLink.url,
+      },
+    });
+  } catch (error) {
+    console.error(tutorMessages.ERROR.CONNECTED_TUTOR_TO_STRIPE, error);
     res.status(500).json({ message: tutorMessages.ERROR.UPDATE_TUTOR, error });
   }
 };

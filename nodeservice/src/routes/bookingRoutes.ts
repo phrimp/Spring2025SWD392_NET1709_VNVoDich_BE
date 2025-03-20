@@ -9,7 +9,7 @@ import tutorAuth from "../middleware/tutorAuth";
 
 const router = express.Router();
 
-router.post("/stripe/payment-intent", createStripePaymentIntent);
+router.post("/stripe/payment-intent", tutorAuth, createStripePaymentIntent);
 router.post("/create-trial-booking", createTrialBooking);
 router.get("/parent", tutorAuth, getParentBookings);
 

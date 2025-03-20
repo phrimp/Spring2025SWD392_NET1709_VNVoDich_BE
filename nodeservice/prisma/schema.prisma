@@ -60,13 +60,14 @@ model User {
 }
 
 model Tutor {
-  id             Int     @id
-  bio            String?
-  qualifications String?
-  teaching_style String?
-  is_available   Boolean @default(false)
-  demo_video_url String?
-  image          String?
+  id                Int     @id
+  bio               String?
+  qualifications    String?
+  teaching_style    String?
+  is_available      Boolean @default(false)
+  demo_video_url    String?
+  image             String?
+  stripe_account_id String?
 
   profile User @relation(fields: [id], references: [id], onDelete: Cascade)
 
@@ -142,6 +143,7 @@ model Lesson {
   description         String?
   learning_objectives String?
   materials_needed    String?
+  homeWork            String?
 
   course_id Int
   Course    Course @relation(fields: [course_id], references: [id], onDelete: Cascade)
@@ -179,6 +181,7 @@ model CourseSubscription {
   id                 Int    @id @default(autoincrement())
   status             String
   sessions_remaining Int?
+  transaction        Json?
 
   course_id Int
   course    Course @relation(fields: [course_id], references: [id])

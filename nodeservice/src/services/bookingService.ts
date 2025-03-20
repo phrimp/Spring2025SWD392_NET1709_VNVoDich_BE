@@ -16,32 +16,67 @@ if (!process.env.STRIPE_SECRET_KEY) {
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-export const createStripePaymentIntentService = async (amount: number) => {
+export const createStripePaymentIntentService = async (
+  amount: number,
+  userId: number
+) => {
+  if (!userId) {
+    throw new Error(BOOKINGMESSAGE.USER_ID_REQUIRED);
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new Error(BOOKINGMESSAGE.USER_NOT_FOUND);
+  }
+
   if (!amount || amount <= 0) {
     amount = 50;
   }
 
+  let customer;
+  const doesCustomerExist = await stripe.customers.list({
+    email: user.email || `${user.username}@email.com`,
+  });
+
+  if (doesCustomerExist.data.length > 0) {
+    customer = doesCustomerExist.data[0];
+  } else {
+    const newCustomer = await stripe.customers.create({
+      name: user.username,
+      email: user.email || `${user.username}@email.com`,
+    });
+
+    customer = newCustomer;
+  }
+
   return await stripe.paymentIntents.create({
-    amount,
+    amount: amount * 100,
     currency: "usd",
     automatic_payment_methods: {
       enabled: true,
       allow_redirects: "never",
     },
+    customer: customer.id,
+    description: "Booking a tutor course",
   });
 };
 
 export const createTrialBookingService = async (
   courseId: number,
   children_id: number,
-  dates: any[]
+  dates: any[],
+  transactionId: string
 ) => {
   if (
     !courseId ||
     !children_id ||
     !dates ||
     !Array.isArray(dates) ||
-    dates.length === 0
+    dates.length === 0 ||
+    !transactionId
   ) {
     throw new Error(BOOKINGMESSAGE.INVALID_REQUEST_BODY);
   }
@@ -70,6 +105,7 @@ export const createTrialBookingService = async (
         children_id: Number(children_id),
         status: "Active",
         sessions_remaining: course.total_lessons,
+        transaction: { transactionId },
         courseSubscriptionSchedules: {
           createMany: {
             data: dates.map((date) => ({
@@ -150,7 +186,7 @@ export const createTrialBookingService = async (
 };
 
 export const getParentBookingsService = async (userId: number) => {
-  if (!userId) {
+  if (userId) {
     throw new Error(BOOKINGMESSAGE.USER_ID_REQUIRED);
   }
 
@@ -218,4 +254,40 @@ const generateMeetLink = async (children_id: number) => {
   });
 
   return meetResponse.data.hangoutLink;
+};
+
+export const connectTutorAccountToStripeService = async (userId: number) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user || !user.email) {
+    throw new Error(BOOKINGMESSAGE.USER_NOT_FOUND);
+  }
+
+  const account = await stripe.accounts.create({
+    type: "express",
+    country: "US",
+    email: user.email,
+    capabilities: {
+      card_payments: { requested: true },
+      transfers: { requested: true },
+    },
+  });
+
+  const destination = account.id;
+
+  await prisma.tutor.update({
+    where: { id: userId },
+    data: { stripe_account_id: destination },
+  });
+
+  const accountLink = await stripe.accountLinks.create({
+    account: destination,
+    return_url: `${process.env.DOMAIN}/tutor/profile`,
+    refresh_url: `${process.env.DOMAIN}/tutor/profile`,
+    type: "account_onboarding",
+  });
+
+  return { destination, accountLink };
 };
