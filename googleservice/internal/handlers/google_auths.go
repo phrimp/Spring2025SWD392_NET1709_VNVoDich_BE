@@ -93,7 +93,7 @@ func (h *GoogleHandler) HandleGoogleCallback(c *fiber.Ctx) error {
 	}
 
 	type User struct {
-		Userid   uint   `json:"user_id"`
+		Userid   uint   `json:"ID"`
 		Username string `json:"username"`
 		Email    string `json:"email"`
 		Role     string `json:"role"`

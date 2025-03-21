@@ -55,7 +55,10 @@ export const getCourses = async (
       },
     });
   } catch (error) {
-    res.status(500).json({ message: COURSE_MESSAGES.ERROR_FETCHING, error });
+    res.status(500).json({
+      message: COURSE_MESSAGES.ERROR_FETCHING,
+      error: (error as Error).message,
+    });
   }
 };
 
@@ -69,7 +72,10 @@ export const getCourse = async (req: Request, res: Response): Promise<void> => {
     }
     res.json({ message: COURSE_MESSAGES.COURSES_RETRIEVED, data: course });
   } catch (error) {
-    res.status(500).json({ message: COURSE_MESSAGES.ERROR_FETCHING, error });
+    res.status(500).json({
+      message: COURSE_MESSAGES.ERROR_FETCHING,
+      error: (error as Error).message,
+    });
   }
 };
 
@@ -87,7 +93,10 @@ export const createCourse = async (
     const newCourse = await createCourseService(Number(req.body.tutor_id));
     res.json({ message: COURSE_MESSAGES.COURSE_CREATED, data: newCourse });
   } catch (error) {
-    res.status(500).json({ message: COURSE_MESSAGES.ERROR_CREATING, error });
+    res.status(500).json({
+      message: COURSE_MESSAGES.ERROR_CREATING,
+      error: (error as Error).message,
+    });
   }
 };
 export const updateCourse = async (
@@ -101,7 +110,10 @@ export const updateCourse = async (
     const updatedCourse = await updateCourseService(courseId, updateData);
     res.json({ message: COURSE_MESSAGES.COURSE_UPDATED, data: updatedCourse });
   } catch (error) {
-    res.status(500).json({ message: COURSE_MESSAGES.ERROR_UPDATING, error });
+    res.status(500).json({
+      message: COURSE_MESSAGES.ERROR_UPDATING,
+      error: (error as Error).message,
+    });
   }
 };
 
@@ -116,7 +128,10 @@ export const deleteCourse = async (
     await deleteCourseService(courseId);
     res.json({ message: COURSE_MESSAGES.COURSE_DELETED });
   } catch (error) {
-    res.status(500).json({ message: COURSE_MESSAGES.ERROR_DELETING, error });
+    res.status(500).json({
+      message: COURSE_MESSAGES.ERROR_DELETING,
+      error: (error as Error).message,
+    });
   }
 };
 
@@ -132,7 +147,10 @@ export const addLessonToCourse = async (
     const updatedCourse = await addLessonToCourseService(courseId, lessonData);
     res.json({ message: COURSE_MESSAGES.LESSON_ADDED, data: updatedCourse });
   } catch (error) {
-    res.status(500).json({ message: COURSE_MESSAGES.ERROR_CREATING, error });
+    res.status(500).json({
+      message: COURSE_MESSAGES.ERROR_CREATING,
+      error: (error as Error).message,
+    });
   }
 };
 
@@ -153,7 +171,10 @@ export const updateLesson = async (
     );
     res.json({ message: COURSE_MESSAGES.LESSON_UPDATED, data: updatedCourse });
   } catch (error) {
-    res.status(500).json({ message: COURSE_MESSAGES.ERROR_UPDATING, error });
+    res.status(500).json({
+      message: COURSE_MESSAGES.ERROR_UPDATING,
+      error: (error as Error).message,
+    });
   }
 };
 
@@ -169,6 +190,9 @@ export const deleteLesson = async (
     const updatedCourse = await deleteLessonService(courseId, lessonId);
     res.json({ message: COURSE_MESSAGES.LESSON_DELETED, data: updatedCourse });
   } catch (error) {
-    res.status(500).json({ message: COURSE_MESSAGES.ERROR_DELETING, error });
+    res.status(500).json({
+      message: COURSE_MESSAGES.ERROR_DELETING,
+      error: (error as Error).message,
+    });
   }
 };

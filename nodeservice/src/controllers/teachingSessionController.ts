@@ -21,7 +21,7 @@ export const getTeachingSessions = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({
       message: TEACHING_SESSION_MESSAGES.RETRIEVE_ERROR,
-      error,
+      error: (error as Error).message,
     });
   }
 };
@@ -68,7 +68,7 @@ export const updateTeachingSession = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({
       message: TEACHING_SESSION_MESSAGES.UPDATE_ERROR,
-      error,
+      error: (error as Error).message,
     });
   }
 };

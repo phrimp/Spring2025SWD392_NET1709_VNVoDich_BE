@@ -19,7 +19,10 @@ export const getChildrenHandler = async (req: Request, res: Response) => {
     const children = await getChildren(Number(userId));
     res.json({ message: childMessages.CHILDREN_RETRIEVED, data: children });
   } catch (error) {
-    res.status(500).json({ message: childMessages.ERROR_RETRIEVING_CHILDREN, error });
+    res.status(500).json({
+      message: childMessages.ERROR_RETRIEVING_CHILDREN,
+      error: (error as Error).message,
+    });
   }
 };
 
@@ -39,15 +42,32 @@ export const getChildHandler = async (req: Request, res: Response) => {
 
     res.json({ message: childMessages.CHILD_RETRIEVED, data: child });
   } catch (error) {
-    res.status(500).json({ message: childMessages.ERROR_RETRIEVING_CHILDREN, error });
+    res.status(500).json({
+      message: childMessages.ERROR_RETRIEVING_CHILDREN,
+      error: (error as Error).message,
+    });
   }
 };
 
 export const createChildHandler = async (req: Request, res: Response) => {
   try {
-    const { full_name, username, learning_goals, password, userId, date_of_birth } = req.body;
+    const {
+      full_name,
+      username,
+      learning_goals,
+      password,
+      userId,
+      date_of_birth,
+    } = req.body;
 
-    if (!full_name || !username || !learning_goals || !password || !userId || !date_of_birth) {
+    if (
+      !full_name ||
+      !username ||
+      !learning_goals ||
+      !password ||
+      !userId ||
+      !date_of_birth
+    ) {
       res.status(400).json({ message: childMessages.ALL_FIELDS_REQUIRED });
       return;
     }
@@ -63,7 +83,9 @@ export const createChildHandler = async (req: Request, res: Response) => {
 
     res.json({ message: childMessages.CHILD_CREATED, data: newChild });
   } catch (error) {
-    res.status(500).json({ message: childMessages.ERROR_CREATING_CHILD, error });
+    res
+      .status(500)
+      .json({ message: childMessages.ERROR_CREATING_CHILD, error });
   }
 };
 
@@ -76,7 +98,6 @@ export const updateChildHandler = async (req: Request, res: Response) => {
       res.status(400).json({ message: childMessages.INVALID_CHILD_ID });
       return;
     }
-
     const updatedChild = await updateChild(
       Number(id),
       full_name,
@@ -87,7 +108,10 @@ export const updateChildHandler = async (req: Request, res: Response) => {
 
     res.json({ message: childMessages.CHILD_UPDATED, data: updatedChild });
   } catch (error) {
-    res.status(500).json({ message: childMessages.ERROR_UPDATING_CHILD, error });
+    res.status(500).json({
+      message: childMessages.ERROR_UPDATING_CHILD,
+      error: (error as Error).message,
+    });
   }
 };
 
@@ -103,6 +127,9 @@ export const deleteChildHandler = async (req: Request, res: Response) => {
     await deleteChild(Number(id));
     res.json({ message: childMessages.CHILD_DELETED });
   } catch (error) {
-    res.status(500).json({ message: childMessages.ERROR_DELETING_CHILD, error });
+    res.status(500).json({
+      message: childMessages.ERROR_DELETING_CHILD,
+      error: (error as Error).message,
+    });
   }
 };
