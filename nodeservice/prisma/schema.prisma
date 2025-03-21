@@ -143,7 +143,7 @@ model Lesson {
   description         String?
   learning_objectives String?
   materials_needed    String?
-  homeWork            String?
+  homework            String?
 
   course_id Int
   Course    Course @relation(fields: [course_id], references: [id], onDelete: Cascade)

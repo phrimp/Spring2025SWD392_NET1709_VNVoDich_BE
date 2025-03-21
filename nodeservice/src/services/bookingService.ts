@@ -88,7 +88,7 @@ export const createTrialBookingService = async (
       total_lessons: true,
       price: true,
       lessons: {
-        select: { id: true, title: true },
+        select: { id: true, title: true, homework: true },
       },
     },
   });
@@ -167,6 +167,7 @@ export const createTrialBookingService = async (
           subscription_id: newBooking.id,
           google_meet_id: meetLink,
           topics_covered: currentLesson?.title || null,
+          homework_assigned: currentLesson?.homework || null,
         });
 
         lessonCount++;
@@ -209,6 +210,7 @@ export const getParentBookingsService = async (userId: number) => {
           },
         },
       },
+      teachingSessions: true,
     },
   });
 };

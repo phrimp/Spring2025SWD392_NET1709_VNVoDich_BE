@@ -115,7 +115,15 @@ export const deleteCourse = async (
 
     await deleteCourseService(courseId);
     res.json({ message: COURSE_MESSAGES.COURSE_DELETED });
-  } catch (error) {
+  } catch (error: any) {
+    console.log(error);
+    if (error.code === "P2003") {
+      res
+        .status(500)
+        .json({ message: COURSE_MESSAGES.FOREIGN_KEY_ERROR, error });
+      return;
+    }
+
     res.status(500).json({ message: COURSE_MESSAGES.ERROR_DELETING, error });
   }
 };
@@ -132,6 +140,8 @@ export const addLessonToCourse = async (
     const updatedCourse = await addLessonToCourseService(courseId, lessonData);
     res.json({ message: COURSE_MESSAGES.LESSON_ADDED, data: updatedCourse });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({ message: COURSE_MESSAGES.ERROR_CREATING, error });
   }
 };
