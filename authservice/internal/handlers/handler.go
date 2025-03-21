@@ -168,7 +168,7 @@ func HandleRegister() fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Request"})
 		}
 
-		err := services.AddUserUserService(utils.SERVICES_ROUTES.UserService, req.Username, req.Password, req.Email, req.Role, req.Fullname)
+		err := services.AddUserUserService(utils.SERVICES_ROUTES.UserService, req.Username, req.Password, req.Email, req.Role, req.Fullname, req.Phone)
 		if err != nil {
 			fmt.Println("Register Error:", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})

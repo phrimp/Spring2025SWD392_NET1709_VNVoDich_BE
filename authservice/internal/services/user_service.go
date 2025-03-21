@@ -34,11 +34,11 @@ func GetUserFromUserService(userServiceURL string, username, password string) (*
 	return &user, nil
 }
 
-func AddUserUserService(userServiceURL, username, password, email, role, fullname string) error {
+func AddUserUserService(userServiceURL, username, password, email, role, fullname, phone string) error {
 	req := &fasthttp.Request{}
 	resp := &fasthttp.Response{}
 
-	body := fmt.Sprintf(`{"username":"%s","password":"%s", "email":"%s", "role":"%s", "fulname":"%s"}`, username, password, email, role, fullname)
+	body := fmt.Sprintf(`{"username":"%s","password":"%s", "email":"%s", "role":"%s", "fullname":"%s", "phone":"%s"}`, username, password, email, role, fullname, phone)
 	utils.BuildRequest(req, "POST", []byte(body), utils.API_KEY, userServiceURL+"/user/add")
 
 	if err := fasthttp.Do(req, resp); err != nil {
