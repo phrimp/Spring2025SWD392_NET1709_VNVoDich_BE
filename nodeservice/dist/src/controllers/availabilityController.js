@@ -22,18 +22,25 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCourseAvailability = exports.updateAvailability = exports.getTutorAvailability = void 0;
 const availabilityService_1 = require("../services/availabilityService");
+const availabilityMessage_1 = require("../message/availabilityMessage");
 const getTutorAvailability = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.body;
         const availabilityData = yield (0, availabilityService_1.getTutorAvailabilityService)(userId);
         if (!availabilityData) {
-            res.json({ message: "Tutor not found", data: null });
+            res.json({ message: availabilityMessage_1.MESSAGES.tutorNotFound, data: null });
             return;
         }
-        res.json({ message: "Availability retrieved successfully", data: availabilityData });
+        res.json({
+            message: availabilityMessage_1.MESSAGES.availabilityRetrieved,
+            data: availabilityData,
+        });
     }
     catch (error) {
-        res.status(500).json({ message: "Error retrieving availability", error });
+        res.status(500).json({
+            message: availabilityMessage_1.MESSAGES.errorRetrievingAvailability,
+            error: error.message,
+        });
     }
 });
 exports.getTutorAvailability = getTutorAvailability;
@@ -42,13 +49,19 @@ const updateAvailability = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const _a = req.body, { userId } = _a, data = __rest(_a, ["userId"]);
         const updatedAvailability = yield (0, availabilityService_1.updateAvailabilityService)(userId, data);
         if (!updatedAvailability) {
-            res.json({ message: "Tutor not found", data: null });
+            res.json({ message: availabilityMessage_1.MESSAGES.tutorNotFound, data: null });
             return;
         }
-        res.json({ message: "Availability updated successfully", data: updatedAvailability });
+        res.json({
+            message: availabilityMessage_1.MESSAGES.availabilityUpdated,
+            data: updatedAvailability,
+        });
     }
     catch (error) {
-        res.status(500).json({ message: "Error updating availability", error });
+        res.status(500).json({
+            message: availabilityMessage_1.MESSAGES.errorUpdatingAvailability,
+            error: error.message,
+        });
     }
 });
 exports.updateAvailability = updateAvailability;
@@ -58,13 +71,19 @@ const getCourseAvailability = (req, res) => __awaiter(void 0, void 0, void 0, fu
         const { type } = req.query;
         const availableDates = yield (0, availabilityService_1.getCourseAvailabilityService)(Number(courseId), type);
         if (!availableDates) {
-            res.status(404).json({ message: "Course not found" });
+            res.status(404).json({ message: availabilityMessage_1.MESSAGES.courseNotFound });
             return;
         }
-        res.json({ message: "Course Availability retrieved successfully", data: availableDates });
+        res.json({
+            message: availabilityMessage_1.MESSAGES.courseAvailabilityRetrieved,
+            data: availableDates,
+        });
     }
     catch (error) {
-        res.status(500).json({ message: "Error retrieving availability", error });
+        res.status(500).json({
+            message: availabilityMessage_1.MESSAGES.errorRetrievingAvailability,
+            error: error.message,
+        });
     }
 });
 exports.getCourseAvailability = getCourseAvailability;

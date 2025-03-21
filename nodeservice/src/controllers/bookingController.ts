@@ -24,6 +24,10 @@ export const createStripePaymentIntent = async (
   req: Request,
   res: Response
 ) => {
+export const createStripePaymentIntent = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const { amount, userId } = req.body;
 
@@ -37,6 +41,10 @@ export const createStripePaymentIntent = async (
       data: { clientSecret: paymentIntent.client_secret },
     });
   } catch (error) {
+    res.status(500).json({
+      message: BOOKINGMESSAGE.STRIPE_PAYMENT_ERROR,
+      error: (error as Error).message,
+    });
     res.status(500).json({
       message: BOOKINGMESSAGE.STRIPE_PAYMENT_ERROR,
       error: (error as Error).message,
@@ -56,6 +64,10 @@ export const createTrialBooking = async (req: Request, res: Response) => {
 
     res.json({ message: BOOKINGMESSAGE.BOOKING_SUCCESS, data: result });
   } catch (error) {
+    res.status(500).json({
+      message: BOOKINGMESSAGE.BOOKING_CREATION_ERROR,
+      error: (error as Error).message,
+    });
     res.status(500).json({
       message: BOOKINGMESSAGE.BOOKING_CREATION_ERROR,
       error: (error as Error).message,

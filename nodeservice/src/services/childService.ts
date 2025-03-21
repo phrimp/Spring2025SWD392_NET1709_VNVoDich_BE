@@ -101,5 +101,7 @@ export const updateChild = async (
 };
 
 export const deleteChild = async (childId: number) => {
-  return await prisma.user.delete({ where: { id: childId } });
+  return await prisma.children.delete({
+    where: { id: childId },
+  });
 };

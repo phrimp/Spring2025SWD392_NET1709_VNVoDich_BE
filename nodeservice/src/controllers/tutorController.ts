@@ -58,7 +58,12 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error) {
     console.error(tutorMessages.ERROR.GET_TUTORS, error);
-    res.status(500).json({ message: tutorMessages.ERROR.GET_TUTORS, error });
+    res
+      .status(500)
+      .json({
+        message: tutorMessages.ERROR.GET_TUTORS,
+        error: (error as Error).message,
+      });
   }
 };
 
@@ -77,7 +82,12 @@ export const getTutor = async (req: Request, res: Response): Promise<void> => {
     res.json({ message: tutorMessages.SUCCESS.GET_TUTOR, data: tutor });
   } catch (error) {
     console.error(tutorMessages.ERROR.GET_TUTOR, error);
-    res.status(500).json({ message: tutorMessages.ERROR.GET_TUTOR, error });
+    res
+      .status(500)
+      .json({
+        message: tutorMessages.ERROR.GET_TUTOR,
+        error: (error as Error).message,
+      });
   }
 };
 
@@ -100,7 +110,12 @@ export const updateTutorProfile = async (
     res.json({ message: tutorMessages.SUCCESS.UPDATE_TUTOR, data: tutor });
   } catch (error) {
     console.error(tutorMessages.ERROR.UPDATE_TUTOR, error);
-    res.status(500).json({ message: tutorMessages.ERROR.UPDATE_TUTOR, error });
+    res
+      .status(500)
+      .json({
+        message: tutorMessages.ERROR.UPDATE_TUTOR,
+        error: (error as Error).message,
+      });
   }
 };
 
