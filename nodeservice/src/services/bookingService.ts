@@ -210,7 +210,15 @@ export const getParentBookingsService = async (userId: number) => {
           },
         },
       },
-      teachingSessions: true,
+      teachingSessions: {
+        include: {
+          subscription: {
+            select: {
+              course_id: true,
+            },
+          },
+        },
+      },
     },
   });
 };
