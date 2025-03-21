@@ -59,6 +59,8 @@ export const updateTeachingSession = async (req: Request, res: Response) => {
       data: updatedSession,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       message: TEACHING_SESSION_MESSAGES.UPDATE_ERROR,
       error: (error as Error).message,

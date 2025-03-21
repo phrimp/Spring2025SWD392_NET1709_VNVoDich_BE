@@ -15,4 +15,5 @@ export const BOOKINGMESSAGE = {
   NOT_COMPLETE_ONBOARDING: "User has not completed onboarding",
   BOOKING_NOT_FOUND: "Course Subscription not found",
   BOOKING_IS_CANCELED: "Course Subscription already canceled",
+  BOOKING_IS_NOT_PAYED: "Course Subscription is not payed",
 };

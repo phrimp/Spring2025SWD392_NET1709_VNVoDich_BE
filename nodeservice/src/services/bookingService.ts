@@ -417,3 +417,31 @@ export const cancelBookingService = async (
 
   return updatedSubscription;
 };
+
+export const payoutForTutorService = async (
+  tutorStripeAccountId: string | null,
+  coursePrice: number,
+  subscriptionId: number
+) => {
+  if (!tutorStripeAccountId) {
+    throw new Error(BOOKINGMESSAGE.NOT_CONNECTED);
+  }
+
+  // if (!transactionId) {
+  //   throw new Error(BOOKINGMESSAGE.BOOKING_IS_NOT_PAYED);
+  // }
+
+  const transfer = await stripe.transfers.create({
+    amount: Math.round(coursePrice * 100),
+    currency: "usd",
+    destination: tutorStripeAccountId,
+    description: `Payment for completed course subscription ${subscriptionId}`,
+  });
+
+  await prisma.courseSubscription.update({
+    where: { id: subscriptionId },
+    data: {
+      payoutId: transfer.id,
+    },
+  });
+};

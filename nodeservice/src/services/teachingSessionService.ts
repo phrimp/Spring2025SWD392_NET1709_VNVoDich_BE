@@ -1,5 +1,6 @@
 import { PrismaClient, SessionStatus, SessionQuality } from "@prisma/client";
 import { TEACHING_SESSION_MESSAGES } from "../message/teachingSessionMessages";
+import { payoutForTutorService } from "./bookingService";
 
 const prisma = new PrismaClient();
 
@@ -72,7 +73,43 @@ export const updateTeachingSessionData = async (
         },
       },
     },
+    include: {
+      subscription: {
+        select: {
+          id: true,
+          sessions_remaining: true,
+          price: true,
+          transactionId: true,
+          course: {
+            select: {
+              tutor: {
+                select: {
+                  stripe_account_id: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   });
+
+  const remainingSessions =
+    updatedTeachingSession.subscription.sessions_remaining;
+  if (remainingSessions === 0) {
+    const tutorStripeAccountId =
+      updatedTeachingSession.subscription.course.tutor.stripe_account_id;
+    const coursePrice = updatedTeachingSession.subscription.price;
+    const subscriptionId = updatedTeachingSession.subscription_id;
+    // const transactionId = updatedTeachingSession.subscription.transactionId;
+
+    await payoutForTutorService(
+      tutorStripeAccountId,
+      coursePrice,
+      subscriptionId
+      // transactionId
+    );
+  }
 
   return updatedTeachingSession;
 };
