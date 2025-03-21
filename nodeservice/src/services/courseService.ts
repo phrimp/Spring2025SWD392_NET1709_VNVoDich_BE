@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { COURSE_MESSAGES } from "../message/courseMessages";
 
 const prisma = new PrismaClient();
 
@@ -83,6 +84,18 @@ export const updateCourseService = async (id: number, updateData: any) => {
     const grade = parseInt(updateData.grade);
 
     updateData.grade = grade;
+  }
+
+  const course = await prisma.course.findUnique({
+    where: { id },
+  });
+
+  if (!course) {
+    throw new Error(COURSE_MESSAGES.COURSE_NOT_FOUND);
+  }
+
+  if (course.total_lessons < 5) {
+    throw new Error(COURSE_MESSAGES.LESSON_LESS_THAN_5);
   }
 
   return prisma.course.update({

@@ -102,6 +102,7 @@ services:
       - GOOGLE_REDIRECT_URL=${GOOGLE_REDIRECT_URL}
       - GOOGLE_ACCESS_TOKEN=${GOOGLE_ACCESS_TOKEN}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - DOMAIN=${DOMAIN}
     depends_on:
       mysql:
         condition: service_healthy

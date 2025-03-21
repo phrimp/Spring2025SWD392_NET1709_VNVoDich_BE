@@ -4,6 +4,7 @@ export const COURSE_MESSAGES = {
   COURSE_CREATED: "Course created successfully",
   COURSE_UPDATED: "Course updated successfully",
   COURSE_DELETED: "Course deleted successfully",
+  LESSON_LESS_THAN_5: "Lesson cannot be less than 5",
   LESSON_ADDED: "Lesson added successfully",
   LESSON_UPDATED: "Lesson updated successfully",
   LESSON_DELETED: "Lesson deleted successfully",

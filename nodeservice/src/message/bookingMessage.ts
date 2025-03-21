@@ -7,9 +7,12 @@ export const BOOKINGMESSAGE = {
   PARENT_BOOKINGS_RETRIEVED: "Parent's bookings retrieved successfully",
   USER_ID_REQUIRED: "UserId is required",
   USER_NOT_FOUND: "User not found",
+  USER_NOT_MATCH: "You are not authorized to cancel this subscription",
   PAYMENT_SUCCESS: "Payment intent created successfully",
   BOOKING_SUCCESS: "Booking created successfully",
   NOT_CONNECTED: "User is not connected to Stripe",
   CONNECTED: "User is connected to Stripe",
   NOT_COMPLETE_ONBOARDING: "User has not completed onboarding",
+  BOOKING_NOT_FOUND: "Course Subscription not found",
+  BOOKING_IS_CANCELED: "Course Subscription already canceled",
 };

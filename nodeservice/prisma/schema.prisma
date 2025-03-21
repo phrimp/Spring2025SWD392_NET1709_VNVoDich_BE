@@ -119,7 +119,7 @@ model Course {
   title         String
   description   String?
   price         Float
-  total_lessons Int
+  total_lessons Int          @default(0)
   grade         Int
   subject       String
   status        CourseStatus @default(Draft)

@@ -325,3 +325,95 @@ export const checkConnectionStatusService = async (userId: number) => {
       : BOOKINGMESSAGE.NOT_COMPLETE_ONBOARDING,
   };
 };
+
+export const cancelBookingService = async (
+  subscriptionId: number,
+  userId: number
+) => {
+  const subscription = await prisma.courseSubscription.findUnique({
+    where: { id: Number(subscriptionId) },
+    select: {
+      id: true,
+      status: true,
+      transactionId: true,
+      course: {
+        select: {
+          price: true,
+        },
+      },
+      children: {
+        select: {
+          parent_id: true,
+        },
+      },
+      teachingSessions: {
+        select: {
+          status: true,
+        },
+      },
+    },
+  });
+
+  if (!subscription) {
+    throw new Error(BOOKINGMESSAGE.BOOKING_NOT_FOUND);
+  }
+
+  if (subscription.status === "Canceled") {
+    throw new Error(BOOKINGMESSAGE.BOOKING_IS_CANCELED);
+  }
+
+  if (subscription.children.parent_id !== Number(userId)) {
+    throw new Error(BOOKINGMESSAGE.USER_NOT_MATCH);
+  }
+
+  // Calculate refund amount
+  const totalSessions = subscription.teachingSessions.length;
+  const completedSessions = subscription.teachingSessions.filter(
+    (session) => session.status !== "NotYet"
+  ).length;
+  const pricePerSession = subscription.course.price / totalSessions;
+  const refundAmount = (totalSessions - completedSessions) * pricePerSession;
+
+  // Xử lý hoàn tiền cho phụ huynh nếu có
+  if (refundAmount > 0) {
+    if (!subscription.transactionId) {
+      throw new Error("Payment Intent ID not found for refund");
+    }
+
+    // Tạo refund qua Stripe, hoàn tiền về phương thức thanh toán của phụ huynh
+    const refund = await stripe.refunds.create({
+      payment_intent: subscription.transactionId,
+      amount: Math.round(refundAmount * 100), // Chuyển sang cents
+      reason: "requested_by_customer", // Lý do hủy
+    });
+
+    await prisma.courseSubscription.update({
+      where: { id: Number(subscriptionId) },
+      data: {
+        refundId: refund.id,
+      },
+    });
+  }
+
+  const updatedSubscription = await prisma.$transaction(async (prisma) => {
+    // Update subscription status
+    const updated = await prisma.courseSubscription.update({
+      where: { id: Number(subscriptionId) },
+      data: {
+        status: "Canceled",
+      },
+    });
+
+    // Delete pending sessions
+    const deletedSessions = await prisma.teachingSession.deleteMany({
+      where: {
+        subscription_id: Number(subscriptionId),
+        status: "NotYet",
+      },
+    });
+
+    return { updated, deletedSessionsCount: deletedSessions.count };
+  });
+
+  return updatedSubscription;
+};

@@ -64,19 +64,15 @@ export const updateTeachingSessionData = async (
     data: {
       ...data,
       rating: data.rating ? Number(data.rating) : undefined,
-    },
-  });
-
-  if (updatedTeachingSession.status !== "NotYet") {
-    await prisma.courseSubscription.update({
-      where: { id: updatedTeachingSession.subscription_id },
-      data: {
-        sessions_remaining: {
-          decrement: 1,
+      subscription: {
+        update: {
+          sessions_remaining: {
+            decrement: 1,
+          },
         },
       },
-    });
-  }
+    },
+  });
 
   return updatedTeachingSession;
 };
