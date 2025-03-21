@@ -32,7 +32,7 @@ func NewGateway(config *config.Config) *Gateway {
 	// Middleware
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
-		AllowMethods: "GET, POST, PUT, DELETE",
+		AllowMethods: "GET, POST, PUT, DELETE, PATCH",
 		AllowHeaders: "*",
 	}))
 
