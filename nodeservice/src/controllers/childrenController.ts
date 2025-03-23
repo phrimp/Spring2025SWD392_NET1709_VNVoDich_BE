@@ -19,6 +19,8 @@ export const getChildrenHandler = async (req: Request, res: Response) => {
     const children = await getChildren(Number(userId));
     res.json({ message: childMessages.CHILDREN_RETRIEVED, data: children });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       message:
         (error as Error).message || childMessages.ERROR_RETRIEVING_CHILDREN,
@@ -129,10 +131,19 @@ export const deleteChildHandler = async (req: Request, res: Response) => {
 
     await deleteChild(Number(id));
     res.json({ message: childMessages.CHILD_DELETED });
-  } catch (error) {
-    res.status(500).json({
-      message: (error as Error).message || childMessages.ERROR_DELETING_CHILD,
-      error,
-    });
+
+  } catch (error: any) {
+    if (error.code === "P2003") {
+      res.status(500).json({ message: childMessages.FOREIGN_KEY_ERROR, error });
+      return;
+    }
+
+    res
+      .status(500)
+      .json({
+        message: (error as Error).message || childMessages.ERROR_DELETING_CHILD,
+        error,
+      });
+
   }
 };

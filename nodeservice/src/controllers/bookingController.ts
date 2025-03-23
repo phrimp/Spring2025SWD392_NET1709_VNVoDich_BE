@@ -6,20 +6,6 @@ import {
   createTrialBookingService,
   getParentBookingsService,
 } from "../services/bookingService";
-import { PrismaClient } from "@prisma/client";
-import dotenv from "dotenv";
-import Stripe from "stripe";
-
-dotenv.config();
-const prisma = new PrismaClient();
-
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error(
-    "STRIPE_SECRET_KEY is required but was not found in env variables"
-  );
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const createStripePaymentIntent = async (
   req: Request,
@@ -104,9 +90,11 @@ export const cancelBooking = async (req: Request, res: Response) => {
       data: updatedSubscription.updated,
     });
   } catch (error) {
-    console.error(BOOKINGMESSAGE.BOOOKING_ERROR_CANCEL, error);
+
     res.status(500).json({
-      message: (error as Error).message || BOOKINGMESSAGE.BOOOKING_ERROR_CANCEL,
+      message:
+        (error as Error).message || BOOKINGMESSAGE.BOOKING_CANCELED_ERROR,
+
       error,
     });
   }

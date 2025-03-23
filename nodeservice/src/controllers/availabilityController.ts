@@ -13,10 +13,10 @@ export const getTutorAvailability = async (
   try {
     const { userId } = req.body;
     const availabilityData = await getTutorAvailabilityService(userId);
-    if (!availabilityData) {
-      res.json({ message: MESSAGES.tutorNotFound, data: null });
-      return;
-    }
+    // if (!availabilityData) {
+    //   res.json({ message: MESSAGES.tutorNotFound, data: null });
+    //   return;
+    // }
     res.json({
       message: MESSAGES.availabilityRetrieved,
       data: availabilityData,
@@ -33,10 +33,7 @@ export const updateAvailability = async (req: Request, res: Response) => {
   try {
     const { userId, ...data } = req.body;
     const updatedAvailability = await updateAvailabilityService(userId, data);
-    if (!updatedAvailability) {
-      res.json({ message: MESSAGES.tutorNotFound, data: null });
-      return;
-    }
+
     res.json({
       message: MESSAGES.availabilityUpdated,
       data: updatedAvailability,
@@ -57,10 +54,7 @@ export const getCourseAvailability = async (req: Request, res: Response) => {
       Number(courseId),
       type as string
     );
-    if (!availableDates) {
-      res.status(404).json({ message: MESSAGES.courseNotFound });
-      return;
-    }
+
     res.json({
       message: MESSAGES.courseAvailabilityRetrieved,
       data: availableDates,

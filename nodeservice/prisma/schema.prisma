@@ -118,7 +118,7 @@ model Course {
   id            Int          @id @default(autoincrement())
   title         String
   description   String?
-  price         Float
+  price         Int          @default(0)
   total_lessons Int          @default(0)
   grade         Int
   subject       String

@@ -16,7 +16,9 @@ export const getTutorAvailabilityService = async (userId: number) => {
     include: { availability: { include: { days: true } } },
   });
 
-  if (!tutor || !tutor.availability) return null;
+  if (!tutor || !tutor.availability) {
+    throw new Error("Tutor not found or availability not set");
+  }
 
   const availabilityData: Record<string, any> = {
     timeGap: tutor.availability.timeGap,
@@ -53,7 +55,9 @@ export const updateAvailabilityService = async (userId: number, data: any) => {
     include: { availability: true },
   });
 
-  if (!tutor) return null;
+  if (!tutor) {
+    throw new Error("Tutor not found");
+  }
 
   const availabilityData = Object.entries(data).flatMap(
     ([day, { isAvailable, startTime, endTime }]: any) => {
@@ -108,7 +112,9 @@ export const getCourseAvailabilityService = async (
     },
   });
 
-  if (!course) return null;
+  if (!course) {
+    throw new Error("Course not found");
+  }
 
   const startDate = startOfDay(new Date().getTime() + 7 * 60 * 60 * 1000);
   const endDate = addDays(startDate, 7);
