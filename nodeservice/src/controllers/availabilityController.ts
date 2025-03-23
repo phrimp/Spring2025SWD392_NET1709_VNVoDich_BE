@@ -23,8 +23,8 @@ export const getTutorAvailability = async (
     });
   } catch (error) {
     res.status(500).json({
-      message: MESSAGES.errorRetrievingAvailability,
-      error: (error as Error).message,
+      message: (error as Error).message || MESSAGES.errorRetrievingAvailability,
+      error,
     });
   }
 };
