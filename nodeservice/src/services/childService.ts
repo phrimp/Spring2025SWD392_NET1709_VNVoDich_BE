@@ -32,7 +32,7 @@ export const getChild = async (childId: number) => {
     where: { id: childId },
     include: {
       profile: {
-        select: { full_name: true },
+        select: { full_name: true, username: true },
       },
     },
   });
