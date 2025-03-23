@@ -517,7 +517,7 @@ func UpdateUserStatus(username string, status string, db *gorm.DB) (*models.User
 	case models.StatusBanned:
 		user.Status = models.StatusBanned
 	default:
-		return nil, fmt.Errorf("invalid status value: must be 'active', 'banned', or 'pending'")
+		return nil, fmt.Errorf("invalid status value: must be 'Active', 'Banned', or 'Pending'")
 	}
 
 	// Save updated status
