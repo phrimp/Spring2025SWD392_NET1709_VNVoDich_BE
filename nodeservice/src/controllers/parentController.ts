@@ -21,8 +21,8 @@ export const handleGetParents = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(PARENT_MESSAGES.ERROR_RETRIEVING, error);
     res.status(500).json({
-      message: PARENT_MESSAGES.ERROR_RETRIEVING,
-      error: (error as Error).message,
+      message: (error as Error).message || PARENT_MESSAGES.ERROR_RETRIEVING,
+      error,
     });
   }
 };
@@ -42,8 +42,8 @@ export const handleGetParentById = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(PARENT_MESSAGES.ERROR_RETRIEVING_ONE, error);
     res.status(500).json({
-      message: PARENT_MESSAGES.ERROR_RETRIEVING_ONE,
-      error: (error as Error).message,
+      message: (error as Error).message || PARENT_MESSAGES.ERROR_RETRIEVING_ONE,
+      error,
     });
   }
 };
@@ -68,8 +68,8 @@ export const handleUpdateParentProfile = async (
     });
   } catch (error) {
     res.status(500).json({
-      message: PARENT_MESSAGES.ERROR_UPDATING,
-      error: (error as Error).message,
+      message: (error as Error).message || PARENT_MESSAGES.ERROR_UPDATING,
+      error,
     });
   }
 };

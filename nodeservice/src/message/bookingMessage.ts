@@ -14,6 +14,7 @@ export const BOOKINGMESSAGE = {
   CONNECTED: "User is connected to Stripe",
   NOT_COMPLETE_ONBOARDING: "User has not completed onboarding",
   BOOKING_NOT_FOUND: "Course Subscription not found",
-  BOOKING_IS_CANCELED: "Course Subscription already canceled",
+  BOOKING_IS_CANCELED: "Booking canceled successfully",
   BOOKING_IS_NOT_PAYED: "Course Subscription is not payed",
+  BOOOKING_ERROR_CANCEL: "Error canceling booking",
 };

@@ -15,7 +15,6 @@ import searchRoutes from "./routes/searchMenuRoutes";
 import reviewTutorRoutes from "./routes/reviewTutorRoutes";
 import reviewCourseRoutes from "./routes/reviewCourseRoutes";
 import parentRoutes from "./routes/parentRoutes";
-import userRoutes from "./routes/manageUserRoutes";
 
 // CONFIGURATIONS
 dotenv.config();
@@ -43,7 +42,6 @@ app.use("/search", searchRoutes);
 app.use("/reviewsTutor", reviewTutorRoutes);
 app.use("/reviewsCourse", reviewCourseRoutes);
 app.use("/parent", parentRoutes);
-app.use("/users", userRoutes);
 
 // SERVER
 const port = Number(process.env.PORT) || 3000;

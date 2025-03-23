@@ -43,8 +43,8 @@ export const updateAvailability = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({
-      message: MESSAGES.errorUpdatingAvailability,
-      error: (error as Error).message,
+      message: (error as Error).message || MESSAGES.errorUpdatingAvailability,
+      error,
     });
   }
 };
@@ -67,8 +67,8 @@ export const getCourseAvailability = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({
-      message: MESSAGES.errorRetrievingAvailability,
-      error: (error as Error).message,
+      message: (error as Error).message || MESSAGES.errorRetrievingAvailability,
+      error,
     });
   }
 };

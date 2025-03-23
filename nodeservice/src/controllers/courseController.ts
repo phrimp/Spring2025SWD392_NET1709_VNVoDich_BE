@@ -56,8 +56,8 @@ export const getCourses = async (
     });
   } catch (error) {
     res.status(500).json({
-      message: COURSE_MESSAGES.ERROR_FETCHING,
-      error: (error as Error).message,
+      message: (error as Error).message || COURSE_MESSAGES.ERROR_FETCHING,
+      error,
     });
   }
 };
@@ -73,8 +73,8 @@ export const getCourse = async (req: Request, res: Response): Promise<void> => {
     res.json({ message: COURSE_MESSAGES.COURSES_RETRIEVED, data: course });
   } catch (error) {
     res.status(500).json({
-      message: COURSE_MESSAGES.ERROR_FETCHING,
-      error: (error as Error).message,
+      message: (error as Error).message || COURSE_MESSAGES.ERROR_FETCHING,
+      error,
     });
   }
 };
@@ -94,8 +94,8 @@ export const createCourse = async (
     res.json({ message: COURSE_MESSAGES.COURSE_CREATED, data: newCourse });
   } catch (error) {
     res.status(500).json({
-      message: COURSE_MESSAGES.ERROR_CREATING,
-      error: (error as Error).message,
+      message: (error as Error).message || COURSE_MESSAGES.ERROR_CREATING,
+      error,
     });
   }
 };
@@ -111,8 +111,8 @@ export const updateCourse = async (
     res.json({ message: COURSE_MESSAGES.COURSE_UPDATED, data: updatedCourse });
   } catch (error) {
     res.status(500).json({
-      message: COURSE_MESSAGES.ERROR_UPDATING,
-      error: (error as Error).message,
+      message: (error as Error).message || COURSE_MESSAGES.ERROR_UPDATING,
+      error,
     });
   }
 };
@@ -136,7 +136,10 @@ export const deleteCourse = async (
       return;
     }
 
-    res.status(500).json({ message: COURSE_MESSAGES.ERROR_DELETING, error });
+    res.status(500).json({
+      message: (error as Error).message || COURSE_MESSAGES.ERROR_DELETING,
+      error,
+    });
   }
 };
 
@@ -154,7 +157,10 @@ export const addLessonToCourse = async (
   } catch (error) {
     console.log(error);
 
-    res.status(500).json({ message: COURSE_MESSAGES.ERROR_CREATING, error });
+    res.status(500).json({
+      message: (error as Error).message || COURSE_MESSAGES.ERROR_CREATING,
+      error,
+    });
   }
 };
 
@@ -176,8 +182,8 @@ export const updateLesson = async (
     res.json({ message: COURSE_MESSAGES.LESSON_UPDATED, data: updatedCourse });
   } catch (error) {
     res.status(500).json({
-      message: COURSE_MESSAGES.ERROR_UPDATING,
-      error: (error as Error).message,
+      message: (error as Error).message || COURSE_MESSAGES.ERROR_UPDATING,
+      error,
     });
   }
 };
@@ -195,8 +201,8 @@ export const deleteLesson = async (
     res.json({ message: COURSE_MESSAGES.LESSON_DELETED, data: updatedCourse });
   } catch (error) {
     res.status(500).json({
-      message: COURSE_MESSAGES.ERROR_DELETING,
-      error: (error as Error).message,
+      message: (error as Error).message || COURSE_MESSAGES.ERROR_DELETING,
+      error,
     });
   }
 };
