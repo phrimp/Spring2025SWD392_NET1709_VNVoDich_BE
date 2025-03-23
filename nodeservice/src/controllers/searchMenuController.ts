@@ -20,12 +20,10 @@ export const searchTutors = async (req: Request, res: Response) => {
     );
     res.json({ message: SEARCH_MESSAGES.TUTORS_SUCCESS, data: { tutors } });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: SEARCH_MESSAGES.ERROR_SEARCH_TUTORS,
-        error: (error as Error).message,
-      });
+    res.status(500).json({
+      message: (error as Error).message || SEARCH_MESSAGES.ERROR_SEARCH_TUTORS,
+      error,
+    });
   }
 };
 
@@ -40,12 +38,10 @@ export const searchCourses = async (req: Request, res: Response) => {
     );
     res.json({ message: SEARCH_MESSAGES.COURSES_SUCCESS, data: { courses } });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: SEARCH_MESSAGES.ERROR_SEARCH_COURSES,
-        error: (error as Error).message,
-      });
+    res.status(500).json({
+      message: (error as Error).message || SEARCH_MESSAGES.ERROR_SEARCH_COURSES,
+      error,
+    });
   }
 };
 
@@ -59,12 +55,10 @@ export const filterByPrice = async (req: Request, res: Response) => {
     );
     res.json({ message: SEARCH_MESSAGES.FILTER_PRICE_SUCCESS, data: courses });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: SEARCH_MESSAGES.ERROR_FILTER_PRICE,
-        error: (error as Error).message,
-      });
+    res.status(500).json({
+      message: (error as Error).message || SEARCH_MESSAGES.ERROR_FILTER_PRICE,
+      error,
+    });
   }
 };
 
@@ -75,12 +69,10 @@ export const searchByGrade = async (req: Request, res: Response) => {
     const courses = await filterCoursesByGrade(Number(grade));
     res.json({ message: SEARCH_MESSAGES.FILTER_GRADE_SUCCESS, data: courses });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: SEARCH_MESSAGES.ERROR_FILTER_GRADE,
-        error: (error as Error).message,
-      });
+    res.status(500).json({
+      message: (error as Error).message || SEARCH_MESSAGES.ERROR_FILTER_GRADE,
+      error,
+    });
   }
 };
 
@@ -94,12 +86,10 @@ export const searchBySubject = async (req: Request, res: Response) => {
       data: courses,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: SEARCH_MESSAGES.ERROR_FILTER_SUBJECT,
-        error: (error as Error).message,
-      });
+    res.status(500).json({
+      message: (error as Error).message || SEARCH_MESSAGES.ERROR_FILTER_SUBJECT,
+      error,
+    });
   }
 };
 
@@ -113,11 +103,9 @@ export const filterTutorsByRatings = async (req: Request, res: Response) => {
       data: tutorsWithAvgRating,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: SEARCH_MESSAGES.ERROR_FILTER_TUTORS,
-        error: (error as Error).message,
-      });
+    res.status(500).json({
+      message: (error as Error).message || SEARCH_MESSAGES.ERROR_FILTER_TUTORS,
+      error,
+    });
   }
 };

@@ -38,8 +38,8 @@ const getTutorAvailability = (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
     catch (error) {
         res.status(500).json({
-            message: availabilityMessage_1.MESSAGES.errorRetrievingAvailability,
-            error: error.message,
+            message: error.message || availabilityMessage_1.MESSAGES.errorRetrievingAvailability,
+            error,
         });
     }
 });
@@ -59,8 +59,8 @@ const updateAvailability = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
     catch (error) {
         res.status(500).json({
-            message: availabilityMessage_1.MESSAGES.errorUpdatingAvailability,
-            error: error.message,
+            message: error.message || availabilityMessage_1.MESSAGES.errorUpdatingAvailability,
+            error,
         });
     }
 });
@@ -81,8 +81,8 @@ const getCourseAvailability = (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
     catch (error) {
         res.status(500).json({
-            message: availabilityMessage_1.MESSAGES.errorRetrievingAvailability,
-            error: error.message,
+            message: error.message || availabilityMessage_1.MESSAGES.errorRetrievingAvailability,
+            error,
         });
     }
 });

@@ -131,6 +131,7 @@ export const deleteChildHandler = async (req: Request, res: Response) => {
 
     await deleteChild(Number(id));
     res.json({ message: childMessages.CHILD_DELETED });
+
   } catch (error: any) {
     if (error.code === "P2003") {
       res.status(500).json({ message: childMessages.FOREIGN_KEY_ERROR, error });
@@ -143,5 +144,6 @@ export const deleteChildHandler = async (req: Request, res: Response) => {
         message: (error as Error).message || childMessages.ERROR_DELETING_CHILD,
         error,
       });
+
   }
 };
