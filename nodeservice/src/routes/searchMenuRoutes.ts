@@ -5,7 +5,7 @@ import {
   filterByPrice,
   searchByGrade,
   searchBySubject,
-  filterTutorsByRating,
+  filterTutorsByRatings,
 } from "../controllers/searchMenuController";
 
 const router = express.Router();
@@ -15,8 +15,7 @@ router.get("/course", searchCourses);
 router.get("/price", filterByPrice);
 router.get("/grade", searchByGrade);
 router.get("/subject", searchBySubject);
-router.get("/rating", filterTutorsByRating);
+router.get("/rating", filterTutorsByRatings);
 
 export default router;
 
-//hehee

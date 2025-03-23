@@ -37,8 +37,8 @@ async function main() {
     "courseSubscription.json",
     "courseSubscriptionSchedule.json",
     "teachingSession.json",
-    "sessionFeedback.json",
     "tutorSpecialty.json",
+    "subscriptionPlan.json",
   ];
 
   const deleteFileNames = [...orderedFileNames].reverse();

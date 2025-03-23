@@ -32,17 +32,16 @@ model User {
   updated_at DateTime  @default(now()) @updatedAt
   deleted_at DateTime?
 
-  username String @unique @db.VarChar(50)
-  password String @db.VarChar(255)
-  email    String @unique @db.VarChar(255)
+  username String  @unique @db.VarChar(50)
+  password String  @db.VarChar(255)
+  email    String? @unique @db.VarChar(255)
 
-  role      UserRole @default(Parent)
-  phone     String?  @db.VarChar(20)
-  full_name String?  @db.VarChar(255)
-  googleToken    String?   @db.Text @map("google_token") 
+  role        UserRole @default(Parent)
+  phone       String?  @db.VarChar(20)
+  full_name   String?  @db.VarChar(255)
+  googleToken String?  @map("google_token") @db.Text
 
-  picture   String?
-
+  picture String?
 
   is_verified Boolean    @default(false)
   status      UserStatus @default(Active)
@@ -51,8 +50,9 @@ model User {
   account_locked      Boolean @default(false)
   password_changed_at BigInt?
 
-  Tutor  Tutor[]
-  Parent Parent[]
+  Tutor    Tutor[]
+  Parent   Parent[]
+  Children Children[]
 
   @@index([status])
   @@index([role])
@@ -60,15 +60,16 @@ model User {
 }
 
 model Tutor {
-  id             Int     @id
-  bio            String
-  qualifications String
-  teaching_style String
-  is_available   Boolean @default(false)
-  demo_video_url String?
-  image          String?
+  id                Int     @id
+  bio               String?
+  qualifications    String?
+  teaching_style    String?
+  is_available      Boolean @default(false)
+  demo_video_url    String?
+  image             String?
+  stripe_account_id String?
 
-  profile User @relation(fields: [id], references: [id])
+  profile User @relation(fields: [id], references: [id], onDelete: Cascade)
 
   tutorSpecialty TutorSpecialty[]
   subscriptions  TutorSubscriptions[]
@@ -79,10 +80,10 @@ model Tutor {
 
 model Parent {
   id                    Int     @id
-  preferred_language    String
+  preferred_language    String?
   notifications_enabled Boolean @default(false)
 
-  profile User @relation(fields: [id], references: [id])
+  profile User @relation(fields: [id], references: [id], onDelete: Cascade)
 
   childrens     Children[]
   tutorReviews  TutorReview[]
@@ -90,15 +91,14 @@ model Parent {
 }
 
 model Children {
-  id             Int    @id @default(autoincrement())
-  age            Int
-  grade_level    String
+  id             Int      @id
   learning_goals String
-  full_name      String
-  password       String
+  date_of_birth  DateTime
+
+  profile User @relation(fields: [id], references: [id], onDelete: Cascade)
 
   parent_id Int
-  parent    Parent @relation(fields: [parent_id], references: [id])
+  parent    Parent @relation(fields: [parent_id], references: [id], onDelete: Cascade)
 
   courseSubscriptions CourseSubscription[]
 }
@@ -118,8 +118,8 @@ model Course {
   id            Int          @id @default(autoincrement())
   title         String
   description   String?
-  price         Float
-  total_lessons Int
+  price         Int          @default(0)
+  total_lessons Int          @default(0)
   grade         Int
   subject       String
   status        CourseStatus @default(Draft)
@@ -135,7 +135,6 @@ model Course {
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now()) @updatedAt
   deleted_at DateTime?
-
 }
 
 model Lesson {
@@ -144,6 +143,7 @@ model Lesson {
   description         String?
   learning_objectives String?
   materials_needed    String?
+  homework            String?
 
   course_id Int
   Course    Course @relation(fields: [course_id], references: [id], onDelete: Cascade)
@@ -181,6 +181,11 @@ model CourseSubscription {
   id                 Int    @id @default(autoincrement())
   status             String
   sessions_remaining Int?
+  price              Int    @default(0)
+
+  transactionId String?
+  refundId      String?
+  payoutId      String?
 
   course_id Int
   course    Course @relation(fields: [course_id], references: [id])
@@ -194,31 +199,23 @@ model CourseSubscription {
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now()) @updatedAt
   deleted_at DateTime?
-
 }
 
 model TeachingSession {
-  id                Int      @id @default(autoincrement())
-  google_meet_id    String?
-  startTime         DateTime
-  endTime           DateTime
-  status            String
-  topics_covered    String?
+  id             Int           @id @default(autoincrement())
+  google_meet_id String?
+  startTime      DateTime
+  endTime        DateTime
+  status         SessionStatus @default(NotYet)
+  topics_covered String?
+
   homework_assigned String?
+  rating            Int?
+  comment           String?
+  teaching_quality  SessionQuality?
 
   subscription_id Int
   subscription    CourseSubscription @relation(fields: [subscription_id], references: [id])
-  sessionFeedback SessionFeedback[]
-}
-
-model SessionFeedback {
-  id               Int     @id @default(autoincrement())
-  rating           Int
-  comment          String?
-  teaching_quality String?
-
-  session_id Int
-  session    TeachingSession @relation(fields: [session_id], references: [id])
 }
 
 model CourseSubscriptionSchedule {
@@ -256,7 +253,6 @@ model CourseReview {
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now()) @updatedAt
   deleted_at DateTime?
-
 }
 
 enum CourseStatus {
@@ -293,56 +289,65 @@ enum SubscriptionStatus {
   INCOMPLETE
 }
 
+enum SessionQuality {
+  POOR
+  FAIR
+  GOOD
+  EXCELLENT
+}
+
 model SubscriptionPlan {
-  id               Int               @id @default(autoincrement())
-  name             String
-  description      String?
-  price_monthly    Float
-  price_annually   Float
-  max_courses      Int
-  commission_rate  Float
-  features         String            @db.Text // Stored as JSON string
-  is_active        Boolean           @default(true)
-  created_at       DateTime          @default(now())
-  updated_at       DateTime          @default(now()) @updatedAt
-  deleted_at       DateTime?
+  id              Int                  @id @default(autoincrement())
+  name            String
+  description     String?
+  price_monthly   Float
+  price_annually  Float
+  max_courses     Int
+  commission_rate Float
+  features        String               @db.Text // Stored as JSON string
+  is_active       Boolean              @default(true)
+  created_at      DateTime             @default(now())
+  updated_at      DateTime             @default(now()) @updatedAt
+  deleted_at      DateTime?
   // Relations
-  subscriptions    TutorSubscriptions[]
+  subscriptions   TutorSubscriptions[]
 }
 
 model TutorSubscriptions {
-  id                     Int               @id @default(autoincrement())
-  tutor_id               Int
-  plan_id                Int
-  status                 SubscriptionStatus
-  current_period_start   DateTime
-  current_period_end     DateTime
-  cancel_at_period_end   Boolean           @default(false)
-  billing_cycle          BillingCycle
-  payment_order_id       String?
-  created_at             DateTime          @default(now())
-  updated_at             DateTime          @default(now()) @updatedAt
-  deleted_at             DateTime?
+  id                   Int                 @id @default(autoincrement())
+  tutor_id             Int
+  plan_id              Int
+  status               SubscriptionStatus
+  current_period_start DateTime
+  current_period_end   DateTime
+  cancel_at_period_end Boolean             @default(false)
+  billing_cycle        BillingCycle
+  payment_order_id     String?
+  created_at           DateTime            @default(now())
+  updated_at           DateTime            @default(now()) @updatedAt
+  deleted_at           DateTime?
   // Relations
-  tutor                  Tutor             @relation(fields: [tutor_id], references: [id])
-  plan                   SubscriptionPlan  @relation(fields: [plan_id], references: [id])
-  events                 SubscriptionEvent[]
+  tutor                Tutor               @relation(fields: [tutor_id], references: [id])
+  plan                 SubscriptionPlan    @relation(fields: [plan_id], references: [id])
+  events               SubscriptionEvent[]
+
   @@index([tutor_id])
   @@index([plan_id])
 }
 
 model SubscriptionEvent {
-  id                  Int               @id @default(autoincrement())
-  subscription_id     Int
-  event_type          String            // created, renewed, canceled, plan_changed, etc.
-  previous_status     SubscriptionStatus?
-  current_status      SubscriptionStatus
-  notes               String?           @db.Text
-  created_at          DateTime          @default(now())
-  updated_at          DateTime          @default(now()) @updatedAt
-  deleted_at          DateTime?
+  id              Int                 @id @default(autoincrement())
+  subscription_id Int
+  event_type      String // created, renewed, canceled, plan_changed, etc.
+  previous_status SubscriptionStatus?
+  current_status  SubscriptionStatus
+  notes           String?             @db.Text
+  created_at      DateTime            @default(now())
+  updated_at      DateTime            @default(now()) @updatedAt
+  deleted_at      DateTime?
   // Relations
-  subscription        TutorSubscriptions @relation(fields: [subscription_id], references: [id])
+  subscription    TutorSubscriptions  @relation(fields: [subscription_id], references: [id])
+
   @@index([subscription_id])
 }
 
@@ -355,29 +360,29 @@ enum RefundStatus {
 
 // Refund request model
 model RefundRequests {
-  id              Int           @id @default(autoincrement())
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-  deleteAt DateTime? @map("deleted_at")
-  
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deleteAt  DateTime? @map("deleted_at")
+
   // User information
-  userId          Int           @map("user_id")
-  username        String
-  email           String
-  
+  userId   Int    @map("user_id")
+  username String
+  email    String
+
   // Refund details
-  orderId         String        @map("order_id")
-  amount          Decimal       @db.Decimal(10, 2)
-  cardNumber      String        @map("card_number")
-  reason          String?       @db.Text
-  
+  orderId    String  @map("order_id")
+  amount     Decimal @db.Decimal(10, 2)
+  cardNumber String  @map("card_number")
+  reason     String? @db.Text
+
   // Status and processing information
-  status          RefundStatus  @default(PENDING)
-  processedBy     Int?          @map("processed_by") 
-  processedAt     DateTime?     @map("processed_at")
-  adminNote       String?       @map("admin_note") @db.Text
+  status           RefundStatus @default(PENDING)
+  processedBy      Int?         @map("processed_by")
+  processedAt      DateTime?    @map("processed_at")
+  adminNote        String?      @map("admin_note") @db.Text
   notificationSent Boolean      @default(false) @map("notification_sent")
-  
+
   // Relations (uncomment and adjust these as needed for your schema)
   // user            User          @relation(fields: [userId], references: [id])
   // admin           User?         @relation("ProcessedRefunds", fields: [processedBy], references: [id])
@@ -387,4 +392,10 @@ model RefundRequests {
   @@index([orderId])
   @@index([status])
   @@index([createdAt])
+}
+
+enum SessionStatus {
+  NotYet
+  Attended
+  Absent
 }

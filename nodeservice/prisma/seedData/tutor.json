@@ -4,8 +4,9 @@
     "bio": "Experienced math tutor specializing in algebra and calculus.",
     "qualifications": "B.Sc. in Mathematics, Certified Tutor",
     "teaching_style": "Interactive and student-centered",
+    "stripe_account_id": "acct_1R4JwlQPQIS08zyS",
     "is_available": true,
-    "demo_video_url": "https://example.com/videos/tutor1",
+    "demo_video_url": "https://4mlgzdj164.ufs.sh/f/Y1D5BsqL0EJaQ8ylsC9NnDZcydUx9z6MpjwYvu4bPGWJR2Cf",
     "image": "https://example.com/images/tutor1.jpg"
   },
   {
@@ -14,7 +15,7 @@
     "qualifications": "M.Sc. in Physics",
     "teaching_style": "Visual and practical demonstrations",
     "is_available": true,
-    "demo_video_url": null,
+    "demo_video_url": "https://4mlgzdj164.ufs.sh/f/Y1D5BsqL0EJaQ8ylsC9NnDZcydUx9z6MpjwYvu4bPGWJR2Cf",
     "image": "https://example.com/images/tutor2.jpg"
   },
   {
@@ -23,7 +24,7 @@
     "qualifications": "B.A. in English, Teaching Credential",
     "teaching_style": "Discussion-based and analytical",
     "is_available": false,
-    "demo_video_url": "https://example.com/videos/tutor3",
+    "demo_video_url": "https://4mlgzdj164.ufs.sh/f/Y1D5BsqL0EJaQ8ylsC9NnDZcydUx9z6MpjwYvu4bPGWJR2Cf",
     "image": "https://example.com/images/tutor3.jpg"
   },
   {
@@ -32,7 +33,7 @@
     "qualifications": "Ph.D. in Chemistry",
     "teaching_style": "Simplified and example-driven",
     "is_available": true,
-    "demo_video_url": "https://example.com/videos/tutor4",
+    "demo_video_url": "https://4mlgzdj164.ufs.sh/f/Y1D5BsqL0EJaQ8ylsC9NnDZcydUx9z6MpjwYvu4bPGWJR2Cf",
     "image": null
   },
   {
@@ -41,7 +42,7 @@
     "qualifications": "M.A. in History, Published Author",
     "teaching_style": "Storytelling and critical thinking",
     "is_available": false,
-    "demo_video_url": "https://example.com/videos/tutor5",
+    "demo_video_url": "https://4mlgzdj164.ufs.sh/f/Y1D5BsqL0EJaQ8ylsC9NnDZcydUx9z6MpjwYvu4bPGWJR2Cf",
     "image": "https://example.com/images/tutor5.jpg"
   }
 ]

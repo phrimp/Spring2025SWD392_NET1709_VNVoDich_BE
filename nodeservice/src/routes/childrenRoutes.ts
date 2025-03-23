@@ -1,20 +1,20 @@
 import { Router } from "express";
 import {
-  getChildren,
-  getChild,
-  createChild,
-  updateChild,
-  deleteChild,
+ getChildrenHandler,
+ createChildHandler,
+ deleteChildHandler,
+ getChildHandler,
+ updateChildHandler
 } from "../controllers/childrenController";
 import tutorAuth from "../middleware/tutorAuth";
 
 const router = Router();
 
-router.get("/", tutorAuth, getChildren);
-router.get("/:id", tutorAuth, getChild);
-router.post("/", tutorAuth, createChild);
-router.put("/:id", tutorAuth, updateChild);
-router.delete("/:id", tutorAuth, deleteChild);
+router.get("/", tutorAuth, getChildrenHandler);
+router.get("/:id", tutorAuth, getChildHandler);
 
+router.post("/", tutorAuth, createChildHandler);
+router.put("/:id", tutorAuth, updateChildHandler);
+router.delete("/:id", tutorAuth, deleteChildHandler);
 
 export default router;

@@ -1,37 +1,71 @@
-import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import {
+  findTeachingSessions,
+  updateTeachingSessionData,
+} from "../services/teachingSessionService";
+import { SessionStatus, SessionQuality } from "@prisma/client";
+import { TEACHING_SESSION_MESSAGES } from "../message/teachingSessionMessages";
 
-const prisma = new PrismaClient();
-
-export const getChildrenTeachingSessions = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getTeachingSessions = async (req: Request, res: Response) => {
   try {
-    const { children_id } = req.params;
+    const { userId } = req.query;
 
-    const teachingSessions = await prisma.teachingSession.findMany({
-      where: {
-        subscription: {
-          children_id: Number(children_id),
-        },
-      },
-      include: {
-        subscription: {
-          select: {
-            course: true,
-          },
-        },
-      },
-    });
+    const teachingSessions = await findTeachingSessions(
+      userId ? Number(userId) : undefined
+    );
 
     res.json({
-      message: "Teaching sessions retrieved successfully",
+      message: TEACHING_SESSION_MESSAGES.RETRIEVE_SUCCESS,
       data: teachingSessions,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error retrieving teaching sessions", error });
+    res.status(500).json({
+      message:
+        (error as Error).message || TEACHING_SESSION_MESSAGES.RETRIEVE_ERROR,
+      error,
+    });
+  }
+};
+
+export const updateTeachingSession = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const {
+      startTime,
+      endTime,
+      status,
+      homework_assigned,
+      rating,
+      teaching_quality,
+      comment,
+    } = req.body;
+
+    const updatedSession = await updateTeachingSessionData(Number(id), {
+      startTime,
+      endTime,
+      status: status as SessionStatus,
+      homework_assigned,
+      rating: Number(rating),
+      teaching_quality: teaching_quality as SessionQuality,
+      comment,
+    });
+
+    if (updatedSession === null) {
+      res.status(404).json({ message: TEACHING_SESSION_MESSAGES.NOT_FOUND });
+      return;
+    }
+
+    res.json({
+      message: TEACHING_SESSION_MESSAGES.UPDATE_SUCCESS,
+      data: updatedSession,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message:
+        (error as Error).message || TEACHING_SESSION_MESSAGES.UPDATE_ERROR,
+      error,
+    });
   }
 };

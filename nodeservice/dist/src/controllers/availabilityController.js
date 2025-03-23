@@ -21,223 +21,69 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCourseAvailability = exports.updateAvailability = exports.getTutorAvailability = void 0;
-const client_1 = require("@prisma/client");
-const date_fns_1 = require("date-fns");
-const prisma = new client_1.PrismaClient();
+const availabilityService_1 = require("../services/availabilityService");
+const availabilityMessage_1 = require("../message/availabilityMessage");
 const getTutorAvailability = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.body;
-        const tutor = yield prisma.tutor.findUnique({
-            where: {
-                id: userId,
-            },
-            include: {
-                availability: {
-                    include: { days: true },
-                },
-            },
-        });
-        if (!tutor || !tutor.availability) {
-            res.json({
-                message: "Tutor not found",
-                data: null,
-            });
+        const availabilityData = yield (0, availabilityService_1.getTutorAvailabilityService)(userId);
+        if (!availabilityData) {
+            res.json({ message: availabilityMessage_1.MESSAGES.tutorNotFound, data: null });
             return;
         }
-        // Transform the availability data into the format expected by the form
-        const availabilityData = {
-            timeGap: tutor.availability.timeGap,
-        };
-        [
-            "monday",
-            "tuesday",
-            "wednesday",
-            "thursday",
-            "friday",
-            "saturday",
-            "sunday",
-        ].forEach((day) => {
-            var _a;
-            const dayAvailability = (_a = tutor.availability) === null || _a === void 0 ? void 0 : _a.days.find((d) => d.day === day.toUpperCase());
-            availabilityData[day] = {
-                isAvailable: !!dayAvailability,
-                startTime: dayAvailability
-                    ? dayAvailability.startTime.toISOString().slice(11, 16)
-                    : "09:00",
-                endTime: dayAvailability
-                    ? dayAvailability.endTime.toISOString().slice(11, 16)
-                    : "17:00",
-            };
-        });
         res.json({
-            message: "Availability retrieved successfully",
+            message: availabilityMessage_1.MESSAGES.availabilityRetrieved,
             data: availabilityData,
         });
     }
     catch (error) {
-        res.status(500).json({ message: "Error retrieving availability", error });
+        res.status(500).json({
+            message: availabilityMessage_1.MESSAGES.errorRetrievingAvailability,
+            error: error.message,
+        });
     }
 });
 exports.getTutorAvailability = getTutorAvailability;
 const updateAvailability = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const _a = req.body, { userId } = _a, data = __rest(_a, ["userId"]);
-        const tutor = yield prisma.tutor.findUnique({
-            where: {
-                id: userId,
-            },
-            include: {
-                availability: true,
-            },
-        });
-        if (!tutor) {
-            res.json({
-                message: "Tutor not found",
-                data: null,
-            });
+        const updatedAvailability = yield (0, availabilityService_1.updateAvailabilityService)(userId, data);
+        if (!updatedAvailability) {
+            res.json({ message: availabilityMessage_1.MESSAGES.tutorNotFound, data: null });
             return;
         }
-        const availabilityData = Object.entries(data).flatMap(([day, { isAvailable, startTime, endTime }]) => {
-            if (isAvailable) {
-                const baseDate = new Date().toISOString().split("T")[0];
-                return [
-                    {
-                        day: day.toUpperCase(),
-                        startTime: new Date(`${baseDate}T${startTime}:00Z`),
-                        endTime: new Date(`${baseDate}T${endTime}:00Z`),
-                    },
-                ];
-            }
-            return [];
-        });
-        let updatedAvailability;
-        if (tutor.availability) {
-            updatedAvailability = yield prisma.availability.update({
-                where: {
-                    id: tutor.availability.id,
-                },
-                data: {
-                    timeGap: data.timeGap,
-                    days: {
-                        deleteMany: {},
-                        create: availabilityData,
-                    },
-                },
-            });
-        }
-        else {
-            updatedAvailability = yield prisma.availability.create({
-                data: {
-                    tutor_id: tutor.id,
-                    timeGap: data.timeGap,
-                    days: {
-                        create: availabilityData,
-                    },
-                },
-            });
-        }
         res.json({
-            message: "Availability updated successfully",
+            message: availabilityMessage_1.MESSAGES.availabilityUpdated,
             data: updatedAvailability,
         });
     }
     catch (error) {
-        res.status(500).json({ message: "Error retrieving availability", error });
+        res.status(500).json({
+            message: availabilityMessage_1.MESSAGES.errorUpdatingAvailability,
+            error: error.message,
+        });
     }
 });
 exports.updateAvailability = updateAvailability;
 const getCourseAvailability = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
     try {
         const { courseId } = req.params;
-        const course = yield prisma.course.findUnique({
-            where: {
-                id: Number(courseId),
-            },
-            include: {
-                tutor: {
-                    select: {
-                        availability: {
-                            select: {
-                                days: true,
-                                timeGap: true,
-                            },
-                        },
-                    },
-                },
-                courseSubscriptions: {
-                    select: {
-                        teachingSessions: {
-                            select: {
-                                startTime: true,
-                                endTime: true,
-                            },
-                        },
-                    },
-                },
-            },
-        });
-        if (!course) {
-            res.status(404).json({ message: "Course not found" });
+        const { type } = req.query;
+        const availableDates = yield (0, availabilityService_1.getCourseAvailabilityService)(Number(courseId), type);
+        if (!availableDates) {
+            res.status(404).json({ message: availabilityMessage_1.MESSAGES.courseNotFound });
             return;
         }
-        const startDate = (0, date_fns_1.startOfDay)(new Date().getTime() + 7 * 60 * 60 * 1000);
-        const endDate = (0, date_fns_1.addDays)(startDate, 7);
-        const sessions = course.courseSubscriptions.flatMap((sub) => sub.teachingSessions);
-        const availableDates = [];
-        for (let date = startDate; date <= endDate; date = (0, date_fns_1.addDays)(date, 1)) {
-            const dayOfWeek = (0, date_fns_1.format)(date, "EEEE").toUpperCase();
-            const dayAvailability = (_a = course.tutor.availability) === null || _a === void 0 ? void 0 : _a.days.find((d) => d.day === dayOfWeek);
-            if (dayAvailability) {
-                const dateStr = (0, date_fns_1.format)(date, "yyyy-MM-dd");
-                const slots = generateAvailableTimeSlots({
-                    startTime: dayAvailability.startTime,
-                    endTime: dayAvailability.endTime,
-                    sessions,
-                    dateStr,
-                    timeGap: (_b = course.tutor.availability) === null || _b === void 0 ? void 0 : _b.timeGap,
-                });
-                availableDates.push({
-                    date: dateStr,
-                    slots,
-                });
-            }
-        }
         res.json({
-            message: "Course Availability retrieved successfully",
+            message: availabilityMessage_1.MESSAGES.courseAvailabilityRetrieved,
             data: availableDates,
         });
     }
     catch (error) {
-        res.status(500).json({ message: "Error retrieving availability", error });
+        res.status(500).json({
+            message: availabilityMessage_1.MESSAGES.errorRetrievingAvailability,
+            error: error.message,
+        });
     }
 });
 exports.getCourseAvailability = getCourseAvailability;
-function generateAvailableTimeSlots({ startTime, endTime, sessions, dateStr, timeGap = 10, duration = 50, // Default slot duration in minutes
- }) {
-    const slots = [];
-    let currentTime = (0, date_fns_1.parseISO)(`${dateStr}T${startTime.toISOString().slice(11, 16)}:00.000Z`);
-    const slotEndTime = (0, date_fns_1.parseISO)(`${dateStr}T${endTime.toISOString().slice(11, 16)}:00.000Z`);
-    // If the date is today, start from the next available slot after the current time
-    const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
-    if ((0, date_fns_1.format)(now, "yyyy-MM-dd") === dateStr) {
-        currentTime = (0, date_fns_1.isBefore)(currentTime, now)
-            ? (0, date_fns_1.addMinutes)(now, timeGap)
-            : currentTime;
-    }
-    while (currentTime < slotEndTime) {
-        const slotEnd = new Date(currentTime.getTime() + duration * 60000 + timeGap * 60000);
-        const isSlotAvailable = !sessions.some((booking) => {
-            const bookingStart = booking.startTime;
-            const bookingEnd = booking.endTime;
-            return ((currentTime >= bookingStart && currentTime < bookingEnd) ||
-                (slotEnd > bookingStart && slotEnd <= bookingEnd) ||
-                (currentTime <= bookingStart && slotEnd >= bookingEnd));
-        });
-        if (isSlotAvailable) {
-            slots.push(currentTime.toISOString().slice(11, 16));
-        }
-        currentTime = slotEnd;
-    }
-    return slots;
-}

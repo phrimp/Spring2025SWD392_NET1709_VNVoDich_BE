@@ -1,9 +1,16 @@
-import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import {
+  getTutorsService,
+  getTutorService,
+  updateTutorProfileService,
+} from "../services/tutorService";
+import { tutorMessages } from "../message/tutorMessage";
+import {
+  checkConnectionStatusService,
+  connectTutorAccountToStripeService,
+} from "../services/bookingService";
 
-const prisma = new PrismaClient();
-
-//  Lấy danh sách tất cả tutors với phân trang và bộ lọc
+// Lấy danh sách tutors
 export const getTutors = async (req: Request, res: Response): Promise<void> => {
   try {
     const {
@@ -33,26 +40,14 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
     if (phone) filters.user = { phone: { contains: phone as string } };
 
     const skip = (pageNum - 1) * pageSizeNum;
-    const tutors = await prisma.tutor.findMany({
-      where: filters,
+    const { tutors, totalTutors } = await getTutorsService(
+      filters,
       skip,
-      take: pageSizeNum,
-      include: {
-        profile: {
-          select: {
-            email: true,
-            full_name: true,
-            phone: true,
-          },
-        },
-        tutorReviews: true,
-      },
-    });
-
-    const totalTutors = await prisma.tutor.count({ where: filters });
+      pageSizeNum
+    );
 
     res.json({
-      message: "Tutors retrieved successfully",
+      message: tutorMessages.SUCCESS.GET_TUTORS,
       data: tutors,
       pagination: {
         total: totalTutors,
@@ -62,56 +57,37 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
       },
     });
   } catch (error) {
-    console.error("Error retrieving tutors:", error);
-    res.status(500).json({ message: "Error retrieving tutors", error });
+    console.log(error);
+    res.status(500).json({
+      message: (error as Error).message || tutorMessages.ERROR.GET_TUTORS,
+      error,
+    });
   }
 };
 
-//  Lấy thông tin một tutor theo ID
+// Lấy thông tin một tutor
 export const getTutor = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params; // ID của tutor (chính là user ID)
+  const { id } = req.params;
 
   try {
-    const tutor = await prisma.tutor.findUnique({
-      where: { id: Number(id) },
-      include: {
-        profile: {
-          select: {
-            email: true,
-            full_name: true,
-            phone: true,
-            username: true,
-          },
-        },
-        tutorReviews: {
-          include: {
-            parent: {
-              select: {
-                profile: {
-                  select: {
-                    full_name: true,
-                    picture: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
+    const tutor = await getTutorService(Number(id));
 
     if (!tutor) {
-      res.status(404).json({ message: "Tutor not found" });
+      res.status(404).json({ message: tutorMessages.ERROR.TUTOR_NOT_FOUND });
       return;
     }
 
-    res.json({ message: "Tutor retrieved successfully", data: tutor });
+    res.json({ message: tutorMessages.SUCCESS.GET_TUTOR, data: tutor });
   } catch (error) {
-    console.error("Error retrieving tutor:", error);
-    res.status(500).json({ message: "Error retrieving tutor", error });
+    console.error(tutorMessages.ERROR.GET_TUTOR, error);
+    res.status(500).json({
+      message: (error as Error).message || tutorMessages.ERROR.GET_TUTOR,
+      error,
+    });
   }
 };
 
+// Cập nhật thông tin tutor
 export const updateTutorProfile = async (
   req: Request,
   res: Response
@@ -120,88 +96,69 @@ export const updateTutorProfile = async (
   const updateData = { ...req.body };
 
   try {
-    const tutor = await prisma.tutor.update({
-      where: {
-        id: Number(id),
-      },
-      data: {
-        bio: updateData.bio,
-        qualifications: updateData.qualifications,
-        teaching_style: updateData.teaching_style,
-        demo_video_url: updateData.demo_video_url,
-        profile: {
-          update: {
-            full_name: updateData.full_name,
-            phone: updateData.phone,
-          },
-        },
-      },
-    });
+    const tutor = await updateTutorProfileService(Number(id), updateData);
 
     if (!tutor) {
-      res.status(404).json({ message: "Tutor not found" });
+      res.status(404).json({ message: tutorMessages.ERROR.TUTOR_NOT_FOUND });
       return;
     }
 
-    res.json({ message: "Tutor updated successfully", data: tutor });
+    res.json({ message: tutorMessages.SUCCESS.UPDATE_TUTOR, data: tutor });
   } catch (error) {
-    res.status(500).json({ message: "Error updating tutor", error });
+    console.error(tutorMessages.ERROR.UPDATE_TUTOR, error);
+    res.status(500).json({
+      message: (error as Error).message || tutorMessages.ERROR.UPDATE_TUTOR,
+      error,
+    });
   }
 };
 
-//  Tạo một tutor mới
-// export const createTutor = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     let {
-//       id,
-//       bio,
-//       qualifications,
-//       teaching_style,
-//       is_available,
-//       demo_video_url,
-//       image,
-//     } = req.body;
+export const connectTutorAccountToStripe = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      res.status(400).json({ message: tutorMessages.ERROR.USER_ID_REQUIRED });
+    }
 
-//     if (!id) {
-//       id = Math.floor(1 + Math.random() * 9);
-//     }
+    const result = await connectTutorAccountToStripeService(Number(userId));
 
-//     const newTutor = await prisma.tutor.create({
-//       data: {
-//         id: Number(id), // ✅ ID là số
-//         bio,
-//         qualifications,
-//         teaching_style,
-//         is_available: Boolean(is_available),
-//         demo_video_url: demo_video_url || null,
-//         image: image || null,
-//       },
-//     });
+    res.json({
+      message: tutorMessages.SUCCESS.CONNECTED_TUTOR_TO_STRIPE,
+      data: {
+        destination: result.destination,
+        onboardingUrl: result.accountLink.url,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: (error as Error).message || tutorMessages.ERROR.UPDATE_TUTOR,
+      error,
+    });
+  }
+};
 
-//     res.json({ message: "Tutor created successfully", data: newTutor });
-//   } catch (error: any) {
-//     console.error("Error creating tutor:", error);
-//     res.status(500).json({ message: "Error creating tutor", error });
-//   }
-// };
+export const checkConnection = async (req: Request, res: Response) => {
+  const { id } = req.params;
 
-// //  Xóa một tutor theo ID
-// export const deleteTutor = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   const { id } = req.params;
+  try {
+    const result = await checkConnectionStatusService(Number(id));
 
-//   try {
-//     const tutor = await prisma.tutor.delete({
-//       where: { id: Number(id) },
-//     });
-
-//     res.json({ message: "Tutor deleted successfully", data: tutor });
-//   } catch (error) {
-//     res.status(500).json({ message: "Error deleting tutor", error });
-//   }
-// };
+    res.json({
+      message: tutorMessages.SUCCESS.CHECKED_CONNECTION_STATUS,
+      data: {
+        isConnected: result.isConnected,
+        description: result.description,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message:
+        (error as Error).message || tutorMessages.ERROR.CHECK_CONNECTION_STATUS,
+      error,
+    });
+  }
+};

@@ -1,214 +1,123 @@
-import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import {
+  findTutors,
+  findCourses,
+  filterCoursesByPrice,
+  filterCoursesByGrade,
+  filterCoursesBySubject,
+  filterTutorsByRating,
+} from "../services/searchService";
+import { SEARCH_MESSAGES } from "../message/searchMessages";
 
-const prisma = new PrismaClient();
-
-// export const searchTutorsAndCourses = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const { query, page = 1, pageSize = 10 } = req.query;
-
-//     const pageNum = parseInt(page as string, 10);
-//     const pageSizeNum = parseInt(pageSize as string, 10);
-//     const skip = (pageNum - 1) * pageSizeNum;
-
-//     const tutors = await prisma.tutor.findMany({
-//       where: { profile: { full_name: { contains: query as string } } },
-//       skip,
-//       take: pageSizeNum,
-//       include: { profile: true },
-//     });
-
-//     const courses = await prisma.course.findMany({
-//       where: { title: { contains: query as string } },
-//       skip,
-//       take: pageSizeNum,
-//     });
-
-//     res.json({
-//       message: "Search results retrieved successfully",
-//       data: { tutors, courses },
-//     });
-//   } catch (error) {
-//     res.status(500).json({ message: "Error searching", error });
-//   }
-// };
-
-export const searchTutors = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const searchTutors = async (req: Request, res: Response) => {
   try {
     const { query, page = 1, pageSize = 10 } = req.query;
 
-    const pageNum = parseInt(page as string, 10);
-    const pageSizeNum = parseInt(pageSize as string, 10);
-    const skip = (pageNum - 1) * pageSizeNum;
-    const tutors = await prisma.tutor.findMany({
-      where: { profile: { full_name: { contains: query as string } } },
-      skip,
-      take: pageSizeNum,
-      include: { profile: true },
-    });
-    res.json({
-      message: "Search results retrieved successfully",
-      data: { tutors },
-    });
+    const tutors = await findTutors(
+      query as string,
+      Number(page),
+      Number(pageSize)
+    );
+    res.json({ message: SEARCH_MESSAGES.TUTORS_SUCCESS, data: { tutors } });
   } catch (error) {
-    res.status(500).json({ message: "Error searching tutors", error });
+    res
+      .status(500)
+      .json({
+        message: SEARCH_MESSAGES.ERROR_SEARCH_TUTORS,
+        error: (error as Error).message,
+      });
   }
 };
-export const searchCourses = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+
+export const searchCourses = async (req: Request, res: Response) => {
   try {
     const { query, page = 1, pageSize = 10 } = req.query;
-    const pageNum = parseInt(page as string, 10);
-    const pageSizeNum = parseInt(pageSize as string, 10);
-    const skip = (pageNum - 1) * pageSizeNum;
-    const courses = await prisma.course.findMany({
-      where: { title: { contains: query as string } },
-      skip,
-      take: pageSizeNum,
-    });
 
-    res.json({
-      message: "Search results retrieved successfully",
-      data: { courses },
-    });
+    const courses = await findCourses(
+      query as string,
+      Number(page),
+      Number(pageSize)
+    );
+    res.json({ message: SEARCH_MESSAGES.COURSES_SUCCESS, data: { courses } });
   } catch (error) {
-    res.status(500).json({ message: "Error searching courses", error });
+    res
+      .status(500)
+      .json({
+        message: SEARCH_MESSAGES.ERROR_SEARCH_COURSES,
+        error: (error as Error).message,
+      });
   }
 };
-// Tìm kiếm lịch trình có sẵn
-// export const searchSchedules = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const { date } = req.query;
 
-//     const schedules = await prisma.schedule.findMany({
-//       where: { date: { equals: new Date(date as string) } },
-//     });
-
-//     res.json({ message: "Schedules retrieved successfully", data: schedules });
-//   } catch (error) {
-//     res.status(500).json({ message: "Error retrieving schedules", error });
-//   }
-// };
-
-// Lọc theo giá
-export const filterByPrice = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const filterByPrice = async (req: Request, res: Response) => {
   try {
     const { minPrice, maxPrice } = req.query;
 
-    const courses = await prisma.course.findMany({
-      where: {
-        price: {
-          gte: Number(minPrice),
-          lte: Number(maxPrice),
-        },
-      },
-    });
-
-    res.json({ message: "Courses filtered by price", data: courses });
+    const courses = await filterCoursesByPrice(
+      Number(minPrice),
+      Number(maxPrice)
+    );
+    res.json({ message: SEARCH_MESSAGES.FILTER_PRICE_SUCCESS, data: courses });
   } catch (error) {
-    res.status(500).json({ message: "Error filtering by price", error });
+    res
+      .status(500)
+      .json({
+        message: SEARCH_MESSAGES.ERROR_FILTER_PRICE,
+        error: (error as Error).message,
+      });
   }
 };
 
-// Tìm kiếm theo cấp học
-export const searchByGrade = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const searchByGrade = async (req: Request, res: Response) => {
   try {
     const { grade } = req.query;
 
-    const courses = await prisma.course.findMany({
-      where: { grade: { equals: Number(grade) } },
-    });
-
-    res.json({ message: "Courses filtered by grade", data: courses });
+    const courses = await filterCoursesByGrade(Number(grade));
+    res.json({ message: SEARCH_MESSAGES.FILTER_GRADE_SUCCESS, data: courses });
   } catch (error) {
-    res.status(500).json({ message: "Error filtering by grade", error });
+    res
+      .status(500)
+      .json({
+        message: SEARCH_MESSAGES.ERROR_FILTER_GRADE,
+        error: (error as Error).message,
+      });
   }
 };
 
-// Tìm kiếm theo môn học
-export const searchBySubject = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const searchBySubject = async (req: Request, res: Response) => {
   try {
     const { subject } = req.query;
 
-    const courses = await prisma.course.findMany({
-      where: { subject: { contains: subject as string } },
+    const courses = await filterCoursesBySubject(subject as string);
+    res.json({
+      message: SEARCH_MESSAGES.FILTER_SUBJECT_SUCCESS,
+      data: courses,
     });
-
-    res.json({ message: "Courses filtered by subject", data: courses });
   } catch (error) {
-    res.status(500).json({ message: "Error filtering by subject", error });
+    res
+      .status(500)
+      .json({
+        message: SEARCH_MESSAGES.ERROR_FILTER_SUBJECT,
+        error: (error as Error).message,
+      });
   }
 };
 
-//Lọc gia sư theo đánh giá
-export const filterTutorsByRating = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const filterTutorsByRatings = async (req: Request, res: Response) => {
   try {
     const minRating = Number(req.query.minRating) || 0;
 
-    const tutorsWithRatings = await prisma.tutorReview.groupBy({
-      by: ["tutor_id"],
-      _avg: { rating: true },
-      having: {
-        rating: { _avg: { gte: minRating } }, // Lọc gia sư có rating trung bình >= minRating
-      },
-    });
-
-    // Lấy danh sách Tutor ID từ kết quả groupBy
-    const tutorIds = tutorsWithRatings.map((t) => t.tutor_id);
-
-    // Truy vấn chi tiết thông tin gia sư
-    const tutors = await prisma.tutor.findMany({
-      where: { id: { in: tutorIds } },
-      include: {
-        profile: {
-          select: {
-            full_name: true,
-            email: true,
-            phone: true,
-          },
-        },
-      },
-    });
-
-    // Ghép thông tin rating trung bình vào kết quả
-    const tutorsWithAvgRating = tutors.map((tutor) => {
-      const avgRating =
-        tutorsWithRatings.find((r) => r.tutor_id === tutor.id)?._avg?.rating ??
-        0;
-      return { ...tutor, avgRating };
-    });
-
+    const tutorsWithAvgRating = await filterTutorsByRating(minRating);
     res.json({
-      message: "Tutors filtered by rating",
+      message: SEARCH_MESSAGES.FILTER_TUTORS_RATING_SUCCESS,
       data: tutorsWithAvgRating,
     });
   } catch (error) {
-    console.error("Error filtering tutors by rating:", error);
-    res.status(500).json({ message: "Error filtering tutors", error });
+    res
+      .status(500)
+      .json({
+        message: SEARCH_MESSAGES.ERROR_FILTER_TUTORS,
+        error: (error as Error).message,
+      });
   }
 };
-
-//hehehehe
