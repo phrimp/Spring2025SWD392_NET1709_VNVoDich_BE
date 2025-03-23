@@ -12,5 +12,6 @@ export const childMessages = {
   ERROR_DELETING_CHILD: "Error deleting child",
   INVALID_CHILD_ID: "Invalid child ID",
   ALL_FIELDS_REQUIRED: "All fields are required",
-  };
-  
+  FOREIGN_KEY_ERROR:
+    "Cannot delete this child beause it has been booked in a course",
+};

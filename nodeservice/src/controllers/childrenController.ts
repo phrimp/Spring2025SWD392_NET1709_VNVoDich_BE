@@ -19,9 +19,12 @@ export const getChildrenHandler = async (req: Request, res: Response) => {
     const children = await getChildren(Number(userId));
     res.json({ message: childMessages.CHILDREN_RETRIEVED, data: children });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
-      message: childMessages.ERROR_RETRIEVING_CHILDREN,
-      error: (error as Error).message,
+      message:
+        (error as Error).message || childMessages.ERROR_RETRIEVING_CHILDREN,
+      error,
     });
   }
 };
@@ -43,8 +46,9 @@ export const getChildHandler = async (req: Request, res: Response) => {
     res.json({ message: childMessages.CHILD_RETRIEVED, data: child });
   } catch (error) {
     res.status(500).json({
-      message: childMessages.ERROR_RETRIEVING_CHILDREN,
-      error: (error as Error).message,
+      message:
+        (error as Error).message || childMessages.ERROR_RETRIEVING_CHILDREN,
+      error,
     });
   }
 };
@@ -83,9 +87,10 @@ export const createChildHandler = async (req: Request, res: Response) => {
 
     res.json({ message: childMessages.CHILD_CREATED, data: newChild });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: childMessages.ERROR_CREATING_CHILD, error });
+    res.status(500).json({
+      message: (error as Error).message || childMessages.ERROR_CREATING_CHILD,
+      error,
+    });
   }
 };
 
@@ -109,8 +114,8 @@ export const updateChildHandler = async (req: Request, res: Response) => {
     res.json({ message: childMessages.CHILD_UPDATED, data: updatedChild });
   } catch (error) {
     res.status(500).json({
-      message: childMessages.ERROR_UPDATING_CHILD,
-      error: (error as Error).message,
+      message: (error as Error).message || childMessages.ERROR_UPDATING_CHILD,
+      error,
     });
   }
 };
@@ -126,10 +131,17 @@ export const deleteChildHandler = async (req: Request, res: Response) => {
 
     await deleteChild(Number(id));
     res.json({ message: childMessages.CHILD_DELETED });
-  } catch (error) {
-    res.status(500).json({
-      message: childMessages.ERROR_DELETING_CHILD,
-      error: (error as Error).message,
-    });
+  } catch (error: any) {
+    if (error.code === "P2003") {
+      res.status(500).json({ message: childMessages.FOREIGN_KEY_ERROR, error });
+      return;
+    }
+
+    res
+      .status(500)
+      .json({
+        message: (error as Error).message || childMessages.ERROR_DELETING_CHILD,
+        error,
+      });
   }
 };

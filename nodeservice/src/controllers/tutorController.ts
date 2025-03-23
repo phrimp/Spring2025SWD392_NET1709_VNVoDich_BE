@@ -57,13 +57,11 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
       },
     });
   } catch (error) {
-    console.error(tutorMessages.ERROR.GET_TUTORS, error);
-    res
-      .status(500)
-      .json({
-        message: tutorMessages.ERROR.GET_TUTORS,
-        error: (error as Error).message,
-      });
+    console.log(error);
+    res.status(500).json({
+      message: (error as Error).message || tutorMessages.ERROR.GET_TUTORS,
+      error,
+    });
   }
 };
 
@@ -82,12 +80,10 @@ export const getTutor = async (req: Request, res: Response): Promise<void> => {
     res.json({ message: tutorMessages.SUCCESS.GET_TUTOR, data: tutor });
   } catch (error) {
     console.error(tutorMessages.ERROR.GET_TUTOR, error);
-    res
-      .status(500)
-      .json({
-        message: tutorMessages.ERROR.GET_TUTOR,
-        error: (error as Error).message,
-      });
+    res.status(500).json({
+      message: (error as Error).message || tutorMessages.ERROR.GET_TUTOR,
+      error,
+    });
   }
 };
 
@@ -110,12 +106,10 @@ export const updateTutorProfile = async (
     res.json({ message: tutorMessages.SUCCESS.UPDATE_TUTOR, data: tutor });
   } catch (error) {
     console.error(tutorMessages.ERROR.UPDATE_TUTOR, error);
-    res
-      .status(500)
-      .json({
-        message: tutorMessages.ERROR.UPDATE_TUTOR,
-        error: (error as Error).message,
-      });
+    res.status(500).json({
+      message: (error as Error).message || tutorMessages.ERROR.UPDATE_TUTOR,
+      error,
+    });
   }
 };
 
@@ -139,8 +133,11 @@ export const connectTutorAccountToStripe = async (
       },
     });
   } catch (error) {
-    console.error(tutorMessages.ERROR.CONNECTED_TUTOR_TO_STRIPE, error);
-    res.status(500).json({ message: tutorMessages.ERROR.UPDATE_TUTOR, error });
+    console.log(error);
+    res.status(500).json({
+      message: (error as Error).message || tutorMessages.ERROR.UPDATE_TUTOR,
+      error,
+    });
   }
 };
 
@@ -159,8 +156,9 @@ export const checkConnection = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: tutorMessages.ERROR.CHECK_CONNECTION_STATUS,
-      error: (error as Error).message,
+      message:
+        (error as Error).message || tutorMessages.ERROR.CHECK_CONNECTION_STATUS,
+      error,
     });
   }
 };

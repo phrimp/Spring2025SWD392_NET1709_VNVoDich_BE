@@ -6,20 +6,6 @@ import {
   createTrialBookingService,
   getParentBookingsService,
 } from "../services/bookingService";
-import { PrismaClient } from "@prisma/client";
-import dotenv from "dotenv";
-import Stripe from "stripe";
-
-dotenv.config();
-const prisma = new PrismaClient();
-
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error(
-    "STRIPE_SECRET_KEY is required but was not found in env variables"
-  );
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const createStripePaymentIntent = async (
   req: Request,
@@ -39,8 +25,8 @@ export const createStripePaymentIntent = async (
     });
   } catch (error) {
     res.status(500).json({
-      message: BOOKINGMESSAGE.STRIPE_PAYMENT_ERROR,
-      error: (error as Error).message,
+      message: (error as Error).message || BOOKINGMESSAGE.STRIPE_PAYMENT_ERROR,
+      error,
     });
   }
 };
@@ -58,8 +44,9 @@ export const createTrialBooking = async (req: Request, res: Response) => {
     res.json({ message: BOOKINGMESSAGE.BOOKING_SUCCESS, data: result });
   } catch (error) {
     res.status(500).json({
-      message: BOOKINGMESSAGE.BOOKING_CREATION_ERROR,
-      error: (error as Error).message,
+      message:
+        (error as Error).message || BOOKINGMESSAGE.BOOKING_CREATION_ERROR,
+      error,
     });
   }
 };
@@ -75,8 +62,9 @@ export const getParentBookings = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: BOOKINGMESSAGE.BOOKING_RETRIEVAL_ERROR,
-      error: (error as Error).message,
+      message:
+        (error as Error).message || BOOKINGMESSAGE.BOOKING_RETRIEVAL_ERROR,
+      error,
     });
   }
 };
@@ -102,7 +90,10 @@ export const cancelBooking = async (req: Request, res: Response) => {
       data: updatedSubscription.updated,
     });
   } catch (error) {
-    console.error("Error canceling booking:", error);
-    res.status(500).json({ message: "Error canceling booking", error });
+    res.status(500).json({
+      message:
+        (error as Error).message || BOOKINGMESSAGE.BOOKING_CANCELED_ERROR,
+      error,
+    });
   }
 };
