@@ -1,1145 +1,1702 @@
 {
-	"info": {
-		"_postman_id": "57e92f6b-5e44-4b1d-b3dc-38c5aa4aac76",
-		"name": "Online Tutoring Platform API",
-		"description": "API collection for testing the Online Tutoring Platform gateway",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"item": [
-		{
-			"name": "Health Check",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/health",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"health"
-					]
-				},
-				"description": "Check if the API gateway is running"
-			},
-			"response": []
-		},
-		{
-			"name": "Auth",
-			"item": [
-				{
-					"name": "Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = JSON.parse(responseBody);",
-									"if (jsonData.data && jsonData.data.token) {",
-									"    pm.environment.set(\"authToken\", jsonData.data.token);",
-									"    console.log(\"Token saved to environment\");",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/auth/login",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"login"
-							]
-						},
-						"description": "Login to the platform"
-					},
-					"response": []
-				},
-				{
-					"name": "Register",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"newtutor\",\n    \"password\": \"password123\",\n    \"email\": \"tutor@example.com\",\n    \"role\": \"Tutor\",\n    \"fullname\": \"New Tutor\",\n    \"phone\": \"+84123456789\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/auth/register",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"register"
-							]
-						},
-						"description": "Register a new user"
-					},
-					"response": []
-				},
-				{
-					"name": "Google Auth Login",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/google/auth/login",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"google",
-								"auth",
-								"login"
-							]
-						},
-						"description": "Initiate Google login flow"
-					},
-					"response": []
-				}
-			],
-			"description": "Authentication related endpoints"
-		},
-		{
-			"name": "User Management",
-			"item": [
-				{
-					"name": "Get Public User Profile",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/public/user/admin",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"public",
-								"user",
-								"admin"
-							]
-						},
-						"description": "Get public profile of a user"
-					},
-					"response": []
-				},
-				{
-					"name": "Get Current User",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/get/me",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"get",
-								"me"
-							]
-						},
-						"description": "Get current user profile"
-					},
-					"response": []
-				},
-				{
-					"name": "Update Current User",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"full_name\": \"Updated Name\",\n    \"phone\": \"+84123456789\",\n    \"picture\": \"https://example.com/profile.jpg\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/update/me",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"update",
-								"me"
-							]
-						},
-						"description": "Update current user profile"
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Current User",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/delete/me",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"delete",
-								"me"
-							]
-						},
-						"description": "Delete current user account"
-					},
-					"response": []
-				},
-				{
-					"name": "Cancel Delete User",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/delete/me/cancel",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"delete",
-								"me",
-								"cancel"
-							]
-						},
-						"description": "Cancel user account deletion"
-					},
-					"response": []
-				},
-				{
-					"name": "Send Verification Email",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/verify-email/send",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"verify-email",
-								"send"
-							]
-						},
-						"description": "Send verification email to user"
-					},
-					"response": []
-				},
-				{
-					"name": "Verify Email",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/verify-email/verify?code=VERIFICATION_CODE",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"verify-email",
-								"verify"
-							],
-							"query": [
-								{
-									"key": "code",
-									"value": "VERIFICATION_CODE"
-								}
-							]
-						},
-						"description": "Verify email with code"
-					},
-					"response": []
-				}
-			],
-			"description": "User management related endpoints"
-		},
-		{
-			"name": "Courses",
-			"item": [
-				{
-					"name": "Get All Courses",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/public/course/all",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"public",
-								"course",
-								"all"
-							]
-						},
-						"description": "Get all courses"
-					},
-					"response": []
-				},
-				{
-					"name": "Get Course By ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/public/course/1",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"public",
-								"course",
-								"1"
-							]
-						},
-						"description": "Get a specific course by ID"
-					},
-					"response": []
-				}
-			],
-			"description": "Course related endpoints"
-		},
-		{
-			"name": "Payment",
-			"item": [
-				{
-					"name": "Create Payment",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/payment/create?amount=100000&description=Test Payment&orderId=TEST123",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"payment",
-								"create"
-							],
-							"query": [
-								{
-									"key": "amount",
-									"value": "100000"
-								},
-								{
-									"key": "description",
-									"value": "Test Payment"
-								},
-								{
-									"key": "orderId",
-									"value": "TEST123"
-								}
-							]
-						},
-						"description": "Create a new payment"
-					},
-					"response": []
-				},
-				{
-					"name": "Complete PayPal Payment",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/payment/success?paymentId=PAYID&PayerID=PAYERID&orderId=ORDER123",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"payment",
-								"success"
-							],
-							"query": [
-								{
-									"key": "paymentId",
-									"value": "PAYID"
-								},
-								{
-									"key": "PayerID",
-									"value": "PAYERID"
-								},
-								{
-									"key": "orderId",
-									"value": "ORDER123"
-								}
-							]
-						},
-						"description": "Complete PayPal payment"
-					},
-					"response": []
-				},
-				{
-					"name": "Cancel PayPal Payment",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/payment/cancel?orderId=ORDER123",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"payment",
-								"cancel"
-							],
-							"query": [
-								{
-									"key": "orderId",
-									"value": "ORDER123"
-								}
-							]
-						},
-						"description": "Cancel PayPal payment"
-					},
-					"response": []
-				}
-			],
-			"description": "Payment related endpoints"
-		},
-		{
-			"name": "Subscription",
-			"item": [
-				{
-					"name": "Get All Plans",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/subscription/plans?active_only=true",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"subscription",
-								"plans"
-							],
-							"query": [
-								{
-									"key": "active_only",
-									"value": "true"
-								}
-							]
-						},
-						"description": "Get all subscription plans"
-					},
-					"response": []
-				},
-				{
-					"name": "Get Plan By ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/subscription/plans/1",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"subscription",
-								"plans",
-								"1"
-							]
-						},
-						"description": "Get a specific subscription plan"
-					},
-					"response": []
-				},
-				{
-					"name": "Get Tutor Subscription",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/subscription/tutor/1",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"subscription",
-								"tutor",
-								"1"
-							]
-						},
-						"description": "Get a tutor's subscription"
-					},
-					"response": []
-				},
-				{
-					"name": "Create Subscription",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"tutor_id\": 1,\n    \"plan_id\": 1,\n    \"billing_cycle\": \"monthly\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/subscription",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"subscription"
-							]
-						},
-						"description": "Create a new subscription"
-					},
-					"response": []
-				},
-				{
-					"name": "Confirm Subscription",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"order_id\": \"SUB-1-1-1678901234\",\n    \"payment_id\": \"PAY-1234567890\",\n    \"payer_id\": \"PAYER1234\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/subscription/confirm",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"subscription",
-								"confirm"
-							]
-						},
-						"description": "Confirm subscription after payment"
-					},
-					"response": []
-				},
-				{
-					"name": "Cancel Subscription",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/subscription/1/cancel",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"subscription",
-								"1",
-								"cancel"
-							]
-						},
-						"description": "Cancel a subscription"
-					},
-					"response": []
-				},
-				{
-					"name": "Change Subscription Plan",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"new_plan_id\": 2,\n    \"billing_cycle\": \"annually\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/subscription/1/change-plan",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"subscription",
-								"1",
-								"change-plan"
-							]
-						},
-						"description": "Change a subscription plan"
-					},
-					"response": []
-				}
-			],
-			"description": "Subscription related endpoints"
-		},
-		{
-			"name": "Tutor",
-			"item": [
-				{
-					"name": "Create Meet Link",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/tutor/meet?title=Math Lesson",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"tutor",
-								"meet"
-							],
-							"query": [
-								{
-									"key": "title",
-									"value": "Math Lesson"
-								}
-							]
-						},
-						"description": "Create a Google Meet link for a lesson"
-					},
-					"response": []
-				}
-			],
-			"description": "Tutor specific endpoints"
-		},
-		{
-			"name": "Admin",
-			"item": [
-				{
-					"name": "Get All Users",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/admin/users?page=1&limit=10&role=Tutor&status=Active",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"users"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "role",
-									"value": "Tutor"
-								},
-								{
-									"key": "status",
-									"value": "Active"
-								}
-							]
-						},
-						"description": "Get all users with filtering"
-					},
-					"response": []
-				},
-				{
-					"name": "Update User",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"updated@example.com\",\n    \"full_name\": \"Updated User\",\n    \"phone\": \"+84987654321\",\n    \"status\": \"Active\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/admin/user/update?username=testuser",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"user",
-								"update"
-							],
-							"query": [
-								{
-									"key": "username",
-									"value": "testuser"
-								}
-							]
-						},
-						"description": "Admin update user"
-					},
-					"response": []
-				},
-				{
-					"name": "Get User Detail",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/admin/user?username=testuser",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"user"
-							],
-							"query": [
-								{
-									"key": "username",
-									"value": "testuser"
-								}
-							]
-						},
-						"description": "Admin get user detail"
-					},
-					"response": []
-				},
-				{
-					"name": "Update User Status",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/admin/users/testuser/status?status=Banned",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"users",
-								"testuser",
-								"status"
-							],
-							"query": [
-								{
-									"key": "status",
-									"value": "Banned"
-								}
-							]
-						},
-						"description": "Admin update user status"
-					},
-					"response": []
-				},
-				{
-					"name": "Delete User",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/admin/users/testuser",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"users",
-								"testuser"
-							]
-						},
-						"description": "Admin delete user"
-					},
-					"response": []
-				},
-				{
-					"name": "Assign Role",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/admin/users/testuser/roles?role=Tutor",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"users",
-								"testuser",
-								"roles"
-							],
-							"query": [
-								{
-									"key": "role",
-									"value": "Tutor"
-								}
-							]
-						},
-						"description": "Admin assign role to user"
-					},
-					"response": []
-				},
-				{
-					"name": "Get All Subscriptions",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/admin/subscriptions?page=1&limit=10&status=active",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"subscriptions"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "status",
-									"value": "active"
-								}
-							]
-						},
-						"description": "Admin get all subscriptions"
-					},
-					"response": []
-				},
-				{
-					"name": "Update Subscription Status",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"status\": \"active\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/admin/subscription/1/status",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"subscription",
-								"1",
-								"status"
-							]
-						},
-						"description": "Admin update subscription status"
-					},
-					"response": []
-				},
-				{
-					"name": "Create Subscription Plan",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Premium Plan\",\n    \"description\": \"Premium features for tutors\",\n    \"price_monthly\": 199000,\n    \"price_annually\": 1990000,\n    \"max_courses\": 20,\n    \"commission_rate\": 15,\n    \"features\": [\"Unlimited sessions\", \"Priority support\", \"Advanced analytics\"],\n    \"is_active\": true\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/admin/subscription/plans",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"subscription",
-								"plans"
-							]
-						},
-						"description": "Admin create subscription plan"
-					},
-					"response": []
-				},
-				{
-					"name": "Update Subscription Plan",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Updated Premium Plan\",\n    \"description\": \"Updated premium features for tutors\",\n    \"price_monthly\": 249000,\n    \"price_annually\": 2490000,\n    \"max_courses\": 25,\n    \"commission_rate\": 12,\n    \"features\": [\"Unlimited sessions\", \"Priority support\", \"Advanced analytics\", \"Marketing tools\"],\n    \"is_active\": true\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/admin/subscription/plans/1",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"subscription",
-								"plans",
-								"1"
-							]
-						},
-						"description": "Admin update subscription plan"
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Subscription Plan",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{authToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/admin/subscription/plans/1",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"subscription",
-								"plans",
-								"1"
-							]
-						},
-						"description": "Admin delete subscription plan"
-					},
-					"response": []
-				}
-			],
-			"description": "Admin related endpoints"
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "baseUrl",
-			"value": "http://localhost:8080",
-			"type": "string"
-		}
-	]
+  "info": {
+    "_postman_id": "57e92f6b-5e44-4b1d-b3dc-38c5aa4aac76",
+    "name": "Online Tutoring Platform API",
+    "description": "API collection for testing the microservices of the Online Tutoring Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Gateway Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Check if the API gateway service is running"
+          },
+          "response": []
+        },
+        {
+          "name": "Auth Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{authServiceUrl}}/health",
+              "host": [
+                "{{authServiceUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Check if the auth service is running"
+          },
+          "response": []
+        },
+        {
+          "name": "User Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{userServiceUrl}}/health",
+              "host": [
+                "{{userServiceUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Check if the user service is running"
+          },
+          "response": []
+        },
+        {
+          "name": "Google Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{googleServiceUrl}}/health",
+              "host": [
+                "{{googleServiceUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Check if the Google service is running"
+          },
+          "response": []
+        },
+        {
+          "name": "Payment Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{paymentServiceUrl}}/health",
+              "host": [
+                "{{paymentServiceUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Check if the payment service is running"
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{adminServiceUrl}}/health",
+              "host": [
+                "{{adminServiceUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Check if the admin service is running"
+          },
+          "response": []
+        }
+      ],
+      "description": "Health check endpoints for all services"
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = JSON.parse(responseBody);",
+                  "if (jsonData.Token || jsonData.token) {",
+                  "    pm.environment.set(\"authToken\", jsonData.Token || jsonData.token);",
+                  "    console.log(\"Token saved to environment\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login to get authentication token"
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"newuser\",\n    \"password\": \"password123\",\n    \"email\": \"newuser@example.com\",\n    \"role\": \"Parent\",\n    \"full_name\": \"New User\",\n    \"phone\": \"+84123456789\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Register a new user"
+          },
+          "response": []
+        },
+        {
+          "name": "Google Login",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/google/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "google",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Initiate Google OAuth login flow"
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication endpoints for login and registration"
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/get/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "get",
+                "me"
+              ]
+            },
+            "description": "Get the current logged-in user's profile"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Public User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/public/user/{{username}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "user",
+                "{{username}}"
+              ]
+            },
+            "description": "Get a user's public profile"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Current User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"updated@example.com\",\n    \"full_name\": \"Updated Name\",\n    \"phone\": \"+84987654321\",\n    \"picture\": \"https://example.com/profile-picture.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/update/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "update",
+                "me"
+              ]
+            },
+            "description": "Update current user's profile"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/update/me/password?cur_password=password123&new_password=newpassword123",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "update",
+                "me",
+                "password"
+              ],
+              "query": [
+                {
+                  "key": "cur_password",
+                  "value": "password123"
+                },
+                {
+                  "key": "new_password",
+                  "value": "newpassword123"
+                }
+              ]
+            },
+            "description": "Update password"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Current User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/delete/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "delete",
+                "me"
+              ]
+            },
+            "description": "Delete (soft delete) current user account"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Delete User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/delete/me/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "delete",
+                "me",
+                "cancel"
+              ]
+            },
+            "description": "Cancel a pending user deletion"
+          },
+          "response": []
+        },
+        {
+          "name": "Send Verification Email",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/verify-email/send",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "verify-email",
+                "send"
+              ]
+            },
+            "description": "Send verification email to current user"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/verify-email/verify?code={{verificationCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "verify-email",
+                "verify"
+              ],
+              "query": [
+                {
+                  "key": "code",
+                  "value": "{{verificationCode}}"
+                }
+              ]
+            },
+            "description": "Verify email with code"
+          },
+          "response": []
+        }
+      ],
+      "description": "User management endpoints"
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "Get All Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/public/course/all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "course",
+                "all"
+              ]
+            },
+            "description": "Get all courses"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/public/course/{{courseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "course",
+                "{{courseId}}"
+              ]
+            },
+            "description": "Get a specific course by ID"
+          },
+          "response": []
+        }
+      ],
+      "description": "Course related endpoints"
+    },
+    {
+      "name": "Subscription",
+      "item": [
+        {
+          "name": "Get All Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/plans?active_only=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscription",
+                "plans"
+              ],
+              "query": [
+                {
+                  "key": "active_only",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Get all subscription plans"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Plan By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/plans/{{planId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscription",
+                "plans",
+                "{{planId}}"
+              ]
+            },
+            "description": "Get a specific subscription plan"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Subscription",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"tutor_id\": {{tutorId}},\n    \"plan_id\": {{planId}},\n    \"billing_cycle\": \"monthly\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subscription",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subscription"
+              ]
+            },
+            "description": "Create a new subscription"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tutor Subscription",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subscription/tutor/{{tutorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subscription",
+                "tutor",
+                "{{tutorId}}"
+              ]
+            },
+            "description": "Get subscription details for a tutor"
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm Subscription",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"order_id\": \"{{orderId}}\",\n    \"payment_id\": \"{{paymentId}}\",\n    \"payer_id\": \"{{payerId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subscription/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subscription",
+                "confirm"
+              ]
+            },
+            "description": "Confirm subscription after payment"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Subscription",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subscription/{{subscriptionId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subscription",
+                "{{subscriptionId}}",
+                "cancel"
+              ]
+            },
+            "description": "Cancel a subscription"
+          },
+          "response": []
+        },
+        {
+          "name": "Change Subscription Plan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"new_plan_id\": {{newPlanId}},\n    \"billing_cycle\": \"monthly\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subscription/{{subscriptionId}}/change-plan",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subscription",
+                "{{subscriptionId}}",
+                "change-plan"
+              ]
+            },
+            "description": "Change subscription plan"
+          },
+          "response": []
+        }
+      ],
+      "description": "Subscription management endpoints"
+    },
+    {
+      "name": "Payment",
+      "item": [
+        {
+          "name": "Create Payment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payment/create?amount=100000&description=Subscription Payment&orderId=SUB-{{tutorId}}-{{planId}}-{{timestamp}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payment",
+                "create"
+              ],
+              "query": [
+                {
+                  "key": "amount",
+                  "value": "100000"
+                },
+                {
+                  "key": "description",
+                  "value": "Subscription Payment"
+                },
+                {
+                  "key": "orderId",
+                  "value": "SUB-{{tutorId}}-{{planId}}-{{timestamp}}"
+                }
+              ]
+            },
+            "description": "Create a new payment"
+          },
+          "response": []
+        },
+        {
+          "name": "Complete PayPal Payment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/payment/success?paymentId={{paymentId}}&PayerID={{payerId}}&orderId={{orderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment",
+                "success"
+              ],
+              "query": [
+                {
+                  "key": "paymentId",
+                  "value": "{{paymentId}}"
+                },
+                {
+                  "key": "PayerID",
+                  "value": "{{payerId}}"
+                },
+                {
+                  "key": "orderId",
+                  "value": "{{orderId}}"
+                }
+              ]
+            },
+            "description": "Callback endpoint for successful PayPal payment"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel PayPal Payment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/payment/cancel?orderId={{orderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment",
+                "cancel"
+              ],
+              "query": [
+                {
+                  "key": "orderId",
+                  "value": "{{orderId}}"
+                }
+              ]
+            },
+            "description": "Callback endpoint for cancelled PayPal payment"
+          },
+          "response": []
+        }
+      ],
+      "description": "Payment related endpoints"
+    },
+    {
+      "name": "Refunds",
+      "item": [
+        {
+          "name": "Create Refund Request",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"order_id\": \"{{orderId}}\",\n    \"amount\": 50000,\n    \"card_number\": \"1234\",\n    \"reason\": \"Subscription cancelled early\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/refunds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "refunds"
+              ]
+            },
+            "description": "Create a refund request"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Refund Request",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/refunds/{{refundId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "refunds",
+                "{{refundId}}"
+              ]
+            },
+            "description": "Get details of a specific refund request"
+          },
+          "response": []
+        }
+      ],
+      "description": "Refund management endpoints"
+    },
+    {
+      "name": "Google Services",
+      "item": [
+        {
+          "name": "Create Meet Link",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tutor/meet?title=Math Lesson",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tutor",
+                "meet"
+              ],
+              "query": [
+                {
+                  "key": "title",
+                  "value": "Math Lesson"
+                }
+              ]
+            },
+            "description": "Create a Google Meet link for a lesson (tutor only)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Google service related endpoints"
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users?page=1&limit=10&role=Tutor&status=Active&search=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "role",
+                  "value": "Tutor"
+                },
+                {
+                  "key": "status",
+                  "value": "Active"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Get all users with filtering options"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/user?username={{username}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "user"
+              ],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "{{username}}"
+                }
+              ]
+            },
+            "description": "Get detailed user information (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"updated@example.com\",\n    \"full_name\": \"Updated User\",\n    \"phone\": \"+84987654321\",\n    \"status\": \"Active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/user/update?username={{username}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "user",
+                "update"
+              ],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "{{username}}"
+                }
+              ]
+            },
+            "description": "Update user details (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/{{username}}/status?status=Banned",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "{{username}}",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Banned"
+                }
+              ]
+            },
+            "description": "Update user status (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Permanently delete a user (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Role",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/{{username}}/roles?role=Tutor",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "{{username}}",
+                "roles"
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "Tutor"
+                }
+              ]
+            },
+            "description": "Assign a role to a user (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Block JWT Token",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/jwt/block?username={{username}}&time=3600",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "jwt",
+                "block"
+              ],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "{{username}}"
+                },
+                {
+                  "key": "time",
+                  "value": "3600"
+                }
+              ]
+            },
+            "description": "Block a user's JWT token (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Unblock JWT Token",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/jwt/unblock?username={{username}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "jwt",
+                "unblock"
+              ],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "{{username}}"
+                }
+              ]
+            },
+            "description": "Unblock a user's JWT token (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Subscriptions",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/subscriptions?page=1&limit=10&status=active",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "subscriptions"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                }
+              ]
+            },
+            "description": "Get all subscriptions (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Subscription Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/subscription/{{subscriptionId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "subscription",
+                "{{subscriptionId}}",
+                "status"
+              ]
+            },
+            "description": "Update subscription status (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Subscription Plan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Premium Plan\",\n    \"description\": \"Premium features for tutors\",\n    \"price_monthly\": 199000,\n    \"price_annually\": 1990000,\n    \"max_courses\": 20,\n    \"commission_rate\": 15,\n    \"features\": [\"Unlimited sessions\", \"Priority support\", \"Advanced analytics\"],\n    \"is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/subscription/plans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "subscription",
+                "plans"
+              ]
+            },
+            "description": "Create a new subscription plan (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Subscription Plan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Premium Plan\",\n    \"description\": \"Updated premium features for tutors\",\n    \"price_monthly\": 249000,\n    \"price_annually\": 2490000,\n    \"max_courses\": 25,\n    \"commission_rate\": 12,\n    \"features\": [\"Unlimited sessions\", \"Priority support\", \"Advanced analytics\", \"Marketing tools\"],\n    \"is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/subscription/plans/{{planId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "subscription",
+                "plans",
+                "{{planId}}"
+              ]
+            },
+            "description": "Update a subscription plan (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Subscription Plan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/subscription/plans/{{planId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "subscription",
+                "plans",
+                "{{planId}}"
+              ]
+            },
+            "description": "Delete a subscription plan (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Refund Requests",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/refunds?page=1&limit=10&status=PENDING",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "refunds"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "PENDING"
+                }
+              ]
+            },
+            "description": "Get all refund requests (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Refund Statistics",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/refunds/statistics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "refunds",
+                "statistics"
+              ]
+            },
+            "description": "Get refund statistics (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Process Refund Request",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"approved\",\n    \"admin_note\": \"Approved due to valid reason\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/refunds/{{refundId}}/process",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "refunds",
+                "{{refundId}}",
+                "process"
+              ]
+            },
+            "description": "Process a refund request (admin only)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Admin endpoints"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Generate timestamp for unique order IDs",
+          "if (pm.variables.get('timestamp') === undefined) {",
+          "    pm.variables.set('timestamp', Date.now());",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Parse response for any useful data to save",
+          "try {",
+          "    const jsonData = pm.response.json();",
+          "    ",
+          "    // Save order ID from payment creation",
+          "    if (pm.info.requestName === 'Create Payment' && jsonData.data && jsonData.data.redirectUrl) {",
+          "        // Extract order ID from response or request",
+          "        const orderId = pm.request.url.query.find(param => param.key === 'orderId').value;",
+          "        pm.environment.set('orderId', orderId);",
+          "        console.log('Saved orderId:', orderId);",
+          "    }",
+          "}",
+          "catch (error) {",
+          "    // Ignore parsing errors",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "authServiceUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "paymentServiceUrl",
+      "value": "http://localhost:8082",
+      "type": "string"
+    },
+    {
+      "key": "adminServiceUrl",
+      "value": "http://localhost:8083",
+      "type": "string"
+    },
+    {
+      "key": "googleServiceUrl",
+      "value": "http://localhost:8084",
+      "type": "string"
+    },
+    {
+      "key": "userServiceUrl",
+      "value": "http://localhost:8085",
+      "type": "string"
+    },
+    {
+      "key": "nodeServiceUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "subscriptionServiceUrl",
+      "value": "http://localhost:8086",
+      "type": "string"
+    }
+  ]
 }
