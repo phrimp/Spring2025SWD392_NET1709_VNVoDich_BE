@@ -57,7 +57,9 @@ export const getTutors = async (req: Request, res: Response): Promise<void> => {
       },
     });
   } catch (error) {
+
     console.log(error);
+
     res.status(500).json({
       message: (error as Error).message || tutorMessages.ERROR.GET_TUTORS,
       error,
@@ -133,7 +135,9 @@ export const connectTutorAccountToStripe = async (
       },
     });
   } catch (error) {
+
     console.log(error);
+
     res.status(500).json({
       message: (error as Error).message || tutorMessages.ERROR.UPDATE_TUTOR,
       error,

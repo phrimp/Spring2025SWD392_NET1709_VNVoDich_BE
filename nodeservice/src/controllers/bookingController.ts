@@ -86,13 +86,15 @@ export const cancelBooking = async (req: Request, res: Response) => {
     );
 
     res.json({
-      message: "Booking canceled successfully",
+      message: BOOKINGMESSAGE.BOOKING_IS_CANCELED,
       data: updatedSubscription.updated,
     });
   } catch (error) {
+
     res.status(500).json({
       message:
         (error as Error).message || BOOKINGMESSAGE.BOOKING_CANCELED_ERROR,
+
       error,
     });
   }
