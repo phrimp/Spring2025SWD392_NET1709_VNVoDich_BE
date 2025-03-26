@@ -2,7 +2,7 @@
   {
     "id": 1,
     "status": "Active",
-    "sessions_remaining": 8,
+    "sessions_remaining": 1,
     "price": 50,
     "course_id": 1,
     "children_id": 11

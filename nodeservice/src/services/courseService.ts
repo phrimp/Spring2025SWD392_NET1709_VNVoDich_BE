@@ -114,6 +114,24 @@ export const addLessonToCourseService = async (
   courseId: number,
   lessonData: any
 ) => {
+  if (!courseId) {
+    throw new Error(COURSE_MESSAGES.COURSE_NOT_FOUND);
+  }
+
+  const teachingSessions = await prisma.teachingSession.findMany({
+    where: {
+      status: "NotYet",
+      subscription: {
+        course_id: courseId,
+        status: "Active",
+      },
+    },
+  });
+
+  if (teachingSessions.length > 0) {
+    throw new Error(COURSE_MESSAGES.COURSE_HAS_ACTIVE_SUBSCRIPTION);
+  }
+
   return prisma.course.update({
     where: { id: courseId },
     data: {
@@ -129,6 +147,24 @@ export const updateLessonService = async (
   lessonId: number,
   lessonData: any
 ) => {
+  if (!courseId) {
+    throw new Error(COURSE_MESSAGES.COURSE_NOT_FOUND);
+  }
+
+  const teachingSessions = await prisma.teachingSession.findMany({
+    where: {
+      status: "NotYet",
+      subscription: {
+        course_id: courseId,
+        status: "Active",
+      },
+    },
+  });
+
+  if (teachingSessions.length > 0) {
+    throw new Error(COURSE_MESSAGES.COURSE_HAS_ACTIVE_SUBSCRIPTION);
+  }
+
   return prisma.course.update({
     where: { id: courseId },
     data: {
@@ -144,6 +180,24 @@ export const deleteLessonService = async (
   courseId: number,
   lessonId: number
 ) => {
+  if (!courseId) {
+    throw new Error(COURSE_MESSAGES.COURSE_NOT_FOUND);
+  }
+
+  const teachingSessions = await prisma.teachingSession.findMany({
+    where: {
+      status: "NotYet",
+      subscription: {
+        course_id: courseId,
+        status: "Active",
+      },
+    },
+  });
+
+  if (teachingSessions.length > 0) {
+    throw new Error(COURSE_MESSAGES.COURSE_HAS_ACTIVE_SUBSCRIPTION);
+  }
+
   return prisma.course.update({
     where: { id: courseId },
     data: {

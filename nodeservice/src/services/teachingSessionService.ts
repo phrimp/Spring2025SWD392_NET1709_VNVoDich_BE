@@ -1,6 +1,7 @@
 import { PrismaClient, SessionStatus, SessionQuality } from "@prisma/client";
 import { TEACHING_SESSION_MESSAGES } from "../message/teachingSessionMessages";
 import { payoutForTutorService } from "./bookingService";
+import { isBefore } from "date-fns";
 
 const prisma = new PrismaClient();
 
@@ -42,8 +43,6 @@ export const findTeachingSessions = async (userId?: number) => {
 export const updateTeachingSessionData = async (
   id: number,
   data: {
-    startTime?: string;
-    endTime?: string;
     status?: SessionStatus;
     homework_assigned?: string;
     rating?: number;
@@ -58,6 +57,10 @@ export const updateTeachingSessionData = async (
   if (!teachingSession) throw new Error(TEACHING_SESSION_MESSAGES.NOT_FOUND);
   if (teachingSession.status !== "NotYet") {
     throw new Error(TEACHING_SESSION_MESSAGES.ALREADY_STARTED);
+  }
+
+  if (new Date(teachingSession.startTime).getDate() !== new Date().getDate()) {
+    throw new Error(TEACHING_SESSION_MESSAGES.INVALID_TIME);
   }
 
   const updatedTeachingSession = await prisma.teachingSession.update({
@@ -110,6 +113,31 @@ export const updateTeachingSessionData = async (
       // transactionId
     );
   }
+
+  return updatedTeachingSession;
+};
+export const rescheduleTeachingSessionData = async (
+  id: number,
+  data: {
+    startTime?: string;
+    endTime?: string;
+  }
+) => {
+  const teachingSession = await prisma.teachingSession.findUnique({
+    where: { id },
+  });
+
+  if (!teachingSession) throw new Error(TEACHING_SESSION_MESSAGES.NOT_FOUND);
+  if (teachingSession.status !== "NotYet") {
+    throw new Error(TEACHING_SESSION_MESSAGES.ALREADY_STARTED);
+  }
+
+  const updatedTeachingSession = await prisma.teachingSession.update({
+    where: { id },
+    data: {
+      ...data,
+    },
+  });
 
   return updatedTeachingSession;
 };
