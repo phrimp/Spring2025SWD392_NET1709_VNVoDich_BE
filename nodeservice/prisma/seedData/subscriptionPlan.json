@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "name": "Basic Plan",
+    "name": "3 months",
     "description": "Basic package for beginners",
     "price_monthly": 9.99,
     "price_annually": 99.99,
@@ -15,7 +15,7 @@
   },
   {
     "id": 2,
-    "name": "Standard Plan",
+    "name": "6 months",
     "description": "Standard package with more features",
     "price_monthly": 19.99,
     "price_annually": 199.99,
@@ -29,7 +29,7 @@
   },
   {
     "id": 3,
-    "name": "Premium Plan",
+    "name": "12 months",
     "description": "Premium package with full features",
     "price_monthly": 29.99,
     "price_annually": 299.99,
