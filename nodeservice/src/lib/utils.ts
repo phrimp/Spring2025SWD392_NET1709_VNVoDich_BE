@@ -1,5 +1,5 @@
 export const calculateAge = (dateOfBirth: string) => {
-  const birthDate = new Date(dateOfBirth.split("T")[0]); // Lấy phần YYYY-MM-DD
+  const birthDate = new Date(dateOfBirth.split("T")[0]);
   const today = new Date();
 
   let age = today.getFullYear() - birthDate.getFullYear();

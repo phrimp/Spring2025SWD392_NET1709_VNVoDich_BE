@@ -97,7 +97,8 @@ export const createChildHandler = async (req: Request, res: Response) => {
 export const updateChildHandler = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { full_name, learning_goals, password, date_of_birth } = req.body;
+    const { full_name, learning_goals, password, date_of_birth, userId } =
+      req.body;
 
     if (!id || isNaN(Number(id))) {
       res.status(400).json({ message: childMessages.INVALID_CHILD_ID });
@@ -108,7 +109,8 @@ export const updateChildHandler = async (req: Request, res: Response) => {
       full_name,
       learning_goals,
       password,
-      date_of_birth
+      date_of_birth,
+      Number(userId)
     );
 
     res.json({ message: childMessages.CHILD_UPDATED, data: updatedChild });
@@ -137,11 +139,9 @@ export const deleteChildHandler = async (req: Request, res: Response) => {
       return;
     }
 
-    res
-      .status(500)
-      .json({
-        message: (error as Error).message || childMessages.ERROR_DELETING_CHILD,
-        error,
-      });
+    res.status(500).json({
+      message: (error as Error).message || childMessages.ERROR_DELETING_CHILD,
+      error,
+    });
   }
 };
