@@ -79,9 +79,10 @@ model Tutor {
 }
 
 model Parent {
-  id                    Int     @id
+  id                    Int       @id
   preferred_language    String?
-  notifications_enabled Boolean @default(false)
+  notifications_enabled Boolean   @default(false)
+  date_of_birth         DateTime?
 
   profile User @relation(fields: [id], references: [id], onDelete: Cascade)
 

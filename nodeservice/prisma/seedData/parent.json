@@ -2,26 +2,31 @@
   {
     "id": 2,
     "preferred_language": "English",
-    "notifications_enabled": true
+    "notifications_enabled": true,
+    "date_of_birth": "1985-03-12T00:00:00Z"
   },
   {
     "id": 4,
     "preferred_language": "Spanish",
-    "notifications_enabled": false
+    "notifications_enabled": false,
+    "date_of_birth": "1990-07-25T00:00:00Z"
   },
   {
     "id": 6,
     "preferred_language": "French",
-    "notifications_enabled": true
+    "notifications_enabled": true,
+    "date_of_birth": "1978-11-30T00:00:00Z"
   },
   {
     "id": 8,
     "preferred_language": "German",
-    "notifications_enabled": false
+    "notifications_enabled": false,
+    "date_of_birth": "1995-01-15T00:00:00Z"
   },
   {
     "id": 10,
     "preferred_language": "Chinese",
-    "notifications_enabled": true
+    "notifications_enabled": true,
+    "date_of_birth": "1982-09-08T00:00:00Z"
   }
 ]

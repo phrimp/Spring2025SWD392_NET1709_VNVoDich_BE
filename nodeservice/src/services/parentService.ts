@@ -64,6 +64,7 @@ export const updateParentProfile = async (id: number, data: any) => {
     data: {
       preferred_language: data.preferred_language,
       notifications_enabled: data.notifications_enabled,
+      date_of_birth: data.date_of_birth,
       profile: {
         update: {
           full_name: data.full_name,

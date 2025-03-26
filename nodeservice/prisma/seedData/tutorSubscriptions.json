@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "tutor_id": 1,
+    "plan_id": 3,
+    "status": "ACTIVE",
+    "current_period_start": "2025-03-01T00:00:00Z",
+    "current_period_end": "2025-04-01T00:00:00Z",
+    "cancel_at_period_end": false,
+    "billing_cycle": "MONTHLY",
+    "payment_order_id": "ORD-1001-XYZ",
+    "created_at": "2025-03-01T00:00:00Z",
+    "updated_at": "2025-03-01T00:00:00Z",
+    "deleted_at": null
+  },
+  {
+    "id": 2,
+    "tutor_id": 3,
+    "plan_id": 2,
+    "status": "ACTIVE",
+    "current_period_start": "2025-02-15T00:00:00Z",
+    "current_period_end": "2026-02-15T00:00:00Z",
+    "cancel_at_period_end": false,
+    "billing_cycle": "ANNUALLY",
+    "payment_order_id": "ORD-1002-XYZ",
+    "created_at": "2025-02-15T00:00:00Z",
+    "updated_at": "2025-02-15T00:00:00Z",
+    "deleted_at": null
+  },
+  {
+    "id": 3,
+    "tutor_id": 5,
+    "plan_id": 1,
+    "status": "PAST_DUE",
+    "current_period_start": "2025-01-10T00:00:00Z",
+    "current_period_end": "2025-02-10T00:00:00Z",
+    "cancel_at_period_end": false,
+    "billing_cycle": "MONTHLY",
+    "payment_order_id": "ORD-1003-XYZ",
+    "created_at": "2025-01-10T00:00:00Z",
+    "updated_at": "2025-02-11T00:00:00Z",
+    "deleted_at": null
+  },
+  {
+    "id": 4,
+    "tutor_id": 7,
+    "plan_id": 3,
+    "status": "ACTIVE",
+    "current_period_start": "2025-01-20T00:00:00Z",
+    "current_period_end": "2026-01-20T00:00:00Z",
+    "cancel_at_period_end": true,
+    "billing_cycle": "ANNUALLY",
+    "payment_order_id": "ORD-1004-XYZ",
+    "created_at": "2025-01-20T00:00:00Z",
+    "updated_at": "2025-03-15T00:00:00Z",
+    "deleted_at": null
+  },
+  {
+    "id": 5,
+    "tutor_id": 9,
+    "plan_id": 2,
+    "status": "CANCELED",
+    "current_period_start": "2025-01-05T00:00:00Z",
+    "current_period_end": "2025-02-05T00:00:00Z",
+    "cancel_at_period_end": true,
+    "billing_cycle": "MONTHLY",
+    "payment_order_id": "ORD-1005-XYZ",
+    "created_at": "2025-01-05T00:00:00Z",
+    "updated_at": "2025-01-25T00:00:00Z",
+    "deleted_at": "2025-01-25T00:00:00Z"
+  }
+]
