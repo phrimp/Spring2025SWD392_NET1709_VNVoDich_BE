@@ -56,6 +56,7 @@ export const getTutorService = async (id: number) => {
           },
         },
       },
+      tutorSpecialty: true,
     },
   });
 };
