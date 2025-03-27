@@ -9,11 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -21,6 +17,7 @@ import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -32,6 +29,9 @@ public class PaymentImportController {
   @Autowired
   private PaymentRepo paymentRepo;
 
+  /**
+   * Import payments from a JSON file uploaded by the user
+   */
   @PostMapping("/import")
   public ResponseEntity<Map<String, Object>> importPaymentsFromFile(
       @RequestParam("file") MultipartFile file,
@@ -149,6 +149,91 @@ public class PaymentImportController {
     } catch (Exception e) {
       response.put("status", "error");
       response.put("message", "Failed to clear payment data: " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+  }
+
+  /**
+   * Add a single payment using request body
+   */
+  @PostMapping("/add")
+  public ResponseEntity<Map<String, Object>> addPayment(
+      @RequestBody Payment payment,
+      @RequestHeader("API_KEY") String apiKey) {
+
+    Map<String, Object> response = new HashMap<>();
+
+    // Validate API key
+    if (!apiKey.equals(System.getenv("API_KEY"))) {
+      response.put("error", "Unauthorized: Invalid API key");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    try {
+      // Set timestamps if not provided
+      if (payment.getCreatedAt() == null) {
+        payment.setCreatedAt(LocalDateTime.now());
+      }
+      if (payment.getUpdatedAt() == null) {
+        payment.setUpdatedAt(LocalDateTime.now());
+      }
+
+      // Save the payment to the database
+      Payment savedPayment = paymentRepo.save(payment);
+
+      response.put("status", "success");
+      response.put("message", "Payment added successfully");
+      response.put("payment", savedPayment);
+
+      return ResponseEntity.ok(response);
+
+    } catch (Exception e) {
+      response.put("status", "error");
+      response.put("message", "Failed to add payment: " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+  }
+
+  /**
+   * Add multiple payments using request body
+   */
+  @PostMapping("/add/batch")
+  public ResponseEntity<Map<String, Object>> addPayments(
+      @RequestBody List<Payment> payments,
+      @RequestHeader("API_KEY") String apiKey) {
+
+    Map<String, Object> response = new HashMap<>();
+
+    // Validate API key
+    if (!apiKey.equals(System.getenv("API_KEY"))) {
+      response.put("error", "Unauthorized: Invalid API key");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    try {
+      // Set timestamps if not provided
+      LocalDateTime now = LocalDateTime.now();
+      for (Payment payment : payments) {
+        if (payment.getCreatedAt() == null) {
+          payment.setCreatedAt(now);
+        }
+        if (payment.getUpdatedAt() == null) {
+          payment.setUpdatedAt(now);
+        }
+      }
+
+      // Save all payments to the database
+      List<Payment> savedPayments = paymentRepo.saveAll(payments);
+
+      response.put("status", "success");
+      response.put("message", "Successfully added " + savedPayments.size() + " payment records");
+      response.put("count", savedPayments.size());
+
+      return ResponseEntity.ok(response);
+
+    } catch (Exception e) {
+      response.put("status", "error");
+      response.put("message", "Failed to add payments: " + e.getMessage());
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
   }
