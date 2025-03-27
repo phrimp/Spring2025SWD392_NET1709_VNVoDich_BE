@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 
+// In Payment.java
 @Entity
 @Table(name = "payments")
 @Data
@@ -21,6 +22,7 @@ public class Payment {
   private String paymentMethod;
   private String transactionId;
   private String payerId;
+
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
   private LocalDateTime createdAt;
