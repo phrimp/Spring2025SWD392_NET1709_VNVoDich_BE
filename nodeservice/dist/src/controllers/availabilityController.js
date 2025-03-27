@@ -27,10 +27,10 @@ const getTutorAvailability = (req, res) => __awaiter(void 0, void 0, void 0, fun
     try {
         const { userId } = req.body;
         const availabilityData = yield (0, availabilityService_1.getTutorAvailabilityService)(userId);
-        if (!availabilityData) {
-            res.json({ message: availabilityMessage_1.MESSAGES.tutorNotFound, data: null });
-            return;
-        }
+        // if (!availabilityData) {
+        //   res.json({ message: MESSAGES.tutorNotFound, data: null });
+        //   return;
+        // }
         res.json({
             message: availabilityMessage_1.MESSAGES.availabilityRetrieved,
             data: availabilityData,
@@ -48,10 +48,6 @@ const updateAvailability = (req, res) => __awaiter(void 0, void 0, void 0, funct
     try {
         const _a = req.body, { userId } = _a, data = __rest(_a, ["userId"]);
         const updatedAvailability = yield (0, availabilityService_1.updateAvailabilityService)(userId, data);
-        if (!updatedAvailability) {
-            res.json({ message: availabilityMessage_1.MESSAGES.tutorNotFound, data: null });
-            return;
-        }
         res.json({
             message: availabilityMessage_1.MESSAGES.availabilityUpdated,
             data: updatedAvailability,
@@ -70,10 +66,6 @@ const getCourseAvailability = (req, res) => __awaiter(void 0, void 0, void 0, fu
         const { courseId } = req.params;
         const { type } = req.query;
         const availableDates = yield (0, availabilityService_1.getCourseAvailabilityService)(Number(courseId), type);
-        if (!availableDates) {
-            res.status(404).json({ message: availabilityMessage_1.MESSAGES.courseNotFound });
-            return;
-        }
         res.json({
             message: availabilityMessage_1.MESSAGES.courseAvailabilityRetrieved,
             data: availableDates,

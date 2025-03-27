@@ -218,5 +218,13 @@
     "email": "isabella.white@example.com",
     "full_name": "Isabella White",
     "role": "Children"
+  },
+  {
+    "id": 21,
+    "username": "admin",
+    "password": "$2a$10$90qCXeh/ITqInaB.sgJu3.J.8J3bEjjEH6YDSOg.DlQ7Atb5cJuTi",
+    "email": "admin@example.com",
+    "full_name": "Admin",
+    "role": "Admin"
   }
 ]

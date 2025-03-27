@@ -8,6 +8,7 @@ export const COURSE_MESSAGES = {
   LESSON_ADDED: "Lesson added successfully",
   LESSON_UPDATED: "Lesson updated successfully",
   LESSON_DELETED: "Lesson deleted successfully",
+  COURSE_HAS_ACTIVE_SUBSCRIPTION: "Course has active subscription",
   ERROR_FETCHING: "Error retrieving courses",
   ERROR_CREATING: "Error creating course",
   ERROR_UPDATING: "Error updating course",

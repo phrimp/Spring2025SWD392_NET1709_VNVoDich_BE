@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { calculateAge } from "../lib/utils";
 
 const prisma = new PrismaClient();
 
@@ -59,11 +60,25 @@ export const getParentById = async (id: number) => {
 };
 
 export const updateParentProfile = async (id: number, data: any) => {
+  const { date_of_birth } = data;
+
+  if (date_of_birth) {
+    const age = calculateAge(date_of_birth);
+
+    // Kiểm tra tuổi phải trên 20
+    if (age < 20) {
+      throw new Error(
+        "Parent must be at least 20 years old to update profile."
+      );
+    }
+  }
+
   return await prisma.parent.update({
     where: { id },
     data: {
       preferred_language: data.preferred_language,
       notifications_enabled: data.notifications_enabled,
+      date_of_birth: data.date_of_birth,
       profile: {
         update: {
           full_name: data.full_name,
