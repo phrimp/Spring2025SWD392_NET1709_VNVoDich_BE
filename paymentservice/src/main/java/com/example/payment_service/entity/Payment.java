@@ -23,8 +23,6 @@ public class Payment {
   private String transactionId;
   private String payerId;
 
-  @Version
-  private Long version; // Add this field for optimistic locking
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
   private LocalDateTime createdAt;
